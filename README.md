@@ -1,6 +1,6 @@
 # F# for Fun and Profit eBook
 
-This is eBook version of my site [fsharpforfunandprofit.com](fsharpforfunandprofit.com), created by popular request for
+This is eBook version of my site [fsharpforfunandprofit.com](http://fsharpforfunandprofit.com), created by popular request for
 people who want to read it offline on their kindle or phone. Special thanks to Roman Provazník for the final nag.
 
 The site (and this book) aims to introduce you to F# and show you ways that F# can help in day-to-day development of mainstream commercial business software.
@@ -13,12 +13,12 @@ Many of the posts were not really designed to be in a book, but I have arranged 
 
 If you are completely new to F#, F# is a general purpose functional/hybrid programming language which is great for tackling almost any kind of software challenge.
 
-F# is free and open source, and runs on Linux, Mac, Windows and more. To download and install F#, or to find out more, go to [F# Foundation site at fsharp.org](fsharp.org).
+F# is free and open source, and runs on Linux, Mac, Windows and more. To download and install F#, or to find out more, go to [F# Foundation site at fsharp.org](http://fsharp.org).
 
 
 ## Getting started
 
-Next, before randomly dipping into the posts, you should read the "why use F#?" page and then the whole "why use F#" series. After that the "site contents" page provides suggestions for further reading on functions, types and more.
+Next, before randomly dipping into the posts, you should read the ["why use F#?"](why-use-fsharp/) page and then the whole "why use F#" series. After that the "site contents" page provides suggestions for further reading on functions, types and more.
 
 There is a page with some advice on learning F#, and if you have problems trying to get your code to compile, the troubleshooting F# page might be helpful.
 
