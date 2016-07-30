@@ -1,10 +1,10 @@
 # F# for Fun and Profit eBook
 
 This is eBook version of my site [fsharpforfunandprofit.com](http://fsharpforfunandprofit.com), created by popular request for
-people who want to read it offline on their kindle or phone. Special thanks to Roman Provazník for the final nag.
+people who want to read it offline on their kindle or phone. Special thanks to Roman Provaznik for the final nag.
 
 The site (and this book) aims to introduce you to F# and show you ways that F# can help in day-to-day development of mainstream commercial business software.
-On the way, I hope to open your mind to the joys of functional programming – it really is fun!
+On the way, I hope to open your mind to the joys of functional programming - it really is fun!
 
 Many of the posts were not really designed to be in a book, but I have arranged them so that beginner posts come first, and more advanced posts later.
 
