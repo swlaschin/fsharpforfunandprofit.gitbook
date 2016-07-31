@@ -178,8 +178,12 @@
 * [An introduction to property-based testing](posts/property-based-testing.md)
 * [Choosing properties for property-based testing](posts/property-based-testing-2.md)
     
-### Annotated Walkthroughs
+### Examples and Walkthroughs
 
+* [Worked example: Designing for correctness](posts/designing-for-correctness.md) 
+* [Worked example: A stack based calculator](posts/stack-based-calculator.md)
+* [Worked example: Parsing command line arguments](posts/pattern-matching-command-line.md)
+* [Worked example: Roman numerals](posts/roman-numerals.md)
 * [Commentary on 'Roman Numerals Kata with Commentary'](posts/roman-numeral-kata.md)
 * [Calculator Walkthrough: Part 1](posts/calculator-design.md)
     * [Calculator Walkthrough: Part 2](posts/calculator-implementation.md)
@@ -187,6 +191,7 @@
     * [Calculator Walkthrough: Part 4](posts/calculator-complete-v2.md)
 * [Enterprise Tic-Tac-Toe](posts/enterprise-tic-tac-toe.md).
     * [Enterprise Tic-Tac-Toe, part 2](posts/enterprise-tic-tac-toe-2.md)
+* [Writing a JSON parser from scratch](posts/understanding-parser-combinators-4.md)
 
 ### Other
 
