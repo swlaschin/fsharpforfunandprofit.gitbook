@@ -9,6 +9,7 @@ System.IO.Directory.SetCurrentDirectory __SOURCE_DIRECTORY__
 
 open System
 open System.IO
+open System.Text
 open System.Text.RegularExpressions
 
 let replaceRegex (pattern:string) (replacement:string) (input:string) = 
@@ -36,16 +37,24 @@ let fixupLinkPaths text =
     |> replaceRegex @"\(\\(.*?)\)" "(..\$1)" 
     |> replaceRegex @"\((.*?)\\\)" @"($1\index.md)" 
 
+let fixupSmartQuotes text = 
+    text
+    |> replace "“" "\""
+    |> replace "”" "\""
+    |> replace "’" "'"
+
 let fixupText text = 
     text
     |> replaceCodeBlockDelimiters
+    |> fixupLinkPaths
+    |> fixupSmartQuotes 
 
 // write to file
 let fixupFile (fi:FileInfo) = 
     let path = fi.FullName
-    File.ReadAllText path 
+    File.ReadAllText(path,Text.Encoding.Default)
     |> fixupText
-    |> fun text -> File.WriteAllText(path,text)
+    |> fun text -> File.WriteAllText(path,text,Text.Encoding.ASCII)
 
 let rec fixupDirectory (d:DirectoryInfo) = 
 

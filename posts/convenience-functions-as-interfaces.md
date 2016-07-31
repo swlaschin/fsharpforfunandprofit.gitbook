@@ -9,13 +9,13 @@ categories: [Convenience, Functions]
 ---
 
 
-An important aspect of functional programming is that, in a sense, all functions are �interfaces�, meaning that many of the roles that interfaces play in object-oriented design are implicit in the way that functions work. 
+An important aspect of functional programming is that, in a sense, all functions are "interfaces", meaning that many of the roles that interfaces play in object-oriented design are implicit in the way that functions work. 
 
 In fact, one of the critical design maxims, "program to an interface, not an implementation", is something you get for free in F#.
 
-To see how this works, let�s compare the same design pattern in C# and F#. For example, in C# we might want to use the �decorator pattern� to enhance some core code. 
+To see how this works, let's compare the same design pattern in C# and F#. For example, in C# we might want to use the "decorator pattern" to enhance some core code. 
 
-Let�s say that we have a calculator interface:
+Let's say that we have a calculator interface:
 
 ```
 interface ICalculator 
@@ -91,7 +91,7 @@ let add1WithLogging = genericLogger add1
 let times2WithLogging = genericLogger times2
 ```
 
-The new "wrapped" functions can be used anywhere the original functions could be used � no one can tell the difference!
+The new "wrapped" functions can be used anywhere the original functions could be used ? no one can tell the difference!
 
 ```
 // test
@@ -120,15 +120,15 @@ add1WithTimer 3
 The ability to do this kind of generic wrapping is one of the great conveniences of the function-oriented approach. You can take any function and create a similar function based on it.  As long as the new function has exactly the same inputs and outputs as the original function, the new can be substituted for the original anywhere.  Some more examples:
 
 * It is easy to write a generic caching wrapper for a slow function, so that the value is only calculated once.
-* It is also easy to write a generic �lazy� wrapper for a function, so that the inner function is only called when a result is needed
+* It is also easy to write a generic "lazy" wrapper for a function, so that the inner function is only called when a result is needed
 
 ## The strategy pattern 
 
-We can apply this same approach to another common design pattern, the �strategy pattern.� 
+We can apply this same approach to another common design pattern, the "strategy pattern." 
 
-Let�s use the familiar example of inheritance: an `Animal` superclass with `Cat` and `Dog` subclasses, each of which overrides a `MakeNoise()` method to make different noises. 
+Let's use the familiar example of inheritance: an `Animal` superclass with `Cat` and `Dog` subclasses, each of which overrides a `MakeNoise()` method to make different noises. 
 
-In a true functional design, there are no subclasses, but instead the `Animal` class would have a `NoiseMaking` function that would be passed in with the constructor.   This approach is exactly the same as the �strategy� pattern in OO design.
+In a true functional design, there are no subclasses, but instead the `Animal` class would have a `NoiseMaking` function that would be passed in with the constructor.   This approach is exactly the same as the "strategy" pattern in OO design.
 
 ```
 type Animal(noiseMakingStrategy) = 
@@ -149,7 +149,7 @@ dog.MakeNoise  //try again a second later
 ```
 
 Note that again, we do not have to define any kind of `INoiseMakingStrategy` interface first. Any function with the right signature will work.
-As a consequence, in the functional model, the standard .NET �strategy� interfaces such as `IComparer`, `IFormatProvider`, and `IServiceProvider` become irrelevant.
+As a consequence, in the functional model, the standard .NET "strategy" interfaces such as `IComparer`, `IFormatProvider`, and `IServiceProvider` become irrelevant.
 
 Many other design patterns can be simplified in the same way.
 

@@ -85,9 +85,9 @@ let myCallback (reader:IO.StreamReader) url =
 let google = fetchUrl myCallback "http://google.com"
 ```
 
-Finally, we have to resort to a type declaration for the reader parameter (`reader:IO.StreamReader`). This is required because the F# compiler cannot determine the type of the �reader� parameter automatically. 
+Finally, we have to resort to a type declaration for the reader parameter (`reader:IO.StreamReader`). This is required because the F# compiler cannot determine the type of the "reader" parameter automatically. 
 
-A very useful feature of F# is that you can "bake in" parameters in a function so that they don�t have to be passed in every time. This is why the `url` parameter was placed *last* rather than first, as in the C# version.
+A very useful feature of F# is that you can "bake in" parameters in a function so that they don't have to be passed in every time. This is why the `url` parameter was placed *last* rather than first, as in the C# version.
 The callback can be setup once, while the url varies from call to call.
 
 ```
