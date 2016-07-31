@@ -241,7 +241,7 @@ module Images =
     let findImagesInFile (fi:FileInfo) =
         let path = fi.FullName
         let text = File.ReadAllText(path)
-        let pattern = """![.*]\((.*?)\)"""
+        let pattern = """\!\[.*\]\((.*?)\)"""
         Regex.Matches(text,pattern)
         |> Seq.cast<Match>
         |> Seq.map( fun m -> m.Groups.[1].Value)
@@ -252,6 +252,10 @@ module Images =
         Regex.Matches(text,pattern)
 
         *)
+
+    let exists imagePath = 
+        imagePath
+        |> File.Exists 
 
     let rec findImages (d:DirectoryInfo) = 
         seq {
@@ -266,6 +270,7 @@ module Images =
         |> Seq.distinct
         |> Seq.toList
         |> List.sort
+        |> List.filter (exists >> not)
 
 // process all
 let path = @"..\"

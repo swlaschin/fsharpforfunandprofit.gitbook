@@ -70,15 +70,15 @@ So, what can we find out about Roman numerals?
 
 First, a little [background reading from a reliable source](http://en.wikipedia.org/wiki/Roman_numerals) shows that they probably originated from something similar to [tally marks](http://en.wikipedia.org/wiki/Tally_marks).
 
-![Tally marks](http://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Tally_marks.svg/200px-Tally_marks.svg.png)
+![Tally marks](../assets/img/200px-Tally_marks.svg.png)
 
 This explains the simple strokes for "I" to "IIII" and then the different symbol for "V".
 
 As it evolved, symbols were added for ten and fifty, one hundred and five hundred, and so on.  
 This system of counting with ones and fives can be seen in the design of the [abacus](http://en.wikipedia.org/wiki/Roman_abacus), old and new.
 
-![Roman Abacus](http://upload.wikimedia.org/wikipedia/commons/b/b5/RomanAbacusRecon.jpg)
-![Modern abacus](http://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Sharp-abacus-japan.jpg/320px-Sharp-abacus-japan.jpg)
+![Roman Abacus](../assets/img/RomanAbacusRecon.jpg)
+![Modern abacus](../assets/img/320px-Sharp-abacus-japan.jpg)
 
 In fact, this system even has a name which I'd never heard of -- ["bi-quinary coded decimal"](http://en.wikipedia.org/wiki/Bi-quinary_coded_decimal). 
 Isn't that fun? I shall now attempt to drop that phrase into casual conversation wherever possible.
