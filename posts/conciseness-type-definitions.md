@@ -101,5 +101,5 @@ This code fragment contains 17 type definitions in just a few lines, but with mi
 
 Obviously, this is a simplified version with just the basic types ? in a real system, constraints and other methods would be added.  But note how easy it is to create lots of DDD value objects, especially wrapper types for strings, such as "`ZipCode`" and "`Email`". By using these wrapper types, we can enforce certain constraints at creation time, and also ensure that these types don't get confused with unconstrained strings in normal code. The only "entity" type is the `CustomerAccount`, which is clearly indicated as having special treatment for equality and comparison.
 
-For a more in-depth discussion, see the series called ["Domain driven design in F#"](/series/domain-driven-design-in-fsharp.html).
+For a more in-depth discussion, see the series called ["Domain driven design in F#"](../series/domain-driven-design-in-fsharp.md).
 

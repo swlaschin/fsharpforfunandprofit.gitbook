@@ -29,6 +29,6 @@ This series is not a tutorial, so I will not go too much into *why* the code wor
 
 If you have experience in languages such as C# and Java, you have probably found that you can get a pretty good understanding of source code written in other similar languages, even if you aren't familiar with the keywords or the libraries. You might ask "how do I assign a variable?" or "how do I do a loop?", and with these answers be able to do some basic programming quite quickly.
 
-This approach will not work for F#, because in its pure form there are no variables, no loops, and no objects.  Don't be frustrated - it will eventually make sense! If you want to learn F# in more depth, there are some helpful tips on the ["learning F#"](/learning-fsharp/) page.
+This approach will not work for F#, because in its pure form there are no variables, no loops, and no objects.  Don't be frustrated - it will eventually make sense! If you want to learn F# in more depth, there are some helpful tips on the ["learning F#"](../learning-fsharp/index.md) page.
 
 

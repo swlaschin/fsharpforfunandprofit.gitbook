@@ -12,7 +12,8 @@ open System.IO
 open System.Text
 open System.Text.RegularExpressions
 
-module Fixup = 
+[<AutoOpen>]
+module Helpers =
     let replaceRegex (pattern:string) (replacement:string) (input:string) = 
         Regex.Replace(input,pattern,replacement)
 
@@ -29,6 +30,31 @@ module Fixup =
     let replace (find:string) replacement (input:string) = 
         input.Replace(find,replacement)
 
+    let ifNone v opt = defaultArg opt v
+
+
+module FixupFiles = 
+
+    let rec fixupFileNames (d:DirectoryInfo) = 
+
+        let renameIfNeeded (fi:FileInfo) =
+            let oldName = fi.Name
+            let newName = replaceRegex "(?m)^\d\d\d\d-\d\d-\d\d-(.*?$)" "$1" oldName 
+            if newName <> oldName  then
+                let path = fi.FullName.Replace(oldName,newName)
+                try
+                    fi.MoveTo(path)
+                with
+                | ex ->     
+                    printfn "%s %s" fi.FullName ex.Message
+
+        d.EnumerateFiles("*.md") 
+        |> Seq.iter renameIfNeeded 
+
+        d.EnumerateDirectories() 
+        |> Seq.iter fixupFileNames 
+
+module FixupText = 
 
     let replaceCodeBlockDelimiters text = 
         text
@@ -37,9 +63,10 @@ module Fixup =
 
     let fixupLinkPaths text = 
         text
-        |> replaceRegex @"\(\\(.*?)\)" "(..\$1)" 
-        |> replaceRegex @"\((.*?)\\\)" @"($1\index.md)" 
-        |> replaceRegex @"\((.*?)html\)" @"($1md)"  // replace series.html with series.md 
+        |> replaceRegex @"\(/(.*?)\)" "(../$1)"     // replace root (/xxx) with (../xxx)
+        |> replaceRegex @"\(\.\./(.*?)/\)" @"(../$1/index.md)"  // replace (../dir/) with (../dir/index.md)
+        |> replaceRegex @"\(\.\./(.*?)/#(.*?)\)" @"(../$1/index.md#$2)"  // replace (../dir/#id) with (../dir/index.md#id)
+        |> replaceRegex @"\(\.\./series/(.*?).html\)" @"(../series/$1.md)"  // replace (../series/xxx.html) with (../series/xxx.md)
 
     let fixupSmartQuotes text = 
         text
@@ -69,20 +96,6 @@ module Fixup =
         |> Seq.iter fixupDirectory
 
 
-    let rec fixupFileNames (d:DirectoryInfo) = 
-
-        let renameIfNeeded (fi:FileInfo) =
-            let oldName = fi.Name
-            let newName = replaceRegex "(?m)^\d\d\d\d-\d\d-\d\d-(.*?$)" "$1" oldName 
-            if newName <> oldName  then
-                let path = fi.FullName.Replace(oldName,newName)
-                fi.MoveTo(path)
-
-        d.EnumerateFiles("*.md") 
-        |> Seq.iter renameIfNeeded 
-
-        d.EnumerateDirectories() 
-        |> Seq.iter fixupFileNames 
 
 module Series = 
 
@@ -121,7 +134,6 @@ module Series =
         findField "title" """desc: abc """
         *)
 
-    let ifNone v opt = defaultArg opt v
 
     let parsePageText fi (lines:string seq) = 
         let title = lines |> Seq.tryPick (findField "title") |> ifNone ""
@@ -215,7 +227,7 @@ module Series =
 let path = @"..\"
 let d = DirectoryInfo(path)
 
-Fixup.fixupFileNames d
-Fixup.fixupDirectory d
+FixupFiles.fixupFileNames d
+FixupText.fixupDirectory d
 
-Series.updateSeriesInfoPages()
+// Series.updateSeriesInfoPages()

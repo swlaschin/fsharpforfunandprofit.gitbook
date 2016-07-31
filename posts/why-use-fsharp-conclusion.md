@@ -12,5 +12,5 @@ This completes the tour of F# features. I hope that the examples have given you 
 
 In later series I hope to go deeper into data structures, pattern matching, list processing, asynchronous and parallel programming, and much more.
 
-But before those, I recommend you read the ["thinking functionally"](/series/thinking-functionally.html) series, which will help you understand functional programming at a deeper level.   
+But before those, I recommend you read the ["thinking functionally"](../series/thinking-functionally.md) series, which will help you understand functional programming at a deeper level.   
 

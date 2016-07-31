@@ -28,7 +28,7 @@ The example code below is a simple F# script that demonstrates most of the conce
 I would encourage you to test this code interactively and play with it a bit! Either:  
 
 * Type this into a F# script file (with .fsx extension) 
-and send it to the interactive window. See the ["installing and using F#"](/installing-and-using/) page for details.
+and send it to the interactive window. See the ["installing and using F#"](../installing-and-using/index.md) page for details.
 * Alternatively, try running this code in the interactive window. Remember to always use `;;` at the end to tell
 the interpreter that you are done entering and ready to evaluate.
 

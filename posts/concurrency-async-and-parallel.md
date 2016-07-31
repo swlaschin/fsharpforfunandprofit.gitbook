@@ -386,7 +386,7 @@ Benchmarks from "toy" versions of parallelization like this are not meaningful, 
 
 And also be aware that parallelization is rarely the best way to speed up your code. Your time is almost always better spent on improving your algorithms. 
 I'll bet my serial version of quicksort against your parallel version of bubblesort any day! 
-(For more details on how to improve performance, see the [optimization series](/series/optimization.html))
+(For more details on how to improve performance, see the [optimization series](../series/optimization.md))
 
 Anyway, with that caveat, let's create a little task that chews up some CPU. We'll test this serially and in parallel. 
 

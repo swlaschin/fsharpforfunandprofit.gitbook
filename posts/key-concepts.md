@@ -20,7 +20,7 @@ But before that, let's look at some of the key concepts in F# that we will meet 
 
 In later posts, these will be dealt with in much greater depth -- this is just a taster to help you understand the rest of this series.
 
-![four key concepts](/assets/img/four-concepts2.png)
+![four key concepts](../assets/img/four-concepts2.png)
 
 ### Function-oriented rather than object-oriented
 
@@ -49,11 +49,11 @@ It's hard to explain this in a few paragraphs, but here are some of the benefits
 
 * **Building with composition**. Composition is the 'glue' that allows us build larger systems from smaller ones. This is not an optional technique, but is at the very heart of the functional style. Almost every line of code is a composable expression (see below). Composition is used to build basic functions, and then functions that use those functions, and so on. And the composition principle doesn't just apply to functions, but also to types (the product and sum types discussed below). 
 * **Factoring and refactoring**. The ability to factor a problem into parts depends how easily the parts can be glued back together. Methods and classes that might seem to be indivisible in an imperative language can often be broken down into surprisingly small pieces in a functional design. These fine-grained components typically consist of (a) a few very general functions that take other functions as parameters, and (b) other helper functions that specialize the general case for a particular data structure or application.
-  Once factored out, the generalized functions allow many additional operations to be programmed very easily without having to write new code. You can see a good example of a general function like this (the fold function) in the [post on extracting duplicate code from loops](/posts/conciseness-extracting-boilerplate/).
-* **Good design**. Many of the principles of good design, such as "separation of concerns", "single responsibility principle", ["program to an interface, not an implementation"](/posts/convenience-functions-as-interfaces/), arise naturally as a result of a functional approach. And functional code tends to be high level and declarative in general.
+  Once factored out, the generalized functions allow many additional operations to be programmed very easily without having to write new code. You can see a good example of a general function like this (the fold function) in the [post on extracting duplicate code from loops](../posts/conciseness-extracting-boilerplate/index.md).
+* **Good design**. Many of the principles of good design, such as "separation of concerns", "single responsibility principle", ["program to an interface, not an implementation"](../posts/convenience-functions-as-interfaces/index.md), arise naturally as a result of a functional approach. And functional code tends to be high level and declarative in general.
 
 The following posts in this series will have examples of how functions can make code more 
-concise and convenient, and then for a deeper understanding, there is a whole series on [thinking functionally](/series/thinking-functionally.html). 
+concise and convenient, and then for a deeper understanding, there is a whole series on [thinking functionally](../series/thinking-functionally.md). 
 
 ### Expressions rather than statements 
 
@@ -142,7 +142,7 @@ let z = BoolChoice true
 These "choice" types are not available in C#, but are incredibly useful for modeling many real-world cases, such as states in a state machine (which is a surprisingly common theme in many domains).
 
 And by combining "product" and "sum" types in this way, it is easy to create a rich set of types that accurately models any business domain.
-For examples of this in action, see the posts on [low overhead type definitions](/posts/conciseness-type-definitions/) and [using the type system to ensure correct code](/posts/correctness-type-checking).
+For examples of this in action, see the posts on [low overhead type definitions](../posts/conciseness-type-definitions/index.md) and [using the type system to ensure correct code](../posts/correctness-type-checking).
 
  
 ### Pattern matching for flow of control 
@@ -188,7 +188,7 @@ match aList with
 
 Although the match expression seems unnecessarily complicated at first, you'll see that in practice it is both elegant and powerful.
 
-For the benefits of pattern matching, see the post on [exhaustive pattern matching](/posts/correctness-exhaustive-pattern-matching), and for a worked example that uses pattern matching heavily, see the [roman numerals example](/posts/roman-numerals/).
+For the benefits of pattern matching, see the post on [exhaustive pattern matching](../posts/correctness-exhaustive-pattern-matching), and for a worked example that uses pattern matching heavily, see the [roman numerals example](../posts/roman-numerals/index.md).
 
 ### Pattern matching with union types ###
 
