@@ -53,7 +53,7 @@ let addMyType t1 t2 =
 The `addMyType` function uses integer addition on the `int` field, and list concatenation on the `list` field.
 As a result the `MyType` is closed using the function `addMyType` -- in fact, not only is it closed, it is a monoid too. So in this case, we're done!
 
-This is exactly the approach we took with `CustomerStats` in the [previous post](../posts/monoids-part2/index.md).
+This is exactly the approach we took with `CustomerStats` in the [previous post](../posts/monoids-part2.md).
 
 So here's my first tip:
 

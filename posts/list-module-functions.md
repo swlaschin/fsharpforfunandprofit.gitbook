@@ -845,7 +845,7 @@ let reduceOptions =
 
 If you want to return the first element in the same way as `choose`, consider using `pick` (see [section 11](#11)).
 
-If you want to do a similar action as `choose` but for other wrapper types (such as a Success/Failure result), there is [a discussion here](../posts/elevated-world-5/index.md).
+If you want to do a similar action as `choose` but for other wrapper types (such as a Success/Failure result), there is [a discussion here](../posts/elevated-world-5.md).
   
 <a id="13"></a> 
 <hr>  
@@ -2029,7 +2029,7 @@ addFourParams <!> [1;2;3] <*> [1;2;3] <*> [1;2;3] <*> [1;2;3]
 // Result = [4; 8; 12]
 ```
 
-If that seems like magic, see [this series](../posts/elevated-world/index.md#lift) for a explanation of what this code is doing.
+If that seems like magic, see [this series](../posts/elevated-world.md#lift) for a explanation of what this code is doing.
 
 
 <a id="26"></a> 

@@ -66,6 +66,7 @@ module FixupText =
         |> replaceRegex @"\(/(.*?)\)" "(../$1)"     // replace root (/xxx) with (../xxx)
         |> replaceRegex @"\(\.\./(.*?)/\)" @"(../$1/index.md)"  // replace (../dir/) with (../dir/index.md)
         |> replaceRegex @"\(\.\./(.*?)/#(.*?)\)" @"(../$1/index.md#$2)"  // replace (../dir/#id) with (../dir/index.md#id)
+        |> replaceRegex @"posts/(.*?)/index.md" @"posts/$1.md"  // replace "posts/page/index.md" with "posts/page.md"
         |> replaceRegex @"\(\.\./series/(.*?).html\)" @"(../series/$1.md)"  // replace (../series/xxx.html) with (../series/xxx.md)
 
     let fixupVideoPaths text = 
@@ -276,7 +277,7 @@ module Images =
 let path = @"..\"
 let d = DirectoryInfo(path)
 
-FixupFiles.fixupFileNames d
+// FixupFiles.fixupFileNames d
 FixupText.fixupDirectory d
 
 // Series.updateSeriesInfoPages()

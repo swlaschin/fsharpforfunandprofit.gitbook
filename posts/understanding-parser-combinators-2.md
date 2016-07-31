@@ -11,7 +11,7 @@ seriesOrder: 2
 
 In this series, we are looking at how applicative parsers and parser combinators work.
 
-* In the [first post](../posts/understanding-parser-combinators/index.md), we created the foundations of a parsing library.
+* In the [first post](../posts/understanding-parser-combinators.md), we created the foundations of a parsing library.
 * In this post, we'll build out the library with many other useful combinators.
   The combinator names will be copied from those used by [FParsec](http://www.quanttec.com/fparsec/), so that you can easily migrate to it.
 
@@ -88,7 +88,7 @@ Using this metaphor then, `map` transforms (or "lifts") a function in Normal Wor
 
 ![](../assets/img/parser-map.png)
 
-*And by the way, if you like this metaphor, I have a [whole series of posts that develop it further](../posts/elevated-world/index.md).*
+*And by the way, if you like this metaphor, I have a [whole series of posts that develop it further](../posts/elevated-world.md).*
 
 So that's what `map` does; how do we implement it?
 
@@ -281,7 +281,7 @@ Here's a diagram of `lift2`:
 
 ![](../assets/img/parser-lift2.png)
 
-*If you want to know more about how this works, check out my ["man page" post on `lift2`](../posts/elevated-world/index.md) or [my explanation that involves the "Monadster"](../posts/monadster/index.md).*
+*If you want to know more about how this works, check out my ["man page" post on `lift2`](../posts/elevated-world.md) or [my explanation that involves the "Monadster"](../posts/monadster.md).*
 
 Let's see some examples of using `lift2` in practice. First, lifting integer addition to addition of Parsers:
 
@@ -839,7 +839,7 @@ val bindP :
 ```
 
 which conforms to a standard bind signature. The input `f` is a "diagonal" function (`'a -> Parser<'b>`) and the output is a "horizontal" function (`Parser<'a> -> Parser<'b>`).
-See [this post for more details on how `bind` works](../posts/elevated-world-2/index.md#bind).
+See [this post for more details on how `bind` works](../posts/elevated-world-2.md#bind).
 
 The infix version of `bind` is `>>=`. Note that the parameters are flipped: `f` is now the second parameter which makes it more convenient for F#'s pipeline idiom.
 
@@ -1127,6 +1127,6 @@ let sepBy p sep =
 In this post, we have built on the basic parsing code from last time to create a library of a 15 or so combinators that can be combined to parse almost anything.
 
 Soon, we'll use them to build a JSON parser, but before that, let's pause and take time to clean up the error messages.
-That will be the topic of the [next post](../posts/understanding-parser-combinators-3/index.md).  
+That will be the topic of the [next post](../posts/understanding-parser-combinators-3.md).  
 
 *The source code for this post is available at [this gist](https://gist.github.com/swlaschin/a3dbb114a9ee95b2e30d#file-understanding_parser_combinators-2-fsx).*

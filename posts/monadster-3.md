@@ -13,20 +13,20 @@ seriesOrder: 3
 
 Welcome to the third installment in the gripping tale of Dr Frankenfunctor and the Monadster!
 
-We saw [in the first installment](../posts/monadster/index.md) how Dr Frankenfunctor created life out of dead body parts using "Monadster part generators" (or "M"s for short),
+We saw [in the first installment](../posts/monadster.md) how Dr Frankenfunctor created life out of dead body parts using "Monadster part generators" (or "M"s for short),
 that would, on being supplied with some vital force, return a live body part.
 
 We also saw how the leg and arms of the creature were created, and how these M-values could be processed and combined using `mapM` and `map2M`.
 
-In [the second installment](../posts/monadster-2/index.md) we learned how the head, heart and body were built using other powerful techniques such as `returnM`, `bindM` and `applyM`.
+In [the second installment](../posts/monadster-2.md) we learned how the head, heart and body were built using other powerful techniques such as `returnM`, `bindM` and `applyM`.
 
 In this last installment, we'll review all the techniques used, refactor the code, and compare Dr Frankenfunctor's techniques to the modern-day state monad.
 
 Links for the complete series:
 
-* [Part 1 - Dr Frankenfunctor and the Monadster](../posts/monadster/index.md) 
-* [Part 2 - Completing the body](../posts/monadster-2/index.md) 
-* [Part 3 - Review and refactoring](../posts/monadster-3/index.md) (*this post*)
+* [Part 1 - Dr Frankenfunctor and the Monadster](../posts/monadster.md) 
+* [Part 2 - Completing the body](../posts/monadster-2.md) 
+* [Part 3 - Review and refactoring](../posts/monadster-3.md) (*this post*)
 
 ## Review of the the techniques used
 
@@ -774,7 +774,7 @@ let fiveN = calculate five |> getValue   // 5
 
 ## OK, OK, some monad stuff 
 
-People always want to know about monads, even though I do not want these posts to degenerate into [yet another monad tutorial](../posts/why-i-wont-be-writing-a-monad-tutorial/index.md).
+People always want to know about monads, even though I do not want these posts to degenerate into [yet another monad tutorial](../posts/why-i-wont-be-writing-a-monad-tutorial.md).
 
 So here's how they fit in with what we have worked with in these posts.
 

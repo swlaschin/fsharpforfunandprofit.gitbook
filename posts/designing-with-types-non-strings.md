@@ -146,7 +146,7 @@ let create dttm =
 
 ## Union types vs. units of measure
 
-You might be asking at this point: What about [units of measure](../posts/units-of-measure/index.md)? Aren't they meant to be used for this purpose?
+You might be asking at this point: What about [units of measure](../posts/units-of-measure.md)? Aren't they meant to be used for this purpose?
 
 Yes and no.  Units of measure can indeed be used to avoid mixing up numeric values of different type, and are much more powerful than the single case unions we've been using.
 

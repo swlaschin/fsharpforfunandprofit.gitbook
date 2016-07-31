@@ -23,9 +23,9 @@ and so by the end of this series, parser combinators will have become completely
 There will be four posts in this series:
 
 * In this, the first post, we'll look at the basic concepts of parser combinators and build the core of the library.
-* In the [second post](../posts/understanding-parser-combinators-2/index.md), we'll build up a useful library of combinators.
-* In the [third post](../posts/understanding-parser-combinators-3/index.md), we'll work on providing helpful error messages. 
-* In the [last post](../posts/understanding-parser-combinators-4/index.md), we'll build a JSON parser using this parser library. 
+* In the [second post](../posts/understanding-parser-combinators-2.md), we'll build up a useful library of combinators.
+* In the [third post](../posts/understanding-parser-combinators-3.md), we'll work on providing helpful error messages. 
+* In the [last post](../posts/understanding-parser-combinators-4.md), we'll build a JSON parser using this parser library. 
 
 Obviously, the focus here will not be on performance or efficiency, but I hope that it will give you the understanding that will
 then enable you to use libraries like [FParsec](http://www.quanttec.com/fparsec/) effectively. And by the way, a big thank you to
@@ -311,7 +311,7 @@ Here is the curried version of `pchar` represented as a diagram:
 
 ### What is currying?
 
-If you are unclear on how currying works, I have a post about it [here](../posts/currying/index.md), but basically it means that a multi-parameter
+If you are unclear on how currying works, I have a post about it [here](../posts/currying.md), but basically it means that a multi-parameter
 function can be written as a series of one-parameter functions.
 
 In other words, this two-parameter function:
@@ -387,7 +387,7 @@ let pchar charToMatch =
 
 ### The benefits of the curried implementation
 
-What's nice about the curried implementation is that we can [partially apply](../posts/partial-application/index.md) the character we want to parse, like this:
+What's nice about the curried implementation is that we can [partially apply](../posts/partial-application.md) the character we want to parse, like this:
 
 ```
 let parseA = pchar 'A' 
@@ -745,7 +745,7 @@ This is where where the power of combinators starts kicking in, because with `or
 For example, let's say that we want choose from a *list* of parsers, rather than just two.
 
 Well, that's easy. If we have a pairwise way of combining things, we can extend that to combining an entire list using `reduce`
-(for more on working with `reduce`, [see this post on monoids](../posts/monoids-without-tears/index.md) ).
+(for more on working with `reduce`, [see this post on monoids](../posts/monoids-without-tears.md) ).
 
 ```
 /// Choose any of a list of parsers
@@ -930,7 +930,7 @@ let anyOf listOfChars =
 
 In this post, we have created the foundations of a parsing library, and few simple combinators.
 
-In the [next post](../posts/understanding-parser-combinators-2/index.md), we'll build on this to create a library with many more combinators.  
+In the [next post](../posts/understanding-parser-combinators-2.md), we'll build on this to create a library with many more combinators.  
 
 *The source code for this post is available at [this gist](https://gist.github.com/swlaschin/cb42417079ae2c5f99db#file-understanding_parser_combinators-fsx).*
 

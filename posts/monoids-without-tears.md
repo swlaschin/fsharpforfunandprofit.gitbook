@@ -8,7 +8,7 @@ seriesOrder: 1
 ---
 
 If you are coming from an OO background, one of the more challenging aspects of learning functional programming is the lack of obvious design patterns.
-There are plenty of idioms such as [partial application](../posts/partial-application/index.md), and [error handling techniques](../posts/recipe-part2/index.md), but no apparent patterns in the [GoF sense](http://en.wikipedia.org/wiki/Design_Patterns).
+There are plenty of idioms such as [partial application](../posts/partial-application.md), and [error handling techniques](../posts/recipe-part2.md), but no apparent patterns in the [GoF sense](http://en.wikipedia.org/wiki/Design_Patterns).
 
 In this post, we'll look at a very common "pattern" known as a *monoid*. Monoids are not really a design pattern; more an approach to working with many different types of values in a common way.
 In fact, once you understand monoids, you will start seeing them everywhere!

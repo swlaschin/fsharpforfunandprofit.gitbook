@@ -16,7 +16,7 @@ Just like all other data types in F#, class definitions start with the `type` ke
 
 The thing that distinguishes them from other types is that classes always have some parameters passed in when they are created -- the constructor -- and so there are *always parentheses after the class name*.
 
-Also, unlike other types, classes *must* have functions attached to them as members. This post will explain how you do this for classes, but for a general discussion of attaching functions to other types see [the post on type extensions](../posts/type-extensions/index.md).
+Also, unlike other types, classes *must* have functions attached to them as members. This post will explain how you do this for classes, but for a general discussion of attaching functions to other types see [the post on type extensions](../posts/type-extensions.md).
 
 So, for example, if we want to have a class called `CustomerName` that requires three parameters to construct it, it would be written like this:
 
@@ -117,7 +117,7 @@ understand what the class does by looking at them. It is also important because 
 
 ### Method signatures
 
-Method signatures such as are very similar to the [signatures for standalone functions](../posts/how-types-work-with-functions/index.md), except that the parameter names are part of the signature itself.
+Method signatures such as are very similar to the [signatures for standalone functions](../posts/how-types-work-with-functions.md), except that the parameter names are part of the signature itself.
 
 So in this case, the method signature is:
 
@@ -316,13 +316,13 @@ printfn "%i" <| me.AddTwo 42
 printfn "%f" <| me.Pi()
 ```
     
-You can see that, just like normal functions, methods can have parameters, call other methods, and be parameterless (or to be precise, take a [unit parameter](../posts/how-types-work-with-functions/index.md#parameterless-functions))
+You can see that, just like normal functions, methods can have parameters, call other methods, and be parameterless (or to be precise, take a [unit parameter](../posts/how-types-work-with-functions.md#parameterless-functions))
 
 ### Tuple form vs. curried form
 
 Unlike normal functions, methods with more than one parameter can be defined in two different ways: 
 
-* The curried form, where parameters are separated with spaces, and partial application is supported. (Why "curried"? See the [explanation of currying](../posts/currying/index.md).)
+* The curried form, where parameters are separated with spaces, and partial application is supported. (Why "curried"? See the [explanation of currying](../posts/currying.md).)
 * The tuple form, where all the parameters as passed in at the same time, comma-separated, in a single tuple.
 
 The curried approach is more functional, and the tuple approach is more object-oriented. Here is an example class with a method for each approach:
@@ -362,7 +362,7 @@ On the other hand, the disadvantages of tuple form are:
 * Doesn't work well with higher order functions 
 * Doesn't work well with type inference
 
-For a more detailed discussion on tuple form vs. curried form see the post on [type extensions](../posts/type-extensions/index.md#tuple-form).
+For a more detailed discussion on tuple form vs. curried form see the post on [type extensions](../posts/type-extensions.md#tuple-form).
 
 
 ### Let- bound functions in conjunction with class methods
@@ -391,7 +391,7 @@ let lbf = new LetBoundFunctions()
 printfn "Sum is %i" <| lbf.Sum [1..10]
 ```
 
-For more details on how to do this, see [this discussion](../posts/type-extensions/index.md#attaching-existing-functions).
+For more details on how to do this, see [this discussion](../posts/type-extensions.md#attaching-existing-functions).
 
 ### Recursive methods
 
@@ -585,7 +585,7 @@ val MyProp2 : int = 1
 
 which is almost exactly the same.
 
-If you are unclear on the difference and why the unit parameter is needed for the function, please read the [discussion of parameterless methods](../posts/how-types-work-with-functions/index.md#parameterless-functions).
+If you are unclear on the difference and why the unit parameter is needed for the function, please read the [discussion of parameterless methods](../posts/how-types-work-with-functions.md#parameterless-functions).
 
 
 ## Secondary constructors
@@ -689,7 +689,7 @@ If you are defining classes that need to interop with other .NET code, do not de
 
 The reason for this is that F# modules are exposed as static classes, and any F# classes defined inside a module are then defined as nested classes within the static class, which can mess up your interop.  For example, some unit test runners don't like static classes.
 
-F# classes which are defined outside a module are generated as normal top-level .NET classes, which is probably what you want.  But remember that (as discussed in a [previous post](../posts/organizing-functions/index.md)) if you don't declare a namespace specifically, your class will be placed in an automatically generated module, and will be nested without your knowledge.
+F# classes which are defined outside a module are generated as normal top-level .NET classes, which is probably what you want.  But remember that (as discussed in a [previous post](../posts/organizing-functions.md)) if you don't declare a namespace specifically, your class will be placed in an automatically generated module, and will be nested without your knowledge.
 
 Here's an example of two F# classes, one defined outside a module and one defined inside:
 
@@ -755,7 +755,7 @@ let sr1 = System.IO.StringReader("")      // Warning
 let sr2 = new System.IO.StringReader("")  // OK
 ```
 
-This can be a useful reminder to use the `use` keyword instead of the `let` keyword for disposables. See [the post on `use`](../posts/let-use-do/index.md#use) for more.
+This can be a useful reminder to use the `use` keyword instead of the `let` keyword for disposables. See [the post on `use`](../posts/let-use-do.md#use) for more.
 
 ### Calling methods and properties
 

@@ -9,7 +9,7 @@ seriesOrder: 4
 ---
 
 
-This post is a continuation of the previous series on [low-risk and incremental ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work/index.md).
+This post is a continuation of the previous series on [low-risk and incremental ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work.md).
 
 In this one, we'll see how F# can be unexpectedly helpful when it comes to database related tasks.
 

@@ -9,8 +9,8 @@ seriesOrder: 3
 
 In this post, I'll continue developing a simple pocket calculator app.
 
-In the [first post](../posts/calculator-design/index.md), we completed a first draft of the design, using only types (no UML diagrams!).
-and in the [previous post](../posts/calculator-implementation/index.md), we created an initial implementation that exercised the design and revealed a missing requirement.
+In the [first post](../posts/calculator-design.md), we completed a first draft of the design, using only types (no UML diagrams!).
+and in the [previous post](../posts/calculator-implementation.md), we created an initial implementation that exercised the design and revealed a missing requirement.
 
 Now it's time to build the remaining components and assemble them into a complete application
 
@@ -328,7 +328,7 @@ type CalculatorState = {
 ```
 
 (*This might seem like a good solution for now, but using flags like this is really a design smell.
-In the next post, I'll use a [different approach](../posts/designing-with-types-representing-states/index.md#replace-flags) which doesn't involve flags)*
+In the next post, I'll use a [different approach](../posts/designing-with-types-representing-states.md#replace-flags) which doesn't involve flags)*
 
 ## Fixing the implementation
 
@@ -410,7 +410,7 @@ So the real question is, would test-driven development help us find missing requ
 Not necessarily. Test-driven development will only be effective if we can think of every possible case that could happen in the first place.
 In that sense, TDD would not make up for a lack of imagination!
 
-And if do have good requirements, then hopefully we can design the types to [make illegal states unrepresentable](../posts/designing-with-types-making-illegal-states-unrepresentable/index.md)
+And if do have good requirements, then hopefully we can design the types to [make illegal states unrepresentable](../posts/designing-with-types-making-illegal-states-unrepresentable.md)
 and then we won't need the tests to provide correctness guarantees.
 
 Now I'm not saying that I am against automated testing. In fact, I do use it all the time to verify certain requirements, and especially for integration and testing in the large.
@@ -462,7 +462,7 @@ module CalculatorTests =
         ``when I input 1 + 2 + 3, I expect 6``() 
 ```
 
-And of course, this would be easily adapted to using [NUnit or similar](../posts/low-risk-ways-to-use-fsharp-at-work-3/index.md). 
+And of course, this would be easily adapted to using [NUnit or similar](../posts/low-risk-ways-to-use-fsharp-at-work-3.md). 
 
 ## How can I develop a better design?
 
@@ -474,7 +474,7 @@ How can I prevent this from happening again next time?
 One obvious solution would be to switch to a proper TDD approach.
 But I'm going to be a bit stubborn, and see if I can stay with a type-first design! 
 
-[In the next post](../posts/calculator-complete-v2/index.md), I will stop being so ad-hoc and over-confident,
+[In the next post](../posts/calculator-complete-v2.md), I will stop being so ad-hoc and over-confident,
 and instead use a process that is more thorough and much more likely to prevent these kinds of errors at the design stage.
 
 *The code for this post is available on GitHub in [this gist (unpatched)](https://gist.github.com/swlaschin/0e954cbdc383d1f5d9d3#file-calculator_v1-fsx)

@@ -45,7 +45,7 @@ I think you get the idea!
 ## Calculating the size of compound types
 
 Let's look at calculating the sizes of compound types now. If you remember from the [understanding F# types](../series/understanding-fsharp-types.md) series,
-there are two kinds of algebraic types: "product" types such as [tuples](../posts/tuples/index.md) and records, and "sum" types, called [discriminated unions](../posts/discriminated-unions/index.md) in F#.
+there are two kinds of algebraic types: "product" types such as [tuples](../posts/tuples.md) and records, and "sum" types, called [discriminated unions](../posts/discriminated-unions.md) in F#.
 
 For example, let's say that we have a `Speed` as well as a `Direction`, and we combine them into a record type called `Velocity`:
 
@@ -662,7 +662,7 @@ If we take this rule seriously, it has some knock on effects, such as:
 * Always validate every record you read from a database or other "trusted" source.
 
 You might think that having everything wrapped in a `Success/Failure` type can get annoying, and this is true (!), but there are ways to make this easier.
-See [this post](../posts/elevated-world-5/index.md#asynclist) for example.
+See [this post](../posts/elevated-world-5.md#asynclist) for example.
 
 ## Further reading
 

@@ -112,7 +112,7 @@ type Calculate = CalculatorInput * CalculatorState -> CalculatorState
 
 `CalculatorInput` now means the keystrokes or whatever, and `CalculatorState` is the state.
 
-Notice that I have defined this function using a [tuple](../posts/tuples/index.md) (`CalculatorInput * CalculatorState`) as input,
+Notice that I have defined this function using a [tuple](../posts/tuples.md) (`CalculatorInput * CalculatorState`) as input,
 rather than as two separate parameters (which would look like `CalculatorInput -> CalculatorState -> CalculatorState`).
 I did this because both parameters are always needed and a tuple makes this clear -- I don't want to be partially applying the input, for example.
 
@@ -165,7 +165,7 @@ but since I am in "sketch" mode, and I don't want to reorder things all the time
 I will just append new declarations to the bottom and use `and` to connect them.
 
 In the final production code though, when the design has stabilized, I *would* reorder these types to avoid using `and`.
-The reason is that `and` can [hide cycles between types](../posts/cyclic-dependencies/index.md) and prevent refactoring.
+The reason is that `and` can [hide cycles between types](../posts/cyclic-dependencies.md) and prevent refactoring.
 
 ## Defining the CalculatorInput type
 

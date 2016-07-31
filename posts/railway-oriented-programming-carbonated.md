@@ -5,7 +5,7 @@ description: "Three ways to implement FizzBuzz"
 categories: []
 ---
 
-As a follow up to the [Railway Oriented Programming](../posts/recipe-part2/index.md) post, I thought I'd apply the same technique to the [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/index.md) problem,
+As a follow up to the [Railway Oriented Programming](../posts/recipe-part2.md) post, I thought I'd apply the same technique to the [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/index.md) problem,
 and compare it with other implementations.
 
 A large part of this post was directly <s>stolen from</s> inspired by [Dave Fayram's post on FizzBuzz](http://dave.fayr.am/posts/2012-10-4-finding-fizzbuzz.html), with some additional ideas from
@@ -425,7 +425,7 @@ There is a subtle bug in the use of `List.reduce`, however. Can you see what it 
 ## FizzBuzz: The railway oriented version
 
 The pipeline version is a perfectly adequate functional implementation of FizzBuzz, but for fun, let's see if we can use the "two-track" design described
-in the [railway oriented programming](../posts/recipe-part2/index.md) post.
+in the [railway oriented programming](../posts/recipe-part2.md) post.
 
 As a quick reminder, in "railway oriented programming" (a.k.a the "Either" monad), we define a union type with two cases: "Success" and "Failure", each representing a different "track".
 We then connect a set of "two-track" functions together to make the railway.
@@ -690,7 +690,7 @@ There are some problems with the version we have so far:
 As it happens, we can kill two birds with one stone and address both of these issues at once. 
 
 Instead of combining all the "switch" functions in *series*, we can "add" them together in *parallel*.
-In the [railway oriented programming](../posts/recipe-part2/index.md) post, we used this technique for combining validation functions.
+In the [railway oriented programming](../posts/recipe-part2.md) post, we used this technique for combining validation functions.
 For FizzBuzz we are going to use it for doing all the factors at once.
 
 The trick is to define a "append" or "concat" function for combining two functions. Once we can add two functions this way, we can continue and add as many as we like.
@@ -823,7 +823,7 @@ You can see the difference if you compare the pipeline version of `carbonate` wi
 
 In other situations, of course, the railway oriented approach might not work, and the pipeline approach might be better. I hope this post has given some useful insight into both.
 
-*If you're a FizzBuzz fan, check out the [Functional Reactive Programming](../posts/concurrency-reactive/index.md) page, which has yet another variant of the problem.*
+*If you're a FizzBuzz fan, check out the [Functional Reactive Programming](../posts/concurrency-reactive.md) page, which has yet another variant of the problem.*
 
 ## Postscript: Be careful when using List.reduce
 

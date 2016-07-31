@@ -13,7 +13,7 @@ In this post and the next, we'll look at the nearest F# equivalents to common C#
 
 ## Basic syntax conversion guidelines ##
 
-Before starting a port, you need to understand how F# syntax is different from C# syntax. This section presents some general guidelines for converting from one to another. (For a quick overview of F# syntax as a whole, see ["F# syntax in 60 seconds"](../posts/fsharp-in-60-seconds/index.md))
+Before starting a port, you need to understand how F# syntax is different from C# syntax. This section presents some general guidelines for converting from one to another. (For a quick overview of F# syntax as a whole, see ["F# syntax in 60 seconds"](../posts/fsharp-in-60-seconds.md))
 
 ### Curly braces and indentation ###
 
@@ -167,7 +167,7 @@ type myClassName() =
 
 Note that there are parentheses after the class name. These are required for class definitions.
 
-More complicated class definitions will be shown in the next example, and you read the [complete discussion of classes](../posts/classes/index.md).
+More complicated class definitions will be shown in the next example, and you read the [complete discussion of classes](../posts/classes.md).
 
 ### Converting function/method signatures
 
@@ -324,7 +324,7 @@ let Square input =
 
 This is because F# is expression-based. Everything is an expression, and the value of a block expression as a whole is just the value of the last expression in the block. 
 
-For more details on expression-oriented code, see ["expressions vs statements"](../posts/expressions-vs-statements/index.md).
+For more details on expression-oriented code, see ["expressions vs statements"](../posts/expressions-vs-statements.md).
 
 ### Printing to the console
 

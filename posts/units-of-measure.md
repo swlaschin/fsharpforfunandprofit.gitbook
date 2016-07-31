@@ -7,7 +7,7 @@ seriesId: "Understanding F# types"
 seriesOrder: 11
 ---
 
-As we mentioned [earlier in the "why use F#?" series](../posts/correctness-type-checking/index.md#units-of-measure), F# has a very cool feature which allows you to add extra unit-of-measure information to as metadata to numeric types. 
+As we mentioned [earlier in the "why use F#?" series](../posts/correctness-type-checking.md#units-of-measure), F# has a very cool feature which allows you to add extra unit-of-measure information to as metadata to numeric types. 
 
 The F# compiler will then make sure that only numerics with the same unit-of-measure can be combined. This can be very useful to stop accidental mismatches and to make your code safer.
 

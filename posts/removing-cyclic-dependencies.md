@@ -39,7 +39,7 @@ Before we get started, here are three useful tips which apply generally when try
 
 **Tip 1: Treat F# like F#**.  
 
-Recognize that F# is not C#. If you are willing to work with F# using its native idioms, then it is normally very straightforward to avoid circular dependencies by using a different style of [code organization](../posts/recipe-part3/index.md). 
+Recognize that F# is not C#. If you are willing to work with F# using its native idioms, then it is normally very straightforward to avoid circular dependencies by using a different style of [code organization](../posts/recipe-part3.md). 
 
 **Tip 2: Separate types from behavior**. 
 
@@ -360,7 +360,7 @@ module MethodDependency_SeparateTypes3 =
 
 You might be thinking that I have made things more complicated now -- I have to specify the `observer` function everywhere I call `changeName` in my code. Surely this is worse than before? At least in the OO version, the observer was part of the customer object and I didn't have to keep passing it in.
 
-Ah, but, you're forgetting the magic of [partial application](../posts/partial-application/index.md)!  You can set up a function with the observer "baked in", and then use *that* function everywhere, without needing to pass in an observer every time you use it. Clever!
+Ah, but, you're forgetting the magic of [partial application](../posts/partial-application.md)!  You can set up a function with the observer "baked in", and then use *that* function everywhere, without needing to pass in an observer every time you use it. Clever!
 
 ```
 module MethodDependency_SeparateTypes3 = 
@@ -415,7 +415,7 @@ let hook observer f param1 =
     y                // return the result value
 ```
 
-If you have read the [railway oriented programming post](../posts/recipe-part2/index.md), you might notice that this is quite similar to what I called a "dead-end" function.  I won't go into more details here, but this is indeed a common pattern.
+If you have read the [railway oriented programming post](../posts/recipe-part2.md), you might notice that this is quite similar to what I called a "dead-end" function.  I won't go into more details here, but this is indeed a common pattern.
 
 Ok, back to the code -- how do we use this generic `hook` function?  
 
@@ -1035,12 +1035,12 @@ But that's a big topic, so I'll save it for another day.
 
 ## Summary
 
-I hope that this post has given you some useful tips on removing dependency cycles. With these various approaches in hand, any problems with [module organization](../posts/recipe-part3/index.md) should be able to be resolved easily.
+I hope that this post has given you some useful tips on removing dependency cycles. With these various approaches in hand, any problems with [module organization](../posts/recipe-part3.md) should be able to be resolved easily.
 
 In the next post in this series, I'll look at dependency cycles "in the wild", by comparing some real world C# and F# projects. 
 
 As we have seen, F# is a very opinionated language! It wants us to use modules instead of classes and it prohibits dependency cycles. Are these just annoyances, or do they really make a difference to the way that code is organized?
-[Read on and find out!](../posts/cycles-and-modularity-in-the-wild/index.md)
+[Read on and find out!](../posts/cycles-and-modularity-in-the-wild.md)
 
 
 

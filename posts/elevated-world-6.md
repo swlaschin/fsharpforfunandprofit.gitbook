@@ -8,9 +8,9 @@ seriesOrder: 6
 ---
 
 This post is the sixth in a series.
-In the [first two posts](../posts/elevated-world/index.md), I described some of the core functions for dealing with generic data types:  `map`, `bind`, and so on.
-In the [third post](../posts/elevated-world-3/index.md), I discussed "applicative" vs "monadic" style, and how to lift values and functions to be consistent with each other.
-In the [fourth](../posts/elevated-world-4/index.md) and [previous](../posts/elevated-world-5/index.md) posts, I introduced `traverse` and `sequence`
+In the [first two posts](../posts/elevated-world.md), I described some of the core functions for dealing with generic data types:  `map`, `bind`, and so on.
+In the [third post](../posts/elevated-world-3.md), I discussed "applicative" vs "monadic" style, and how to lift values and functions to be consistent with each other.
+In the [fourth](../posts/elevated-world-4.md) and [previous](../posts/elevated-world-5.md) posts, I introduced `traverse` and `sequence`
 as a way of working with lists of elevated values, and we saw this used in a practical example: downloading some URLs.
 
 In this post, we'll finish up by working through another practical example, but this time we'll create our own "elevated world" as a way to deal with awkward code.
@@ -21,36 +21,36 @@ We'll see that this approach is so common that it has a name -- the "Reader mona
 Here's a list of shortcuts to the various functions mentioned in this series:
 
 * **Part 1: Lifting to the elevated world**
-  * [The `map` function](../posts/elevated-world/index.md#map)
-  * [The `return` function](../posts/elevated-world/index.md#return)
-  * [The `apply` function](../posts/elevated-world/index.md#apply)
-  * [The `liftN` family of functions](../posts/elevated-world/index.md#lift)
-  * [The `zip` function and ZipList world](../posts/elevated-world/index.md#zip)
+  * [The `map` function](../posts/elevated-world.md#map)
+  * [The `return` function](../posts/elevated-world.md#return)
+  * [The `apply` function](../posts/elevated-world.md#apply)
+  * [The `liftN` family of functions](../posts/elevated-world.md#lift)
+  * [The `zip` function and ZipList world](../posts/elevated-world.md#zip)
 * **Part 2: How to compose world-crossing functions**    
-  * [The `bind` function](../posts/elevated-world-2/index.md#bind)
-  * [List is not a monad. Option is not a monad.](../posts/elevated-world-2/index.md#not-a-monad)
+  * [The `bind` function](../posts/elevated-world-2.md#bind)
+  * [List is not a monad. Option is not a monad.](../posts/elevated-world-2.md#not-a-monad)
 * **Part 3: Using the core functions in practice**  
-  * [Independent and dependent data](../posts/elevated-world-3/index.md#dependent)
-  * [Example: Validation using applicative style and monadic style](../posts/elevated-world-3/index.md#validation)
-  * [Lifting to a consistent world](../posts/elevated-world-3/index.md#consistent)
-  * [Kleisli world](../posts/elevated-world-3/index.md#kleisli)
+  * [Independent and dependent data](../posts/elevated-world-3.md#dependent)
+  * [Example: Validation using applicative style and monadic style](../posts/elevated-world-3.md#validation)
+  * [Lifting to a consistent world](../posts/elevated-world-3.md#consistent)
+  * [Kleisli world](../posts/elevated-world-3.md#kleisli)
 * **Part 4: Mixing lists and elevated values**    
-  * [Mixing lists and elevated values](../posts/elevated-world-4/index.md#mixing)
-  * [The `traverse`/`MapM` function](../posts/elevated-world-4/index.md#traverse)
-  * [The `sequence` function](../posts/elevated-world-4/index.md#sequence)
-  * ["Sequence" as a recipe for ad-hoc implementations](../posts/elevated-world-4/index.md#adhoc)
-  * [Readability vs. performance](../posts/elevated-world-4/index.md#readability)
-  * [Dude, where's my `filter`?](../posts/elevated-world-4/index.md#filter)
+  * [Mixing lists and elevated values](../posts/elevated-world-4.md#mixing)
+  * [The `traverse`/`MapM` function](../posts/elevated-world-4.md#traverse)
+  * [The `sequence` function](../posts/elevated-world-4.md#sequence)
+  * ["Sequence" as a recipe for ad-hoc implementations](../posts/elevated-world-4.md#adhoc)
+  * [Readability vs. performance](../posts/elevated-world-4.md#readability)
+  * [Dude, where's my `filter`?](../posts/elevated-world-4.md#filter)
 * **Part 5: A real-world example that uses all the techniques**    
-  * [Example: Downloading and processing a list of websites](../posts/elevated-world-5/index.md#asynclist)
-  * [Treating two worlds as one](../posts/elevated-world-5/index.md#asyncresult)
+  * [Example: Downloading and processing a list of websites](../posts/elevated-world-5.md#asynclist)
+  * [Treating two worlds as one](../posts/elevated-world-5.md#asyncresult)
 * **Part 6: Designing your own elevated world** 
-  * [Designing your own elevated world](../posts/elevated-world-6/index.md#part6)
-  * [Filtering out failures](../posts/elevated-world-6/index.md#filtering)
-  * [The Reader monad](../posts/elevated-world-6/index.md#readermonad)
+  * [Designing your own elevated world](../posts/elevated-world-6.md#part6)
+  * [Filtering out failures](../posts/elevated-world-6.md#filtering)
+  * [The Reader monad](../posts/elevated-world-6.md#readermonad)
 * **Part 7: Summary** 
-  * [List of operators mentioned](../posts/elevated-world-7/index.md#operators)
-  * [Further reading](../posts/elevated-world-7/index.md#further-reading)
+  * [List of operators mentioned](../posts/elevated-world-7.md#operators)
+  * [Further reading](../posts/elevated-world-7.md#further-reading)
 
 <a id="part6"></a>
 <hr>
@@ -532,7 +532,7 @@ type ApiAction<'a> = (ApiClient -> 'a)
 ```
 
 Unfortunately, as it stands, this is just a type alias for a function, not a separate type.
-We need to wrap it in a [single case union](../posts/designing-with-types-single-case-dus/index.md) to make it a distinct type.
+We need to wrap it in a [single case union](../posts/designing-with-types-single-case-dus.md) to make it a distinct type.
 
 ```
 type ApiAction<'a> = ApiAction of (ApiClient -> 'a)
@@ -672,7 +672,7 @@ For example, if we had an `ApiAction<int>` then `run api myAction` would result 
 And at the bottom, there is a `execute` function that creates an `ApiClient`, opens the connection, runs the action, and then closes the connection.
 
 And with the core functions for `ApiAction` defined, we can go ahead and define the functions for the compound type `ApiActionResult`,
-just as we did for `AsyncResult` in the [previous post](../posts/elevated-world-5/index.md#asyncresult):
+just as we did for `AsyncResult` in the [previous post](../posts/elevated-world-5.md#asyncresult):
 
 ```
 module ApiActionResult = 
@@ -1201,6 +1201,6 @@ rather than too abstract.
 In this post, we worked through another practical example, created our own elevated world which made things *much* easier, and in
 the process, accidentally re-invented the reader monad.
 
-If you liked this, you can see a similar practical example, this time for the State monad, in my series on ["Dr Frankenfunctor and the Monadster"](../posts/monadster/index.md).
+If you liked this, you can see a similar practical example, this time for the State monad, in my series on ["Dr Frankenfunctor and the Monadster"](../posts/monadster.md).
 
-The [next and final post](../posts/elevated-world-7/index.md) has a quick summary of the series, and some further reading.
+The [next and final post](../posts/elevated-world-7.md) has a quick summary of the series, and some further reading.

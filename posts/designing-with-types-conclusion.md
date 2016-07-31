@@ -21,7 +21,7 @@ For this final post, let's see them all applied together.
 
 ## The "before" code ##
 
-Here's the original example we started off with in the [first post](../posts/designing-with-types-intro/index.md) in the series:
+Here's the original example we started off with in the [first post](../posts/designing-with-types-intro.md) in the series:
 
 ```
 type Contact = 

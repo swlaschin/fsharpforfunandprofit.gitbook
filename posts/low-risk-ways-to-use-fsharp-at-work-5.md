@@ -8,7 +8,7 @@ seriesOrder: 5
 
 ---
 
-This post is the conclusion of the series on [low-risk and incremental ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work/index.md).
+This post is the conclusion of the series on [low-risk and incremental ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work.md).
 
 To wrap up, we'll look at a few more ways in which F# can help you with various development tasks around the edges, without impacting any core or mission critical code.
 
@@ -75,7 +75,7 @@ doing substitutions in a template, finding HTML links for a web crawler, parsing
 F#, being an ML-derived language, is ideal for parsing tasks of all kinds, from simple regexes to full fledged parsers.
 
 Of course, there are many off-the-shelf libraries for common tasks, but sometimes you need to write your own.
-A good example of this is TickSpec, the BDD framework that [we saw earlier](../posts/low-risk-ways-to-use-fsharp-at-work-3/index.md#test-bdd).
+A good example of this is TickSpec, the BDD framework that [we saw earlier](../posts/low-risk-ways-to-use-fsharp-at-work-3.md#test-bdd).
 
 TickSpec needs to parse the so-called "Gherkin" format of Given/When/Then. Rather than create a dependency on another library,
 I imagine that it was easier (and more fun) for [Phil](http://trelford.com/blog/post/TickSpec.aspx) to write his own parser in a few hundred lines.
@@ -100,7 +100,7 @@ and a [custom DSL for load testing scenarios](http://www.frenk.com/2012/01/real-
 
 Once you have parsed or analyzed something, it is always nice if you can display the results visually, rather than as tables full of data.
 
-For example, in a [previous post](../posts/cycles-and-modularity-in-the-wild/index.md) I used F# in conjunction with [GraphViz](http://www.graphviz.org/index.md)
+For example, in a [previous post](../posts/cycles-and-modularity-in-the-wild.md) I used F# in conjunction with [GraphViz](http://www.graphviz.org/index.md)
 to create diagrams of dependency relationships. You can see a sample below:
 
 ![](../assets/img/tickspec_svg.png)
@@ -219,7 +219,7 @@ So that's Freebase. Lots of good information, both useful and frivolous.
 
 ## Using Freebase to generate realistic test data
 
-We've seen how FsCheck can be used to [generate test data](../posts/low-risk-ways-to-use-fsharp-at-work-3/index.md#test-dummy).
+We've seen how FsCheck can be used to [generate test data](../posts/low-risk-ways-to-use-fsharp-at-work-3.md#test-dummy).
 Well, you can also get the same affect by getting data from Freebase, which makes the data much more realistic.
 
 [Kit Eason](http://twitter.com/kitlovesfsharp) showed how to do this in a [tweet](http://twitter.com/kitlovesfsharp/status/296240699735695360),

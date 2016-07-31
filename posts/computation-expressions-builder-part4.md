@@ -15,7 +15,7 @@ Ultimately, this detour will lead to a dead end, but I hope the journey might pr
 
 At some point, you might have an insight: 
 
-* The builder methods are just normal class methods, and unlike standalone functions, methods can support [overloading with different parameter types](../posts/type-extensions/index.md#method-overloading), which means we can create *different implementations* of any method, as long as the parameter types are different.
+* The builder methods are just normal class methods, and unlike standalone functions, methods can support [overloading with different parameter types](../posts/type-extensions.md#method-overloading), which means we can create *different implementations* of any method, as long as the parameter types are different.
 
 So then you might get excited about this and how it could be used. But it turns out to be less useful than you might think. Let's look at some examples.
 
@@ -68,7 +68,7 @@ successOrError {
 
 What's wrong with this, you might think?
 
-Well, first, if we go back to the [discussion on wrapper types](../posts/computation-expressions-wrapper-types-part2/index.md), we made the point that wrapper types should be *generic*. Workflows should be reusable as much as possible -- why tie the implementation to any particular primitive type?
+Well, first, if we go back to the [discussion on wrapper types](../posts/computation-expressions-wrapper-types-part2.md), we made the point that wrapper types should be *generic*. Workflows should be reusable as much as possible -- why tie the implementation to any particular primitive type?
 
 What that means in this case is that the union type should be resigned to look like this:  
 

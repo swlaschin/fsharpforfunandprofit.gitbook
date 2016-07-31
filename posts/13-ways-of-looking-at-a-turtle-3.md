@@ -7,34 +7,34 @@ categories: [Patterns]
 
 In this, the third part of my two-part mega-post, I'm continuing to stretch the simple turtle graphics model to the breaking point.
 
-In the [first](../posts/13-ways-of-looking-at-a-turtle/index.md) and [second post](../posts/13-ways-of-looking-at-a-turtle-2/index.md),
+In the [first](../posts/13-ways-of-looking-at-a-turtle.md) and [second post](../posts/13-ways-of-looking-at-a-turtle-2.md),
 I described thirteen different ways of looking at a turtle graphics implementation.
 
 Unfortunately, after I published them, I realized that there were some other ways that I had forgotten to mention. 
 So in this post, you'll get to see two BONUS ways.
 
-* [Way 14. Abstract Data Turtle](../posts/13-ways-of-looking-at-a-turtle-3/index.md#way14), in which we encapsulate the details of a turtle implementation by using an Abstract Data Type.
-* [Way 15. Capability-based Turtle](../posts/13-ways-of-looking-at-a-turtle-3/index.md#way15), in which we control what turtle functions are available to a client, based on the current
+* [Way 14. Abstract Data Turtle](../posts/13-ways-of-looking-at-a-turtle-3.md#way14), in which we encapsulate the details of a turtle implementation by using an Abstract Data Type.
+* [Way 15. Capability-based Turtle](../posts/13-ways-of-looking-at-a-turtle-3.md#way15), in which we control what turtle functions are available to a client, based on the current
   state of the turtle.
 
 As a reminder, here were the previous thirteen ways:
 
-* [Way 1. A basic object-oriented approach](../posts/13-ways-of-looking-at-a-turtle/index.md#way1), in which we create a class with mutable state.
-* [Way 2. A basic functional approach](../posts/13-ways-of-looking-at-a-turtle/index.md#way2), in which we create a module of functions with immutable state.
-* [Way 3. An API with a object-oriented core](../posts/13-ways-of-looking-at-a-turtle/index.md#way3), in which we create an object-oriented API that calls a stateful core class.
-* [Way 4. An API with a functional core](../posts/13-ways-of-looking-at-a-turtle/index.md#way4), in which we create an stateful API that uses stateless core functions.
-* [Way 5. An API in front of an agent](../posts/13-ways-of-looking-at-a-turtle/index.md#way5), in which we create an API that uses a message queue to communicate with an agent.
-* [Way 6. Dependency injection using interfaces](../posts/13-ways-of-looking-at-a-turtle/index.md#way6), in which we decouple the implementation from the API using an interface or record of functions.
-* [Way 7. Dependency injection using functions](../posts/13-ways-of-looking-at-a-turtle/index.md#way7), in which we decouple the implementation from the API by passing a function parameter.
-* [Way 8. Batch processing using a state monad](../posts/13-ways-of-looking-at-a-turtle/index.md#way8), in which we create a special "turtle workflow" computation expression to track state for us.
-* [Way 9. Batch processing using command objects](../posts/13-ways-of-looking-at-a-turtle/index.md#way9), in which we create a type to represent a turtle command, and then process a list of commands all at once.
-* [Interlude: Conscious decoupling with data types](../posts/13-ways-of-looking-at-a-turtle/index.md#decoupling). A few notes on using data vs. interfaces for decoupling.
-* [Way 10. Event sourcing](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way10), in which  state is built from a list of past events.
-* [Way 11. Functional Retroactive Programming (stream processing)](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way11), in which business logic is based on reacting to earlier events.
-* [Episode V: The Turtle Strikes Back](../posts/13-ways-of-looking-at-a-turtle-2/index.md#strikes-back), in which the turtle API changes so that some commands may fail.
-* [Way 12. Monadic control flow](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way12), in which we make decisions in the turtle workflow based on results from earlier commands.
-* [Way 13. A turtle interpreter](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way13), in which we completely decouple turtle programming from turtle implementation, and nearly encounter the free monad.
-* [Review of all the techniques used](../posts/13-ways-of-looking-at-a-turtle-2/index.md#review).
+* [Way 1. A basic object-oriented approach](../posts/13-ways-of-looking-at-a-turtle.md#way1), in which we create a class with mutable state.
+* [Way 2. A basic functional approach](../posts/13-ways-of-looking-at-a-turtle.md#way2), in which we create a module of functions with immutable state.
+* [Way 3. An API with a object-oriented core](../posts/13-ways-of-looking-at-a-turtle.md#way3), in which we create an object-oriented API that calls a stateful core class.
+* [Way 4. An API with a functional core](../posts/13-ways-of-looking-at-a-turtle.md#way4), in which we create an stateful API that uses stateless core functions.
+* [Way 5. An API in front of an agent](../posts/13-ways-of-looking-at-a-turtle.md#way5), in which we create an API that uses a message queue to communicate with an agent.
+* [Way 6. Dependency injection using interfaces](../posts/13-ways-of-looking-at-a-turtle.md#way6), in which we decouple the implementation from the API using an interface or record of functions.
+* [Way 7. Dependency injection using functions](../posts/13-ways-of-looking-at-a-turtle.md#way7), in which we decouple the implementation from the API by passing a function parameter.
+* [Way 8. Batch processing using a state monad](../posts/13-ways-of-looking-at-a-turtle.md#way8), in which we create a special "turtle workflow" computation expression to track state for us.
+* [Way 9. Batch processing using command objects](../posts/13-ways-of-looking-at-a-turtle.md#way9), in which we create a type to represent a turtle command, and then process a list of commands all at once.
+* [Interlude: Conscious decoupling with data types](../posts/13-ways-of-looking-at-a-turtle.md#decoupling). A few notes on using data vs. interfaces for decoupling.
+* [Way 10. Event sourcing](../posts/13-ways-of-looking-at-a-turtle-2.md#way10), in which  state is built from a list of past events.
+* [Way 11. Functional Retroactive Programming (stream processing)](../posts/13-ways-of-looking-at-a-turtle-2.md#way11), in which business logic is based on reacting to earlier events.
+* [Episode V: The Turtle Strikes Back](../posts/13-ways-of-looking-at-a-turtle-2.md#strikes-back), in which the turtle API changes so that some commands may fail.
+* [Way 12. Monadic control flow](../posts/13-ways-of-looking-at-a-turtle-2.md#way12), in which we make decisions in the turtle workflow based on results from earlier commands.
+* [Way 13. A turtle interpreter](../posts/13-ways-of-looking-at-a-turtle-2.md#way13), in which we completely decouple turtle programming from turtle implementation, and nearly encounter the free monad.
+* [Review of all the techniques used](../posts/13-ways-of-looking-at-a-turtle-2.md#review).
 
 All source code for this post is available [on github](https://github.com/swlaschin/13-ways-of-looking-at-a-turtle).
 
@@ -50,7 +50,7 @@ That is, a "turtle" is defined as an opaque type along with a corresponding set 
 
 That is, we have number of functions that work on the type, but we are not allowed to see "inside" the type itself.
 
-In a sense, you can think of it as a third alternative to the [OO approach in way 1](../posts/13-ways-of-looking-at-a-turtle/index.md#way1) and the [functional approach in way 2](../posts/13-ways-of-looking-at-a-turtle/index.md#way2).
+In a sense, you can think of it as a third alternative to the [OO approach in way 1](../posts/13-ways-of-looking-at-a-turtle.md#way1) and the [functional approach in way 2](../posts/13-ways-of-looking-at-a-turtle.md#way2).
 
 * In the OO implementation, the details of the internals are nicely encapsulated, and access is only via methods. The downside of the OO class is that it is mutable.
 * In the FP implementation, the `TurtleState` is immutable, but the downside is that the internals of the state are public, and some clients may have accessed these fields,
@@ -130,7 +130,7 @@ module Turtle =
     }                
 ```
 
-The rest of the turtle module functions are unchanged from their implementation in [way 2](../posts/13-ways-of-looking-at-a-turtle/index.md#way2).
+The rest of the turtle module functions are unchanged from their implementation in [way 2](../posts/13-ways-of-looking-at-a-turtle.md#way2).
 
 ### An ADT client
 
@@ -202,7 +202,7 @@ For more on ADTs in F#, see [this talk and thread](https://www.reddit.com/r/fsha
 
 ## 15: Capability-based Turtle 
 
-In the "monadic control flow" approach [(way 12)](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way12) we handled responses from the turtle telling us that it had hit a barrier.
+In the "monadic control flow" approach [(way 12)](../posts/13-ways-of-looking-at-a-turtle-2.md#way12) we handled responses from the turtle telling us that it had hit a barrier.
 
 But even though we had hit a barrier, nothing was stopping us from calling the `move` operation over and over again!  
 
@@ -212,7 +212,7 @@ To make this work, we shouldn't provide an API, but instead, after each call, re
 the usual suspects of `move`, `turn`, `penUp`, etc., but when we hit a barrier, `move` would be dropped from that list.  Simple, but effective.
 
 This technique is closely related to an authorization and security technique called *capability-based security*. If you are interested in learning more,
-I have [a whole series of posts devoted to it](../posts/capability-based-security/index.md).
+I have [a whole series of posts devoted to it](../posts/capability-based-security.md).
 
 ### Designing a capability-based Turtle 
 
@@ -256,7 +256,7 @@ Next, the record of functions `TurtleFunctions` defines a field for each functio
 We have also declared type aliases for each function to make them easier to work. Writing `MoveFn` is easier than writing `Distance -> (MoveResponse * TurtleFunctions)` everywhere!
 Note that, since these definitions are mutually recursive, I was forced to use the `and` keyword.
 
-Finally, note the difference between the signature of `MoveFn` in this design and the signature of `move` in [the earlier design of way 12](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way12).
+Finally, note the difference between the signature of `MoveFn` in this design and the signature of `move` in [the earlier design of way 12](../posts/13-ways-of-looking-at-a-turtle-2.md#way12).
 
 Earlier version:
 
@@ -673,7 +673,7 @@ You'd want to come up with something a bit better for real code, but I hope that
 * The client's logic is much more convoluted as it can never be sure that a function will be available! It has to check every time. 
 * The API is not easily serializable, unlike some of the data-oriented APIs.
 
-For more on capability-based security, see [my posts](../posts/capability-based-security/index.md) or watch my ["Enterprise Tic-Tac-Toe" video](http://fsharpforfunandprofit.com/ettt/).
+For more on capability-based security, see [my posts](../posts/capability-based-security.md) or watch my ["Enterprise Tic-Tac-Toe" video](http://fsharpforfunandprofit.com/ettt/index.md).
 
 *The source code for this version is available [here](https://github.com/swlaschin/13-ways-of-looking-at-a-turtle/blob/master/15-CapabilityBasedTurtle.fsx).*
 

@@ -8,7 +8,7 @@ seriesOrder: 5
 categories: [Object-oriented, Interfaces]
 ---
 
-So as we saw in the [previous post](../posts/interfaces/index.md), implementing interfaces in F# is a bit more awkward than in C#. But F# has a trick up its sleeve, called "object expressions".
+So as we saw in the [previous post](../posts/interfaces.md), implementing interfaces in F# is a bit more awkward than in C#. But F# has a trick up its sleeve, called "object expressions".
 
 With object expressions, you can implement an interface on-the-fly, without having to create a class.  
 

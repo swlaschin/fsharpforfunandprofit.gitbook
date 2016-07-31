@@ -32,7 +32,7 @@ Here is a list of dos and don'ts that will encourage you to think functionally. 
 
 * Don't use the `mutable` keyword **at all** as a beginner. Coding complex functions without the crutch of mutable state will really force you to understand the functional paradigm.
 * Don't use `for` loops or `if-then-else`. Use pattern matching for testing booleans and recursing through lists.
-* Don't use "dot notation". Instead of "dotting into" objects, try to use functions for everything. That is, write `String.length "hello"` rather than `"hello".Length`. It might seem like extra work, but this way of working is essential when using pipes and higher order functions like `List.map`. And don't write your own methods either! See [this post for details](../posts/type-extensions/index.md#downsides-of-methods).
+* Don't use "dot notation". Instead of "dotting into" objects, try to use functions for everything. That is, write `String.length "hello"` rather than `"hello".Length`. It might seem like extra work, but this way of working is essential when using pipes and higher order functions like `List.map`. And don't write your own methods either! See [this post for details](../posts/type-extensions.md#downsides-of-methods).
 * As a corollary, don't create classes. Use only the pure F# types such as tuples, records and unions.
 * Don't use the debugger. If you have relied on the debugger to find and fix incorrect code, you will get a nasty shock. In F#, you will probably not get that far, because the compiler is so much stricter in many ways.  And of course, there is no tool to "debug" the compiler and step through its processing.  The best tool for debugging compiler errors is your brain, and F# forces you to use it! 
 

@@ -265,7 +265,7 @@ Note that F# natively uses `float` instead of `double`, but both can be used.
 
 ## Casting between built-in primitive types
 
-*Note: this section only covers casting of primitive types. For casting between classes see the series on [object-oriented programming](../posts/casting/index.md).*
+*Note: this section only covers casting of primitive types. For casting between classes see the series on [object-oriented programming](../posts/casting.md).*
 
 
 There is no direct "cast" syntax in F#, but there are helper functions to cast between types. These helper functions have the same name as the type (you can see them in the `Microsoft.FSharp.Core` namespace).
@@ -362,7 +362,7 @@ let o = box 1
 let i = unbox o  // FS0030: Value restriction error
 ```
 
-The solution is to reorder the code to help the type inference, or when all else fails, add an explicit type annotation. See [the post on type inference for more tips](../posts/type-inference/index.md#troubleshooting-summary).
+The solution is to reorder the code to help the type inference, or when all else fails, add an explicit type annotation. See [the post on type inference for more tips](../posts/type-inference.md#troubleshooting-summary).
 
 ### Boxing in combination with type detection
 

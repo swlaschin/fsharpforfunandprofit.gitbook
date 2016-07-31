@@ -7,7 +7,7 @@ seriesId: "Understanding monoids"
 seriesOrder: 2
 ---
 
-In the [previous post](../posts/monoids-without-tears/index.md), we looked at the definition of a monoid. In this post, we'll see how to implement some monoids.
+In the [previous post](../posts/monoids-without-tears.md), we looked at the definition of a monoid. In this post, we'll see how to implement some monoids.
 
 First, let's revisit the definition:
 
@@ -172,7 +172,7 @@ We should get this result:
 TOTAL          3  21.97
 ```
 
-*NOTE: For more on the printf formatting options used, see the post on [printf here](../posts/printf/index.md).*
+*NOTE: For more on the printf formatting options used, see the post on [printf here](../posts/printf.md).*
 
 Now let's apply this to a list using `reduce`:
 

@@ -9,8 +9,8 @@ categories: [Folds, Patterns]
 
 This post is the third in a series.
 
-In the [first post](../posts/recursive-types-and-folds/index.md), I introduced "catamorphisms", a way of creating functions for recursive types,
-and in the [second post](../posts/recursive-types-and-folds-1b/index.md), we created a few catamorphism implementations.
+In the [first post](../posts/recursive-types-and-folds.md), I introduced "catamorphisms", a way of creating functions for recursive types,
+and in the [second post](../posts/recursive-types-and-folds-1b.md), we created a few catamorphism implementations.
 
 But at the end of the previous post, I noted that all the catamorphism implementations so far have had a potentially serious flaw.
 
@@ -21,41 +21,41 @@ In this post, we'll look at the flaw and how to work around it, and in the proce
 Here's the contents of this series:
 
 * **Part 1: Introduction to recursive types and catamorphisms**
-  * [A simple recursive type](../posts/recursive-types-and-folds/index.md#basic-recursive-type)
-  * [Parameterize all the things](../posts/recursive-types-and-folds/index.md#parameterize)
-  * [Introducing catamorphisms](../posts/recursive-types-and-folds/index.md#catamorphisms)
-  * [Benefits of catamorphisms](../posts/recursive-types-and-folds/index.md#benefits)
-  * [Rules for creating a catamorphism](../posts/recursive-types-and-folds/index.md#rules)
+  * [A simple recursive type](../posts/recursive-types-and-folds.md#basic-recursive-type)
+  * [Parameterize all the things](../posts/recursive-types-and-folds.md#parameterize)
+  * [Introducing catamorphisms](../posts/recursive-types-and-folds.md#catamorphisms)
+  * [Benefits of catamorphisms](../posts/recursive-types-and-folds.md#benefits)
+  * [Rules for creating a catamorphism](../posts/recursive-types-and-folds.md#rules)
 * **Part 2: Catamorphism examples**  
-  * [Catamorphism example: File system domain](../posts/recursive-types-and-folds-1b/index.md#file-system)
-  * [Catamorphism example: Product domain](../posts/recursive-types-and-folds-1b/index.md#product)
+  * [Catamorphism example: File system domain](../posts/recursive-types-and-folds-1b.md#file-system)
+  * [Catamorphism example: Product domain](../posts/recursive-types-and-folds-1b.md#product)
 * **Part 3: Introducing folds**    
-  * [A flaw in our catamorphism implementation](../posts/recursive-types-and-folds-2/index.md#flaw)
-  * [Introducing `fold`](../posts/recursive-types-and-folds-2/index.md#fold)
-  * [Problems with fold](../posts/recursive-types-and-folds-2/index.md#problems)
-  * [Using functions as accumulators](../posts/recursive-types-and-folds-2/index.md#functions)
-  * [Introducing `foldback`](../posts/recursive-types-and-folds-2/index.md#foldback)
-  * [Rules for creating a fold](../posts/recursive-types-and-folds-2/index.md#rules)
+  * [A flaw in our catamorphism implementation](../posts/recursive-types-and-folds-2.md#flaw)
+  * [Introducing `fold`](../posts/recursive-types-and-folds-2.md#fold)
+  * [Problems with fold](../posts/recursive-types-and-folds-2.md#problems)
+  * [Using functions as accumulators](../posts/recursive-types-and-folds-2.md#functions)
+  * [Introducing `foldback`](../posts/recursive-types-and-folds-2.md#foldback)
+  * [Rules for creating a fold](../posts/recursive-types-and-folds-2.md#rules)
 * **Part 4: Understanding folds**      
-  * [Iteration vs. recursion](../posts/recursive-types-and-folds-2b/index.md#iteration)
-  * [Fold example: File system domain](../posts/recursive-types-and-folds-2b/index.md#file-system)  
-  * [Common questions about "fold"](../posts/recursive-types-and-folds-2b/index.md#questions)
+  * [Iteration vs. recursion](../posts/recursive-types-and-folds-2b.md#iteration)
+  * [Fold example: File system domain](../posts/recursive-types-and-folds-2b.md#file-system)  
+  * [Common questions about "fold"](../posts/recursive-types-and-folds-2b.md#questions)
 * **Part 5: Generic recursive types**  
-  * [LinkedList: A generic recursive type](../posts/recursive-types-and-folds-3/index.md#linkedlist)
-  * [Making the Gift domain generic](../posts/recursive-types-and-folds-3/index.md#revisiting-gift)
-  * [Defining a generic Container type](../posts/recursive-types-and-folds-3/index.md#container)
-  * [A third way to implement the gift domain](../posts/recursive-types-and-folds-3/index.md#another-gift)
-  * [Abstract or concrete? Comparing the three designs](../posts/recursive-types-and-folds-3/index.md#compare)
+  * [LinkedList: A generic recursive type](../posts/recursive-types-and-folds-3.md#linkedlist)
+  * [Making the Gift domain generic](../posts/recursive-types-and-folds-3.md#revisiting-gift)
+  * [Defining a generic Container type](../posts/recursive-types-and-folds-3.md#container)
+  * [A third way to implement the gift domain](../posts/recursive-types-and-folds-3.md#another-gift)
+  * [Abstract or concrete? Comparing the three designs](../posts/recursive-types-and-folds-3.md#compare)
 * **Part 6: Trees in the real world**  
-  * [Defining a generic Tree type](../posts/recursive-types-and-folds-3b/index.md#tree)
-  * [The Tree type in the real world](../posts/recursive-types-and-folds-3b/index.md#reuse)
-  * [Mapping the Tree type](../posts/recursive-types-and-folds-3b/index.md#map)
-  * [Example: Creating a directory listing](../posts/recursive-types-and-folds-3b/index.md#listing)
-  * [Example: A parallel grep](../posts/recursive-types-and-folds-3b/index.md#grep)
-  * [Example: Storing the file system in a database](../posts/recursive-types-and-folds-3b/index.md#database)
-  * [Example: Serializing a Tree to JSON](../posts/recursive-types-and-folds-3b/index.md#tojson)
-  * [Example: Deserializing a Tree from JSON](../posts/recursive-types-and-folds-3b/index.md#fromjson)
-  * [Example: Deserializing a Tree from JSON - with error handling](../posts/recursive-types-and-folds-3b/index.md#json-with-error-handling)
+  * [Defining a generic Tree type](../posts/recursive-types-and-folds-3b.md#tree)
+  * [The Tree type in the real world](../posts/recursive-types-and-folds-3b.md#reuse)
+  * [Mapping the Tree type](../posts/recursive-types-and-folds-3b.md#map)
+  * [Example: Creating a directory listing](../posts/recursive-types-and-folds-3b.md#listing)
+  * [Example: A parallel grep](../posts/recursive-types-and-folds-3b.md#grep)
+  * [Example: Storing the file system in a database](../posts/recursive-types-and-folds-3b.md#database)
+  * [Example: Serializing a Tree to JSON](../posts/recursive-types-and-folds-3b.md#tojson)
+  * [Example: Deserializing a Tree from JSON](../posts/recursive-types-and-folds-3b.md#fromjson)
+  * [Example: Deserializing a Tree from JSON - with error handling](../posts/recursive-types-and-folds-3b.md#json-with-error-handling)
 
 <a id="flaw"></a>
 <hr>
@@ -786,7 +786,7 @@ fWrapped:(WrappingPaperStyle -> 'a -> 'a)
 
 To finish up this post, let's summarize the rules for creating a fold.
 
-In the first post we saw that creating a catamorphism is a mechanical process that [follows rules](../posts/recursive-types-and-folds/index.md#rules).
+In the first post we saw that creating a catamorphism is a mechanical process that [follows rules](../posts/recursive-types-and-folds.md#rules).
 The same is true for creating a iterative top-down fold. The process is:
 
 * Create a function parameter to handle each case in the structure.
@@ -805,7 +805,7 @@ It does not have access to the results from the inner levels.
 
 We've seen in this post how to define a tail-recursive implementation of a catamorphism, called "fold" and the reverse version "foldback".
 
-In the [next post](../posts/recursive-types-and-folds-2b/index.md) we'll step back a bit and spend some time understanding what "fold" really means,
+In the [next post](../posts/recursive-types-and-folds-2b.md) we'll step back a bit and spend some time understanding what "fold" really means,
 and at some guidelines for choosing between `fold`, `foldback` and `cata`.
 
 We'll then see if we can apply these rules to another domain.

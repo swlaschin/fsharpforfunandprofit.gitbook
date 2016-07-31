@@ -81,7 +81,7 @@ let adderGenerator2 x   = fun y -> x + y
 let adderGenerator3     = fun x -> (fun y -> x + y)
 ```
 
-If you can't see it, then do reread the [post on currying](../posts/currying/index.md). This is important stuff to understand!
+If you can't see it, then do reread the [post on currying](../posts/currying.md). This is important stuff to understand!
 
 ## Pattern matching on parameters ##
 
@@ -234,7 +234,7 @@ System.String.Compare tuple   // error
 System.String.Compare "a","b" // error  
 ```
 
-If you do want to partially apply .NET library functions, it is normally trivial to write wrapper functions for them, as we have [seen earlier](../posts/partial-application/index.md), and as shown below:
+If you do want to partially apply .NET library functions, it is normally trivial to write wrapper functions for them, as we have [seen earlier](../posts/partial-application.md), and as shown below:
 
 ```
 // create a wrapper function
@@ -285,7 +285,7 @@ let setCustomerName first last = // not recommended
 let setCustomerName myCredentials aName = //good
 ```
 
-Finally, do be sure to order the parameters appropriately to assist with partial application (see the guidelines in the earlier [post](../posts/partial-application/index.md)). For example, in the last function above, why did I put the `myCredentials` parameter ahead of the `aName` parameter?
+Finally, do be sure to order the parameters appropriately to assist with partial application (see the guidelines in the earlier [post](../posts/partial-application.md)). For example, in the last function above, why did I put the `myCredentials` parameter ahead of the `aName` parameter?
 
 ## Parameter-less functions ##
 

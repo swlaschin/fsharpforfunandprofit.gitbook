@@ -12,7 +12,7 @@ seriesOrder: 6
 *This post is one of series in I which I hope to close the gap between theory and practice in functional programming.
 I pick a small project and show you my thought processes as I go about designing and implementing it from beginning to end.*
  
-In the [previous post](../posts/enterprise-tic-tac-toe/index.md), I did a design for a Tic-Tac-Toe (aka Noughts and Crosses) game.
+In the [previous post](../posts/enterprise-tic-tac-toe.md), I did a design for a Tic-Tac-Toe (aka Noughts and Crosses) game.
 
 It wasn't bad for a direct-to-code brain dump, but there were a couple of things that I wasn't happy with.
 
@@ -98,7 +98,7 @@ Why I am assuming that the user of the API will be so malicious -- forging fake 
 
 The reason is that I use this as a design guideline. If a malicious user can do something I don't want, then the design is probably not good enough.
 
-In my series on [capability based security](../posts/capability-based-security/index.md) I point out that by designing for the
+In my series on [capability based security](../posts/capability-based-security.md) I point out that by designing for the
 [Principle Of Least Authority](https://en.wikipedia.org/wiki/Principle_of_least_privilege) ("POLA"), you end up with a good design as a side-effect.
 
 That is, if you design the most minimal interface that the caller needs, then you will both avoid accidental complexity (good design) and increase security (POLA).
@@ -276,8 +276,8 @@ But oops! This won't compile!
 
 `MoveCapability` depends on `MoveResult` which depends on `NextMoveInfo` which in turn depends on `MoveCapability` again. But the F# compiler does not allow forward references in general.
 
-Circular dependencies like this are generally frowned upon (I even have a post called ["cyclic dependencies are evil"](../posts/cyclic-dependencies/index.md)!)
-and there are [normally work-arounds which you can use](../posts/removing-cyclic-dependencies/index.md) to remove them.
+Circular dependencies like this are generally frowned upon (I even have a post called ["cyclic dependencies are evil"](../posts/cyclic-dependencies.md)!)
+and there are [normally work-arounds which you can use](../posts/removing-cyclic-dependencies.md) to remove them.
 
 In this case though, I will link them together using the `and` keyword, which replaces the `type` keyword and is useful for just these kinds of cases.
 
@@ -509,7 +509,7 @@ The original design was *data-centric*. Yes, we gave each player a function to u
 The new design is *function-centric* (or as I prefer, *capability-centric*). There is very little data now.
 Instead, the result of each function call is *another* set of functions than can be used for the next step, and so on, ad infinitum. 
 
-In fact, it reminds me somewhat of a [continuation-based](../posts/computation-expressions-continuations/index.md) approach, except that rather than passing in a continuation, 
+In fact, it reminds me somewhat of a [continuation-based](../posts/computation-expressions-continuations.md) approach, except that rather than passing in a continuation, 
 the function itself returns a list of continuations, and then you pick one to use.
 
 ## Capabilities and RESTful designs -- a match made in heaven

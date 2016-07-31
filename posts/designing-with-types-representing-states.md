@@ -12,7 +12,7 @@ In this post we will look at making implicit states explicit by using state mach
 
 ## Background ##
 
-In an [earlier post](../posts/designing-with-types-single-case-dus/index.md) in this series, we looked at single case unions as a wrapper for types such as email addresses.
+In an [earlier post](../posts/designing-with-types-single-case-dus.md) in this series, we looked at single case unions as a wrapper for types such as email addresses.
 
 ```
 module EmailAddress = 
@@ -250,7 +250,7 @@ If you do this, it should be in a supporting function to the event handlers, nev
 
 Let's look at how we can apply this approach to a real example now.  
 
-In the `Contact` example from an [earlier post](../posts/designing-with-types-intro/index.md) we had a flag that was used to indicate whether a customer had verified their email address. 
+In the `Contact` example from an [earlier post](../posts/designing-with-types-intro.md) we had a flag that was used to indicate whether a customer had verified their email address. 
 The type looked like this:
 
 ```
@@ -324,7 +324,7 @@ module EmailContactInfo =
             emailContactInfo
 ```
 
-Note that, as [discussed here](../posts/match-expression/index.md), every branch of the match must return the same type, so when ignoring the verified state we must still return something, such as the object that was passed in.
+Note that, as [discussed here](../posts/match-expression.md), every branch of the match must return the same type, so when ignoring the verified state we must still return something, such as the object that was passed in.
 
 Finally, we can write the two utility functions `sendVerificationEmail` and `sendPasswordReset`.
 
@@ -469,7 +469,7 @@ let signedFor package signature =
 ```
 
 *Note: I am using `failWith` to handle the errors. In a production system, this code should be replaced by client driven error handlers.
-See the discussion of handling constructor errors in the [post about single case DUs](../posts/designing-with-types-single-case-dus/index.md) for some ideas.*
+See the discussion of handling constructor errors in the [post about single case DUs](../posts/designing-with-types-single-case-dus.md) for some ideas.*
 
 ## Using explicit cases to replace implicit conditional code ##
 

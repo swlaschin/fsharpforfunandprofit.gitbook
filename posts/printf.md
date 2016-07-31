@@ -676,6 +676,6 @@ MyApplication2.test()
 
 ```
 
-The object-oriented approach, although more familiar, is not automatically better! The pros and cons of OO methods vs. pure functions are discussed [here](../posts/type-extensions/index.md#downsides-of-methods).
+The object-oriented approach, although more familiar, is not automatically better! The pros and cons of OO methods vs. pure functions are discussed [here](../posts/type-extensions.md#downsides-of-methods).
 
 

@@ -138,7 +138,7 @@ As you can see, this implementation matched the earlier diagram precisely.
 
 At this point Dr Frankenfunctor had two important insights.  
 
-The first insight was that, thanks to [currying](../posts/currying/index.md), the function could be converted from a function taking a tuple to a two parameter function, with each parameter passed in turn.
+The first insight was that, thanks to [currying](../posts/currying.md), the function could be converted from a function taking a tuple to a two parameter function, with each parameter passed in turn.
 
 ![Version 2](../assets/img/monadster2.png)
 
@@ -777,5 +777,5 @@ We also saw how various M-values could be processed and combined using `mapM` (f
 
 ## Next time
 
-This exciting tale has more shocks in store for you! Stay tuned for [the next installment](../posts/monadster-2/index.md), when I reveal how the head and body were created.
+This exciting tale has more shocks in store for you! Stay tuned for [the next installment](../posts/monadster-2.md), when I reveal how the head and body were created.
 

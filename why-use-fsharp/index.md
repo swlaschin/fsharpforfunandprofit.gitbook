@@ -12,11 +12,11 @@ Here are five good reasons why you should consider using F# for  your next proje
 
 ## ![](../assets/img/glyphicons/glyphicons_030_pencil.png) Conciseness
 
-F# is not cluttered up with [coding "noise"](../posts/fvsc-sum-of-squares/index.md) such as curly brackets, semicolons and so on. 
+F# is not cluttered up with [coding "noise"](../posts/fvsc-sum-of-squares.md) such as curly brackets, semicolons and so on. 
 
-You almost never have to specify the type of an object, thanks to a powerful [type inference system](../posts/conciseness-type-inference/index.md).
+You almost never have to specify the type of an object, thanks to a powerful [type inference system](../posts/conciseness-type-inference.md).
 
-And, compared with C#, it generally takes [fewer lines of code](../posts/fvsc-download/index.md) to solve the same problem.
+And, compared with C#, it generally takes [fewer lines of code](../posts/fvsc-download.md) to solve the same problem.
 
 
 ```
@@ -44,12 +44,12 @@ let worker = Worker jdoe
 
 
 Many common programming tasks are much simpler in F#.  This includes things like creating and using
- [complex type definitions](../posts/conciseness-type-definitions/index.md), doing [list processing](../posts/conciseness-extracting-boilerplate/index.md),
- [comparison and equality](../posts/convenience-types/index.md), [state machines](../posts/designing-with-types-representing-states/index.md), and much more. 
+ [complex type definitions](../posts/conciseness-type-definitions.md), doing [list processing](../posts/conciseness-extracting-boilerplate.md),
+ [comparison and equality](../posts/convenience-types.md), [state machines](../posts/designing-with-types-representing-states.md), and much more. 
 
 And because functions are first class objects, it is very easy to create powerful and reusable code by creating functions
-that have [other functions as parameters](../posts/conciseness-extracting-boilerplate/index.md),
-or that [combine existing functions](../posts/conciseness-functions-as-building-blocks/index.md) to create new functionality. 
+that have [other functions as parameters](../posts/conciseness-extracting-boilerplate.md),
+or that [combine existing functions](../posts/conciseness-functions-as-building-blocks.md) to create new functionality. 
 
 ```
 // automatic equality and comparison
@@ -75,8 +75,8 @@ as [null reference exceptions](../posts/the-option-type.md#option-is-not-null).
 Values are [immutable by default](../posts/correctness-immutability.md), which prevents a large class of errors.
 
 In addition, you can often encode business logic using the [type system](../posts/correctness-exhaustive-pattern-matching.md) itself in such a way 
-that it is actually [impossible to write incorrect code](../posts/designing-for-correctness/index.md)
-or mix up [units of measure](../posts/units-of-measure/index.md), greatly reducing the need for unit tests.   
+that it is actually [impossible to write incorrect code](../posts/designing-for-correctness.md)
+or mix up [units of measure](../posts/units-of-measure.md), greatly reducing the need for unit tests.   
 
 
 ```
@@ -103,10 +103,10 @@ let distance = 10<m> + 10<ft> // error!
 
 
 F# has a number of built-in libraries to help when more than one thing at a time is happening.
-Asynchronous programming is [very easy](../posts/concurrency-async-and-parallel/index.md), as is parallelism.
+Asynchronous programming is [very easy](../posts/concurrency-async-and-parallel.md), as is parallelism.
 
-F# also has a built-in [actor model](../posts/concurrency-actor-model/index.md), and excellent support for event handling
-and [functional reactive programming](../posts/concurrency-reactive/index.md). 
+F# also has a built-in [actor model](../posts/concurrency-actor-model.md), and excellent support for event handling
+and [functional reactive programming](../posts/concurrency-reactive.md). 
 
 And of course, because data structures are immutable by default, sharing state and avoiding locks is much easier.
 
@@ -131,10 +131,10 @@ MailboxProcessor.Start(fun inbox-> async{
 Although it is a functional language at heart, F# does support other styles which are not 100% pure,
 which makes it much easier to interact with the non-pure world of web sites, databases, other applications, and so on.
 
-In particular, F# is designed as a hybrid functional/OO language, so it can do [virtually everything that C# can do](../posts/completeness-anything-csharp-can-do/index.md).  
+In particular, F# is designed as a hybrid functional/OO language, so it can do [virtually everything that C# can do](../posts/completeness-anything-csharp-can-do.md).  
 
 
-Of course, F# is [part of the .NET ecosystem](../posts/completeness-seamless-dotnet-interop/index.md), which gives you seamless access to all the third party .NET libraries and tools.
+Of course, F# is [part of the .NET ecosystem](../posts/completeness-seamless-dotnet-interop.md), which gives you seamless access to all the third party .NET libraries and tools.
 It runs on most platforms, including Linux and smart phones (via Mono and the new .NET Core).
 
 

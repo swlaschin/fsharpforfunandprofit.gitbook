@@ -20,7 +20,7 @@ Now, to be clear, I'm not a games developer in any shape or form, so I won't be 
 -- taking some requirements that we all know (I hope) and translating them to functional code.   
 
 In fact, to be very clear, I'll deliberately be going a bit overboard on the design just to demonstrate what you can do. There will be no objects. Everything will be immutable, Everything will be [typed](../series/designing-with-types.md).
-There will be [capability based security](../posts/capability-based-security/index.md), and more.
+There will be [capability based security](../posts/capability-based-security.md), and more.
 Performance will *definitely* be taking a back seat. Luckily, Tic-Tac-Toe does not need to support a high frame rate!
 
 In fact, I'm going to call this version "Enterprise Tic-Tac-Toe"!  
@@ -191,7 +191,7 @@ which means: "to play a move, the input is a game state and a selected cell posi
 
 Both player X and player O can play the *same* cell position, so, as we said earlier, we need to make them distinct.
 
-I'm going to do that by wrapping them in a [single case union](../posts/designing-with-types-single-case-dus/index.md):
+I'm going to do that by wrapping them in a [single case union](../posts/designing-with-types-single-case-dus.md):
 
 ```
 type PlayerXPos = PlayerXPos of CellPosition 
@@ -1798,7 +1798,7 @@ as it is likely to change in the future and we want to ensure that the UI is not
 For the move types though, (a) I don't see the implementation changing and (b) the consequence of a malicious UI action is not very high, so overall I don't mind having the
 implementation be public.
 
-*UPDATE 2015-02-16: In the [next post](../posts/enterprise-tic-tac-toe-2/index.md) I solve this problem in a more elegant way, and get rid of `GameState` as well!*
+*UPDATE 2015-02-16: In the [next post](../posts/enterprise-tic-tac-toe-2.md) I solve this problem in a more elegant way, and get rid of `GameState` as well!*
 
 **Question: Why are you using that strange syntax for defining the `initGame` and `move` functions?**
 
@@ -1908,7 +1908,7 @@ This is not a perfect design -- I can think of a number of ways to improve it --
 
 What do you think?  Let me know in the comments.
 
-**UPDATE 2015-02-16: I ended up being unhappy with this design after all. In the [next post](../posts/enterprise-tic-tac-toe-2/index.md) I tell you why, and present a better design.**
+**UPDATE 2015-02-16: I ended up being unhappy with this design after all. In the [next post](../posts/enterprise-tic-tac-toe-2.md) I tell you why, and present a better design.**
 
 *NOTE: The code for this post is available on GitHub in [this gist](https://gist.github.com/swlaschin/3418b549bd222396da82).*
 

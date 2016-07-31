@@ -14,7 +14,7 @@ seriesOrder: 2
 
 Welcome to the gripping tale of Dr Frankenfunctor and the Monadster!
 
-We saw [in the previous installment](../posts/monadster/index.md) how Dr Frankenfunctor created life out of dead body parts using "Monadster part generators" (or "M"s for short),
+We saw [in the previous installment](../posts/monadster.md) how Dr Frankenfunctor created life out of dead body parts using "Monadster part generators" (or "M"s for short),
 that would, on being supplied with some vital force, return a live body part.
 
 We also saw how the leg and arms of the creature were created, and how these M-values could be processed
@@ -708,5 +708,5 @@ In this post, we extended our repertoire of manipulation techniques to include:
 
 ## Next time
 
-In [the final installment](../posts/monadster-3/index.md), we'll refactor the code and review all the techniques used.
+In [the final installment](../posts/monadster-3.md), we'll refactor the code and review all the techniques used.
 

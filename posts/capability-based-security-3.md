@@ -10,7 +10,7 @@ image: "/assets/img/auth_token.png"
 
 *UPDATE: [Slides and video from my talk on this topic](http://fsharpforfunandprofit.com/cap/)*
 
-In the previous posts ([link](../posts/capability-based-security/index.md), [link](../posts/capability-based-security-2/index.md))
+In the previous posts ([link](../posts/capability-based-security.md), [link](../posts/capability-based-security-2.md))
 we looked at "capabilities" as the basis for locking down code.
 
 But in most of the examples so far, we've been relying on self-discipline to avoid using the global capabilities,
@@ -433,7 +433,7 @@ In this post, we used types to represent access tokens, as follows:
 **Question: Why not also store the caller in the access token, so that no other client can use it?**
 
 This is not needed because of the authority-based approach we're using.
-As discussed in the [first post](../posts/capability-based-security/index.md#authority), once a client has a capability,
+As discussed in the [first post](../posts/capability-based-security.md#authority), once a client has a capability,
 they can pass it around to other people to use, so there is no point limiting it to a specific caller.  
 
 **Question: The authorization module needs to know about the capability and access token types now. Isn't that adding extra coupling?**
@@ -457,7 +457,7 @@ analogous work that's accessible to mainstream developers.
 
 **I've got more questions...**
 
-Some additional questions are answered at the end of [part 1](../posts/capability-based-security/index.md#summary) and [part 2](../posts/capability-based-security-2/index.md#summary), so read those answers first.
+Some additional questions are answered at the end of [part 1](../posts/capability-based-security.md#summary) and [part 2](../posts/capability-based-security-2.md#summary), so read those answers first.
 Otherwise please add your question in the comments below, and I'll try to address it.
 
 ## Conclusion

@@ -7,7 +7,7 @@ seriesIndexId: "Map and Bind and Apply, Oh my!"
 In this series of posts, I'll attempt to describe some of the core functions for dealing with generic data types (such as `Option` and `List`).
 This is a follow-up post to [my talk on functional patterns](http://fsharpforfunandprofit.com/fppatterns/).
 
-Yes, I know that [I promised not to do this kind of thing](../posts/why-i-wont-be-writing-a-monad-tutorial/index.md),
+Yes, I know that [I promised not to do this kind of thing](../posts/why-i-wont-be-writing-a-monad-tutorial.md),
 but for this post I thought I'd take a different approach from most people. Rather than talking about abstractions such as type classes,
 I thought it might be useful to focus on the core functions themselves and how they are used in practice.
 

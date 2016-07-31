@@ -10,7 +10,7 @@ image: "/assets/img/auth_3.png"
 
 *UPDATE: [Slides and video from my talk on this topic](http://fsharpforfunandprofit.com/cap/)*
 
-In the [previous post](../posts/capability-based-security/index.md), we started looking at "capabilities" as the basis for ensuring that code could not do any more than it was supposed to do.
+In the [previous post](../posts/capability-based-security.md), we started looking at "capabilities" as the basis for ensuring that code could not do any more than it was supposed to do.
 And I demonstrated this with a simple application that changed a configuration flag.
 
 In this post, we'll look at how to constrain capabilities based on the current user's identity and role.
@@ -1104,13 +1104,13 @@ Yes. This code is just an example. The authorization logic is completely separat
 
 **I've got more questions...**
 
-If you missed them, some additional questions are answered at the [end of part 1](../posts/capability-based-security/index.md#summary).
+If you missed them, some additional questions are answered at the [end of part 1](../posts/capability-based-security.md#summary).
 Otherwise please add your question in the comments below, and I'll try to address it.
 
 
 ## Coming up
 
-In the [next post](../posts/capability-based-security-3/index.md), we'll look at how to use types to emulate access tokens and prevent unauthorized access to global functions.
+In the [next post](../posts/capability-based-security-3.md), we'll look at how to use types to emulate access tokens and prevent unauthorized access to global functions.
 
 *NOTE: All the code for this post is available as a [gist here](https://gist.github.com/swlaschin/909c5b24bf921e5baa8c#file-capabilitybasedsecurity_dbexample-fsx)
 and [here](https://gist.github.com/swlaschin/909c5b24bf921e5baa8c#file-capabilitybasedsecurity_consoleexample-fsx).*

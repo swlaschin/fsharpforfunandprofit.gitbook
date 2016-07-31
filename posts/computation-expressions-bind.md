@@ -69,7 +69,7 @@ This is a key insight: *computation expressions are just a way to create nice sy
 
 Having a "bind" function like this is actually a standard functional pattern, and it is not dependent on computation expressions at all.
 
-First, why is it called "bind"? Well, as we've seen, a "bind" function or method can be thought of as feeding an input value to a function. This is known as "[binding](../posts/function-values-and-simple-values/index.md)" a value to the parameter of the function (recall that all functions have only [one parameter](../posts/currying/index.md)).
+First, why is it called "bind"? Well, as we've seen, a "bind" function or method can be thought of as feeding an input value to a function. This is known as "[binding](../posts/function-values-and-simple-values.md)" a value to the parameter of the function (recall that all functions have only [one parameter](../posts/currying.md)).
 
 So when you think of `bind` this this way, you can see that it is similar to piping or composition.
 

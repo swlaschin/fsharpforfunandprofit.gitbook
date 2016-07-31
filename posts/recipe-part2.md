@@ -171,7 +171,7 @@ let bind switchFunction twoTrackInput =
     | Failure f -> Failure f
 ```
 
-This is exactly the same as the first definition. And if you are wondering how a two parameter function can be exactly the same as a one parameter function, you need to read the post on [currying](../posts/currying/index.md)!
+This is exactly the same as the first definition. And if you are wondering how a two parameter function can be exactly the same as a one parameter function, you need to read the post on [currying](../posts/currying.md)!
 
 Yet another way of writing it is to replace the `match..with` syntax with the more concise `function` keyword, like this:
 
@@ -1149,7 +1149,7 @@ One final suggestion. If you are working with a team of non-experts, unfamiliar 
 
 ## Further reading
 
-* If you like this "railway oriented" approach, you can also [see it applied to FizzBuzz](../posts/railway-oriented-programming-carbonated/index.md).
+* If you like this "railway oriented" approach, you can also [see it applied to FizzBuzz](../posts/railway-oriented-programming-carbonated.md).
 * I also have some [slides and video](http://fsharpforfunandprofit.com/rop/) that show how take this approach further. (At some point I will turn these into a proper blog post)
 
 I presented on this topic at NDC Oslo 2014 (click image to view video)  

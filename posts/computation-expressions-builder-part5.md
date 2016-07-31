@@ -7,7 +7,7 @@ seriesId: "Computation Expressions"
 seriesOrder: 10
 ---
 
-In a [previous post](../posts/computation-expressions-builder-part3/index.md), we saw how to avoid unnecessary evaluation of expressions in a workflow until needed. 
+In a [previous post](../posts/computation-expressions-builder-part3.md), we saw how to avoid unnecessary evaluation of expressions in a workflow until needed. 
 
 But that approach was designed for expressions *inside* a workflow. What happens if we want to delay the *whole workflow itself* until needed.
 
@@ -98,7 +98,7 @@ So, here's our new wrapper type:
 type Maybe<'a> = Maybe of (unit -> 'a option)
 ```
 
-We've replaced a simple `option` with a function that evaluates to an option, and then wrapped that function in a [single case union](../posts/designing-with-types-single-case-dus/index.md) for good measure.
+We've replaced a simple `option` with a function that evaluates to an option, and then wrapped that function in a [single case union](../posts/designing-with-types-single-case-dus.md) for good measure.
 
 And now we need to change the `Run` method as well. Previously, it evaluated the delay function that was passed in to it, but now it should leave it unevaluated and wrap it in our new wrapper type:
 

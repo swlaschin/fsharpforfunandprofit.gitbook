@@ -8,7 +8,7 @@ image: "/assets/img/property_commutative.png"
 
 *UPDATE: I did a talk on property-based testing based on these posts. [Slides and video here.](http://fsharpforfunandprofit.com/pbt/)*
 
-In [the previous post](../posts/property-based-testing/index.md), I described the basics of property-based testing, and showed how it could save a lot of time by generating random tests.  
+In [the previous post](../posts/property-based-testing.md), I described the basics of property-based testing, and showed how it could save a lot of time by generating random tests.  
 
 But here's a common problem. Everyone who sees a property-based testing tool like FsCheck or QuickCheck thinks that it is amazing... but
 when it times come to start creating your own properties, the universal complaint is: "what properties should I use? I can't think of any!"
@@ -200,7 +200,7 @@ In other words, the bad sort of `[0; minValue]` is *not* the same as `[minValue;
 
 So that's good! 
 
-But... we've got some hard coded things in there that the Enterprise Developer From Hell ([see previous post](../posts/property-based-testing/index.md))
+But... we've got some hard coded things in there that the Enterprise Developer From Hell ([see previous post](../posts/property-based-testing.md))
 could take advantage of! The EDFH will exploit the fact that we always use `Int32.MinValue` and that we always prepend or append it to the test list.
 
 In other words, the EDFH can identify which path we are on and have special cases for each one:
@@ -504,7 +504,7 @@ A useful kind of property is based on an invariant that is preserved after some 
 
 They are not normally sufficient in themselves to ensure a correct implementation, but they *do* often act as a counter-check to more general properties.
 
-For example, in [the previous post](../posts/property-based-testing/index.md), we created commutative and associative properties for addition, but then noticed that simply having
+For example, in [the previous post](../posts/property-based-testing.md), we created commutative and associative properties for addition, but then noticed that simply having
 an implementation that returned zero would satisfy them just as well!  It was only when we added `x + 0 = x` as a property that we could eliminate that particular malicious implementation.
 
 And in the "list sort" example above, we could satisfy the "pairwise ordered" property with a function that just returned an empty list!  How could we fix that?
@@ -1028,7 +1028,7 @@ Check.Quick (``sort should give same result as insertion sort`` badSort)
 
 We can also use the test oracle approach to cross-check two different implementations when you're not sure that *either* implementation is right!
 
-For example, in my post ["Commentary on 'Roman Numerals Kata with Commentary'"](../posts/roman-numeral-kata/index.md) I came up with two completely different algorithms for generating Roman Numerals.
+For example, in my post ["Commentary on 'Roman Numerals Kata with Commentary'"](../posts/roman-numeral-kata.md) I came up with two completely different algorithms for generating Roman Numerals.
 Can we compare them to each other and test them both in one fell swoop?
 
 The first algorithm was based on understanding that Roman numerals were based on tallying, leading to this simple code:

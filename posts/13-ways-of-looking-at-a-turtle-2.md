@@ -11,31 +11,31 @@ categories: [Patterns]
 In this two-part mega-post, I'm stretching the simple turtle graphics model to the limit while demonstrating partial application, validation, the concept of "lifting",
 agents with message queues, dependency injection, the State monad, event sourcing, stream processing, and an interpreter!
 
-In the [previous post](../posts/13-ways-of-looking-at-a-turtle/index.md), we covered the first nine ways of looking at a turtle. In this post, we'll look at the remaining four.
+In the [previous post](../posts/13-ways-of-looking-at-a-turtle.md), we covered the first nine ways of looking at a turtle. In this post, we'll look at the remaining four.
 
 As a reminder, here are the thirteen ways:
 
-* [Way 1. A basic object-oriented approach](../posts/13-ways-of-looking-at-a-turtle/index.md#way1), in which we create a class with mutable state.
-* [Way 2. A basic functional approach](../posts/13-ways-of-looking-at-a-turtle/index.md#way2), in which we create a module of functions with immutable state.
-* [Way 3. An API with a object-oriented core](../posts/13-ways-of-looking-at-a-turtle/index.md#way3), in which we create an object-oriented API that calls a stateful core class.
-* [Way 4. An API with a functional core](../posts/13-ways-of-looking-at-a-turtle/index.md#way4), in which we create an stateful API that uses stateless core functions.
-* [Way 5. An API in front of an agent](../posts/13-ways-of-looking-at-a-turtle/index.md#way5), in which we create an API that uses a message queue to communicate with an agent.
-* [Way 6. Dependency injection using interfaces](../posts/13-ways-of-looking-at-a-turtle/index.md#way6), in which we decouple the implementation from the API using an interface or record of functions.
-* [Way 7. Dependency injection using functions](../posts/13-ways-of-looking-at-a-turtle/index.md#way7), in which we decouple the implementation from the API by passing a function parameter.
-* [Way 8. Batch processing using a state monad](../posts/13-ways-of-looking-at-a-turtle/index.md#way8), in which we create a special "turtle workflow" computation expression to track state for us.
-* [Way 9. Batch processing using command objects](../posts/13-ways-of-looking-at-a-turtle/index.md#way9), in which we create a type to represent a turtle command, and then process a list of commands all at once.
-* [Interlude: Conscious decoupling with data types](../posts/13-ways-of-looking-at-a-turtle/index.md#decoupling). A few notes on using data vs. interfaces for decoupling.
-* [Way 10. Event sourcing](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way10), in which  state is built from a list of past events.
-* [Way 11. Functional Retroactive Programming (stream processing)](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way11), in which business logic is based on reacting to earlier events.
-* [Episode V: The Turtle Strikes Back](../posts/13-ways-of-looking-at-a-turtle-2/index.md#strikes-back), in which the turtle API changes so that some commands may fail.
-* [Way 12. Monadic control flow](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way12), in which we make decisions in the turtle workflow based on results from earlier commands.
-* [Way 13. A turtle interpreter](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way13), in which we completely decouple turtle programming from turtle implementation, and nearly encounter the free monad.
-* [Review of all the techniques used](../posts/13-ways-of-looking-at-a-turtle-2/index.md#review).
+* [Way 1. A basic object-oriented approach](../posts/13-ways-of-looking-at-a-turtle.md#way1), in which we create a class with mutable state.
+* [Way 2. A basic functional approach](../posts/13-ways-of-looking-at-a-turtle.md#way2), in which we create a module of functions with immutable state.
+* [Way 3. An API with a object-oriented core](../posts/13-ways-of-looking-at-a-turtle.md#way3), in which we create an object-oriented API that calls a stateful core class.
+* [Way 4. An API with a functional core](../posts/13-ways-of-looking-at-a-turtle.md#way4), in which we create an stateful API that uses stateless core functions.
+* [Way 5. An API in front of an agent](../posts/13-ways-of-looking-at-a-turtle.md#way5), in which we create an API that uses a message queue to communicate with an agent.
+* [Way 6. Dependency injection using interfaces](../posts/13-ways-of-looking-at-a-turtle.md#way6), in which we decouple the implementation from the API using an interface or record of functions.
+* [Way 7. Dependency injection using functions](../posts/13-ways-of-looking-at-a-turtle.md#way7), in which we decouple the implementation from the API by passing a function parameter.
+* [Way 8. Batch processing using a state monad](../posts/13-ways-of-looking-at-a-turtle.md#way8), in which we create a special "turtle workflow" computation expression to track state for us.
+* [Way 9. Batch processing using command objects](../posts/13-ways-of-looking-at-a-turtle.md#way9), in which we create a type to represent a turtle command, and then process a list of commands all at once.
+* [Interlude: Conscious decoupling with data types](../posts/13-ways-of-looking-at-a-turtle.md#decoupling). A few notes on using data vs. interfaces for decoupling.
+* [Way 10. Event sourcing](../posts/13-ways-of-looking-at-a-turtle-2.md#way10), in which  state is built from a list of past events.
+* [Way 11. Functional Retroactive Programming (stream processing)](../posts/13-ways-of-looking-at-a-turtle-2.md#way11), in which business logic is based on reacting to earlier events.
+* [Episode V: The Turtle Strikes Back](../posts/13-ways-of-looking-at-a-turtle-2.md#strikes-back), in which the turtle API changes so that some commands may fail.
+* [Way 12. Monadic control flow](../posts/13-ways-of-looking-at-a-turtle-2.md#way12), in which we make decisions in the turtle workflow based on results from earlier commands.
+* [Way 13. A turtle interpreter](../posts/13-ways-of-looking-at-a-turtle-2.md#way13), in which we completely decouple turtle programming from turtle implementation, and nearly encounter the free monad.
+* [Review of all the techniques used](../posts/13-ways-of-looking-at-a-turtle-2.md#review).
 
 and 2 bonus ways for the extended edition:
 
-* [Way 14. Abstract Data Turtle](../posts/13-ways-of-looking-at-a-turtle-3/index.md#way14), in which we encapsulate the details of a turtle implementation by using an Abstract Data Type.
-* [Way 15. Capability-based Turtle](../posts/13-ways-of-looking-at-a-turtle-3/index.md#way15), in which we control what turtle functions are available to a client, based on the current
+* [Way 14. Abstract Data Turtle](../posts/13-ways-of-looking-at-a-turtle-3.md#way14), in which we encapsulate the details of a turtle implementation by using an Abstract Data Type.
+* [Way 15. Capability-based Turtle](../posts/13-ways-of-looking-at-a-turtle-3.md#way15), in which we control what turtle functions are available to a client, based on the current
   state of the turtle.
 
 It's turtles all the way down!
@@ -48,8 +48,8 @@ All source code for this post is available [on github](https://github.com/swlasc
 
 ## 10: Event sourcing -- Building state from a list of past events
 
-In this design, we build on the "command" concept used in the [Agent (way 5)](../posts/13-ways-of-looking-at-a-turtle/index.md#way5)
-and [Batch (way 9)](../posts/13-ways-of-looking-at-a-turtle/index.md#way9) approaches, but replacing "commands" with "events" as the method of updating state.
+In this design, we build on the "command" concept used in the [Agent (way 5)](../posts/13-ways-of-looking-at-a-turtle.md#way5)
+and [Batch (way 9)](../posts/13-ways-of-looking-at-a-turtle.md#way9) approaches, but replacing "commands" with "events" as the method of updating state.
 
 The way that it works is:
 
@@ -128,7 +128,7 @@ We will need:
 * A (private) `eventsFromCommand` function that determines what events to generate, based on the command and the state.
 * A public `commandHandler` function that handles the command, reads the events from the event store and calls the other two functions.
 
-Here's `applyEvent`. You can see that it is very similar to the `applyCommand` function that we saw in the [previous batch-processing example](../posts/13-ways-of-looking-at-a-turtle/index.md#way9).
+Here's `applyEvent`. You can see that it is very similar to the `applyCommand` function that we saw in the [previous batch-processing example](../posts/13-ways-of-looking-at-a-turtle.md#way9).
 
 ```
 /// Apply an event to the current state and return the new state of the turtle
@@ -655,7 +655,7 @@ With the new versions of the turtle functions available, we have to create imple
 
 ## 12: Monadic control flow
 
-In this approach, we will reuse the `turtle` workflow from [way 8](../posts/13-ways-of-looking-at-a-turtle/index.md#way8).
+In this approach, we will reuse the `turtle` workflow from [way 8](../posts/13-ways-of-looking-at-a-turtle.md#way8).
 This time though, we will make decisions for the next command based on the result of the previous one.
 
 Before we do that though, let's look at what effect the change to `move` will have on our code.  Let's say that we want to move forwards a few times using `move 40.0`, say.   
@@ -795,7 +795,7 @@ So there you go! This code demonstrates how you can make decisions inside the `t
 
 For our final approach, we'll look at a way to *completely* decouple the programming of the turtle from its interpretation.  
 
-This is similar to the [batch processing using command objects](../posts/13-ways-of-looking-at-a-turtle/index.md#way9) approach,
+This is similar to the [batch processing using command objects](../posts/13-ways-of-looking-at-a-turtle.md#way9) approach,
 but is enhanced to support responding to the output of a command.
 
 ### Designing an interpreter
@@ -833,7 +833,7 @@ type TurtleResponse =
 The problem is that we cannot be sure that the response correctly matches the command.  For example, if I send a `Move` command, I expect to get a `MoveResponse`, and never
 a `SetColorResponse`. But this implementation doesn't enforce that!
 
-We want to [make illegal states unrepresentable](../posts/designing-with-types-making-illegal-states-unrepresentable/index.md) -- how can we do that?
+We want to [make illegal states unrepresentable](../posts/designing-with-types-making-illegal-states-unrepresentable.md) -- how can we do that?
 
 The trick is to combine the request and response in *pairs*. That is, for a `Move` command, there is an associated function which is given a `MoveResponse` as input, and similarly for each other combination.
 Commands that have no response can be considered as returning `unit` for now.
@@ -1275,11 +1275,11 @@ and [here ("free monad" version)](https://github.com/swlaschin/13-ways-of-lookin
 In this post, we looked at thirteen different ways to implement a turtle API, using a wide variety of different techniques.  Let's quickly run down all the techniques that were used:
 
 * **Pure, stateless functions**. As seen in all of the FP-oriented examples. All these are very easy to test and mock.
-* **Partial application**. As first seen in [the simplest FP example (way 2)](../posts/13-ways-of-looking-at-a-turtle/index.md#way2), when the turtle functions had the logging function applied so that the main flow could use piping,
-  and thereafter used extensively, particularly in the ["dependency injection using functions approach" (way 7)](../posts/13-ways-of-looking-at-a-turtle/index.md#way7).
-* **Object expressions** to implement an interface without creating a class, as seen in [way 6](../posts/13-ways-of-looking-at-a-turtle/index.md#way6).
-* **The Result type** (a.k.a the Either monad). Used in all the functional API examples ([e.g. way 4](../posts/13-ways-of-looking-at-a-turtle/index.md#way4)) to return an error rather than throw an exception. 
-* **Applicative "lifting"** (e.g. `lift2`) to lift normal functions to the world of `Result`s, again [in way 4](../posts/13-ways-of-looking-at-a-turtle/index.md#way4) and others.
+* **Partial application**. As first seen in [the simplest FP example (way 2)](../posts/13-ways-of-looking-at-a-turtle.md#way2), when the turtle functions had the logging function applied so that the main flow could use piping,
+  and thereafter used extensively, particularly in the ["dependency injection using functions approach" (way 7)](../posts/13-ways-of-looking-at-a-turtle.md#way7).
+* **Object expressions** to implement an interface without creating a class, as seen in [way 6](../posts/13-ways-of-looking-at-a-turtle.md#way6).
+* **The Result type** (a.k.a the Either monad). Used in all the functional API examples ([e.g. way 4](../posts/13-ways-of-looking-at-a-turtle.md#way4)) to return an error rather than throw an exception. 
+* **Applicative "lifting"** (e.g. `lift2`) to lift normal functions to the world of `Result`s, again [in way 4](../posts/13-ways-of-looking-at-a-turtle.md#way4) and others.
 * **Lots of different ways of managing state**:
   * mutable fields (way 1)
   * managing state explicitly and piping it though a series of functions (way 2)
@@ -1287,20 +1287,20 @@ In this post, we looked at thirteen different ways to implement a turtle API, us
   * hiding state in an agent (way 5)
   * threading state behind the scenes in a state monad (the `turtle` workflow in ways 8 and 12)
   * avoiding state altogether by using batches of commands (way 9) or batches of events (way 10) or an interpreter (way 13)
-* **Wrapping a function in a type**. Used in [way 8](../posts/13-ways-of-looking-at-a-turtle/index.md#way8) to manage state (the State monad) and in [way 13](../posts/13-ways-of-looking-at-a-turtle/index.md#way13) to store responses.
+* **Wrapping a function in a type**. Used in [way 8](../posts/13-ways-of-looking-at-a-turtle.md#way8) to manage state (the State monad) and in [way 13](../posts/13-ways-of-looking-at-a-turtle.md#way13) to store responses.
 * **Computation expressions**, lots of them! We created and used three:
   * `result` for working with errors
   * `turtle` for managing turtle state
-  * `turtleProgram` for building an AST in the interpreter approach ([way 13](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way13)).
+  * `turtleProgram` for building an AST in the interpreter approach ([way 13](../posts/13-ways-of-looking-at-a-turtle-2.md#way13)).
 * **Chaining of monadic functions** in the `result` and `turtle` workflows. The underlying functions are monadic ("diagonal") and would not normally compose properly,
   but inside a workflow, they can be sequenced easily and transparently.
-* **Representing behavior as a data structure** in the ["functional dependency injection" example (way 7)](../posts/13-ways-of-looking-at-a-turtle/index.md#way7) so that a single function could be passed in rather than a whole interface.
+* **Representing behavior as a data structure** in the ["functional dependency injection" example (way 7)](../posts/13-ways-of-looking-at-a-turtle.md#way7) so that a single function could be passed in rather than a whole interface.
 * **Decoupling using a data-centric protocol** as seen in the agent, batch command, event sourcing, and interpreter examples.
 * **Lock free and async processing** using an agent (way 5).
 * **The separation of "building" a computation vs. "running" it**, as seen in the `turtle` workflows (ways 8 and 12) and the `turtleProgram` workflow (way 13: interpreter).
-* **Use of event sourcing to rebuild state** from scratch rather than maintaining mutable state in memory, as seen in the [event sourcing (way 10)](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way10)
-   and [FRP (way 11)](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way11) examples.
-* **Use of event streams** and [FRP (way 11)](../posts/13-ways-of-looking-at-a-turtle-2/index.md#way11) to break business logic into small, independent, and decoupled processors rather than having a monolithic object.
+* **Use of event sourcing to rebuild state** from scratch rather than maintaining mutable state in memory, as seen in the [event sourcing (way 10)](../posts/13-ways-of-looking-at-a-turtle-2.md#way10)
+   and [FRP (way 11)](../posts/13-ways-of-looking-at-a-turtle-2.md#way11) examples.
+* **Use of event streams** and [FRP (way 11)](../posts/13-ways-of-looking-at-a-turtle-2.md#way11) to break business logic into small, independent, and decoupled processors rather than having a monolithic object.
 
 I hope it's clear that examining these thirteen ways is just a fun exercise, and I'm not suggesting that you immediately convert all your code to use stream processors and interpreters! And, especially
 if you are working with people who are new to functional programming, I would tend to stick with the earlier (and simpler) approaches unless there is a clear benefit in exchange for the extra complexity.

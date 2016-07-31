@@ -82,7 +82,7 @@ Finally, we can translate this layered design into F# files by turning it upside
 * The next file depends only on the first file. It would represents the functionality at the next-to-bottom layer.
 * And so on. Each file depends only on the previous ones.
 
-So, if we refer back to the use case example discussed in [Part 1](../posts/recipe-part1/index.md):
+So, if we refer back to the use case example discussed in [Part 1](../posts/recipe-part1.md):
 
 ![Recipe Happy Path](../assets/img/Recipe_HappyPath.png)
 
@@ -216,7 +216,7 @@ let g () = Person.create "Alice" "Smith"
 
 Then the compiler will understand that you are referring to the `Person` module. 
 
-For more on modules, see the post on [organizing functions](../posts/organizing-functions/index.md).
+For more on modules, see the post on [organizing functions](../posts/organizing-functions.md).
       
 ## The organization of the modules
 
@@ -243,7 +243,7 @@ If you are doing a pure object-oriented design, then this is a legitimate compla
 
 Even more importantly, it's not easy for a *human* to determine the correct order either, and so it would make maintenance more painful than it needed to be.
 
-In reality, even for large projects, not having folders is not as much of a problem as you might think. There are a number of large F# projects which successfully work within this limitation, such as the F# compiler itself. See the post on [cycles and modularity in the wild](../posts/cycles-and-modularity-in-the-wild/index.md) for more.
+In reality, even for large projects, not having folders is not as much of a problem as you might think. There are a number of large F# projects which successfully work within this limitation, such as the F# compiler itself. See the post on [cycles and modularity in the wild](../posts/cycles-and-modularity-in-the-wild.md) for more.
 
 ### Help, I have mutual dependencies between my types
 
@@ -257,7 +257,7 @@ type Employee = {name: string; worksAt: Location}
 
 How can you fix this to make the F# compiler happy?  
 
-It's not that hard, but it does requires some more explanation, so I have devoted [another whole post to dealing with cyclic dependencies](../posts/cyclic-dependencies/index.md).
+It's not that hard, but it does requires some more explanation, so I have devoted [another whole post to dealing with cyclic dependencies](../posts/cyclic-dependencies.md).
 
 ## Example code
 
@@ -436,6 +436,6 @@ In this post, we looked at organizing code into modules.  In the next post in th
 
 Meanwhile, you can read more on cyclic dependencies in the follow up posts:
 
-* [Cyclic dependencies are evil](../posts/cyclic-dependencies/index.md).
-* [Refactoring to remove cyclic dependencies](../posts/removing-cyclic-dependencies/index.md).
-* [Cycles and modularity in the wild](../posts/cycles-and-modularity-in-the-wild/index.md), which compares some real-world metrics for C# and F# projects.
+* [Cyclic dependencies are evil](../posts/cyclic-dependencies.md).
+* [Refactoring to remove cyclic dependencies](../posts/removing-cyclic-dependencies.md).
+* [Cycles and modularity in the wild](../posts/cycles-and-modularity-in-the-wild.md), which compares some real-world metrics for C# and F# projects.

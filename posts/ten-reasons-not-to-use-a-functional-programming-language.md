@@ -34,7 +34,7 @@ So, all told, I would definitely take the cautious approach and wait a few decad
 I don't know about you, but the more lines of code I write, the more productive I feel. If I can churn out 500 lines of code in a day, that's a job well done. 
 My commits are big, and my boss can see that I've been busy.
 
-But when I [compare code](../posts/fvsc-sum-of-squares/index.md) written in a functional language with a good old C-like language, there's so much less code that it scares me.
+But when I [compare code](../posts/fvsc-sum-of-squares.md) written in a functional language with a good old C-like language, there's so much less code that it scares me.
 
 I mean, just look at this code written in a familiar language:
 
@@ -215,7 +215,7 @@ What I'd really like is for someone to just show me some [real benefits on a sin
 
 UPDATE: So now I've read the "everything you need to know on one page" page. But it's too short and simplistic for me.
 
-I'm really looking for something with a bit more depth -- [something](../posts/designing-for-correctness/index.md) I can [get](../series/designing-with-types.md) my teeth [into](../posts/computation-expressions-intro/index.md).  
+I'm really looking for something with a bit more depth -- [something](../posts/designing-for-correctness.md) I can [get](../series/designing-with-types.md) my teeth [into](../posts/computation-expressions-intro.md).  
 
 And no, don't say that I should read [tutorials](http://learnyouahaskell.com/), and [play with examples](http://www.tryfsharp.org/Learn), and write my own code. I just want to grok it without doing all of that work.  
 

@@ -132,7 +132,7 @@ let isEven ifOdd ifEven aNumber =
     else aNumber |> ifOdd 
 ```
 
-A few things to note. First, you can see that I have put the extra functions (`ifZero`, etc) *first* in the parameter list, rather than last, as in the C# example. Why? Because I am probably going to want to use [partial application](../posts/partial-application/index.md).
+A few things to note. First, you can see that I have put the extra functions (`ifZero`, etc) *first* in the parameter list, rather than last, as in the C# example. Why? Because I am probably going to want to use [partial application](../posts/partial-application.md).
 
 And also, in the `isEven` example, I wrote `aNumber |> ifEven` and `aNumber |> ifOdd`. This makes it clear that we are piping the current value into the continuation and the continuation is always the very last step to be evaluated.  *We will be using this exact same pattern later in this post, so make sure you understand what is going on here.*
 
@@ -228,7 +228,7 @@ In this case, the benefits are subtler, but the same: the caller never had to ha
 
 It might seem like a trivial difference, but by passing functions around like this, we can use all our favorite functional techniques such as composition, partial application, and so on.
 
-We have also met continuations before, in the series on [designing with types](../posts/designing-with-types-single-case-dus/index.md). We saw that their use enabled the caller to decide what would happen in case of possible validation errors in a constructor, rather than just throwing an exception.
+We have also met continuations before, in the series on [designing with types](../posts/designing-with-types-single-case-dus.md). We saw that their use enabled the caller to decide what would happen in case of possible validation errors in a constructor, rather than just throwing an exception.
 
 ```
 type EmailAddress = EmailAddress of string
@@ -293,7 +293,7 @@ If you have ever attached a event handler to a button click in a GUI, or used a 
 
 So how does all this fit in with `let`?
 
-Let's go back and [revisit](../posts/let-use-do/index.md) what 'let` actually does.
+Let's go back and [revisit](../posts/let-use-do.md) what 'let` actually does.
 
 Remember that a (non-top-level) "let" can never be used in isolation -- it must always be part of a larger code block.
 

@@ -26,7 +26,7 @@ Some comments and caveats first:
 Here's an overview of what I plan to cover in this series:
 
 * **Converting a use-case into a function**. In this first post, we'll examine a simple use case and see how it might be implemented using a functional approach.
-* **[Connecting smaller functions together](../posts/recipe-part2/index.md)**. In the next post, we'll discuss a simple metaphor for combining smaller functions into bigger functions.
+* **[Connecting smaller functions together](../posts/recipe-part2.md)**. In the next post, we'll discuss a simple metaphor for combining smaller functions into bigger functions.
 * **Type driven design and failure types**. In the third post, we'll build the types needed for the use case, and discuss the use of special error types for the failure path.
 * **Configuration and dependency management**. In this post, we'll talk about how to wire up all the functions.
 * **Validation**. In this post, we'll discuss various ways of implementing validation, and converting from the unsafe outside world to the warm fuzzy world of type safety.

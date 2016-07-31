@@ -612,7 +612,7 @@ and pass those around if needed.
 Nothing in C# or F# can stop you accessing global public functions. 
 Just like other best practices, such as avoiding global variables, we have to rely on self-discipline (and maybe code reviews) to keep us on the straight and narrow path!
 
-But in the [third part of this series](../posts/capability-based-security-3/index.md), we'll look at a way to prevent access to global functions by using access tokens.
+But in the [third part of this series](../posts/capability-based-security-3.md), we'll look at a way to prevent access to global functions by using access tokens.
 
 **Question: Aren't these just standard functional programming techniques?**
 
@@ -638,7 +638,7 @@ Rather, I'm just trying to encourage some *good design* practices that can help 
 
 **I've got more questions...**
 
-Some additional questions are answered at the [end of part 2](../posts/capability-based-security-2/index.md#summary), so read those answers first.
+Some additional questions are answered at the [end of part 2](../posts/capability-based-security-2.md#summary), so read those answers first.
 Otherwise please add your question in the comments below, and I'll try to address it.
 
 ## Further reading
@@ -668,7 +668,7 @@ and [this one](http://lambda-the-ultimate.org/node/3930) and [this paper](http:/
 
 ## Coming up next
 
-In the [next post](../posts/capability-based-security-2/index.md), we'll look at how to constrain capabilities based on claims such as the current user's identity and role.
+In the [next post](../posts/capability-based-security-2.md), we'll look at how to constrain capabilities based on claims such as the current user's identity and role.
 
 *NOTE: All the code for this post is available as a [gist here](https://gist.github.com/swlaschin/909c5b24bf921e5baa8c#file-capabilitybasedsecurity_configexample-fsx).*
 

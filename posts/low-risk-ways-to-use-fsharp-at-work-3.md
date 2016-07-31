@@ -8,7 +8,7 @@ seriesOrder: 3
 
 ---
 
-This post is a continuation of the previous series on [low-risk and incremental ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work/index.md) --
+This post is a continuation of the previous series on [low-risk and incremental ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work.md) --
 how can you get your hands dirty with F# in a low-risk, incremental way, without affecting any mission critical code?
 
 In this one, we'll talk about using F# for testing.
@@ -458,7 +458,7 @@ But even in Boring Line-Of-Business Applications?, you may find that property ba
   Similarly, if you serialize and then deserialize something, you should get the original thing back.
 * **Invariants**. If you add products to a sales order, the sum of the individual lines should be the same as the order total.
   Or, the sum of word counts for each page should be the sum of the word count for the entire book.
-  More generally, if you calculate things via two different paths, you should get the same answer ([monoid homomorphisms!](../posts/monoids-part2/index.md#monoid-homomorphism))
+  More generally, if you calculate things via two different paths, you should get the same answer ([monoid homomorphisms!](../posts/monoids-part2.md#monoid-homomorphism))
 * **Rounding**. If you add ingredients to a recipe, the sum of the ingredient percentages (with 2 place precision) should always be exactly 100%.
   Similar rules are needed for most partitioning logic, such as shares, tax calculations, etc. 
   (e.g. [the "share pie" example in the DDD book](http://books.google.co.uk/books?id=xColAAPGubgC&pg=PA198&lpg=PA198&dq=%22domain+driven+design%22+%22share+pie%22&source=bl&ots=q9-HdfTK4p&sig=IUnHGFUdwQv2p0tuWVbrqqwdAk4&hl=en&sa=X&ei=IdFbU5bLK8SMOPLFgfgC&ved=0CC8Q6AEwAA#v=onepage&q=%22domain%20driven%20design%22%20%22share%20pie%22&f=false)).  
@@ -473,7 +473,7 @@ Some more links for FsCheck:
 * I have written [an introduction to property-based testing](http://fsharpforfunandprofit.com/posts/property-based-testing/) and [a follow up on choosing properties for property-based testing](http://fsharpforfunandprofit.com/posts/property-based-testing-2/).
 * [FsCheck documentation](http://github.com/fsharp/FsCheck/blob/master/Docs/Documentation.md).
 * [An article on using FsCheck in practice](http://www.clear-lines.com/blog/post/FsCheck-and-XUnit-is-The-Bomb.aspx).
-* [My post on the Roman Numerals kata that mentions FsCheck](../posts/roman-numeral-kata/index.md).
+* [My post on the Roman Numerals kata that mentions FsCheck](../posts/roman-numeral-kata.md).
 
 
 For more on property-based testing in general, look for articles and videos about QuickCheck. 

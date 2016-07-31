@@ -114,7 +114,7 @@ let p = {Person1.first="Alice"; last="Jones"}
 let { Person1.first=f; last=l} = p
 ```
 
-If needed, you can even add a fully qualified name (with namespace). Here's an example using [modules](../posts/organizing-functions/index.md).
+If needed, you can even add a fully qualified name (with namespace). Here's an example using [modules](../posts/organizing-functions.md).
 
 ```
 module Module1 = 
@@ -247,7 +247,7 @@ And records also have an automatically defined hash value based on the values in
 
 ### Record representation
 
-As noted in a [previous post](../posts/convenience-types/index.md), records have a nice default string representation, and can be serialized easily. But unlike tuples, the `ToString()` representation is unhelpful.
+As noted in a [previous post](../posts/convenience-types.md), records have a nice default string representation, and can be serialized easily. But unlike tuples, the `ToString()` representation is unhelpful.
 
 ```
 printfn "%A" {first="Alice"; last="Jones"}   // nice

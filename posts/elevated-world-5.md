@@ -8,9 +8,9 @@ seriesOrder: 5
 ---
 
 This post is the fifth in a series.
-In the [first two posts](../posts/elevated-world/index.md), I described some of the core functions for dealing with generic data types:  `map`, `bind`, and so on.
-In the [third post](../posts/elevated-world-3/index.md), I discussed "applicative" vs "monadic" style, and how to lift values and functions to be consistent with each other.
-In the [previous post](../posts/elevated-world-4/index.md), I introduced `traverse` and `sequence` as a way of working with lists of elevated values.
+In the [first two posts](../posts/elevated-world.md), I described some of the core functions for dealing with generic data types:  `map`, `bind`, and so on.
+In the [third post](../posts/elevated-world-3.md), I discussed "applicative" vs "monadic" style, and how to lift values and functions to be consistent with each other.
+In the [previous post](../posts/elevated-world-4.md), I introduced `traverse` and `sequence` as a way of working with lists of elevated values.
 
 In this post, we'll finish up by working through a practical example that uses all the techniques that have been discussed so far.
 
@@ -19,36 +19,36 @@ In this post, we'll finish up by working through a practical example that uses a
 Here's a list of shortcuts to the various functions mentioned in this series:
 
 * **Part 1: Lifting to the elevated world**
-  * [The `map` function](../posts/elevated-world/index.md#map)
-  * [The `return` function](../posts/elevated-world/index.md#return)
-  * [The `apply` function](../posts/elevated-world/index.md#apply)
-  * [The `liftN` family of functions](../posts/elevated-world/index.md#lift)
-  * [The `zip` function and ZipList world](../posts/elevated-world/index.md#zip)
+  * [The `map` function](../posts/elevated-world.md#map)
+  * [The `return` function](../posts/elevated-world.md#return)
+  * [The `apply` function](../posts/elevated-world.md#apply)
+  * [The `liftN` family of functions](../posts/elevated-world.md#lift)
+  * [The `zip` function and ZipList world](../posts/elevated-world.md#zip)
 * **Part 2: How to compose world-crossing functions**    
-  * [The `bind` function](../posts/elevated-world-2/index.md#bind)
-  * [List is not a monad. Option is not a monad.](../posts/elevated-world-2/index.md#not-a-monad)
+  * [The `bind` function](../posts/elevated-world-2.md#bind)
+  * [List is not a monad. Option is not a monad.](../posts/elevated-world-2.md#not-a-monad)
 * **Part 3: Using the core functions in practice**  
-  * [Independent and dependent data](../posts/elevated-world-3/index.md#dependent)
-  * [Example: Validation using applicative style and monadic style](../posts/elevated-world-3/index.md#validation)
-  * [Lifting to a consistent world](../posts/elevated-world-3/index.md#consistent)
-  * [Kleisli world](../posts/elevated-world-3/index.md#kleisli)
+  * [Independent and dependent data](../posts/elevated-world-3.md#dependent)
+  * [Example: Validation using applicative style and monadic style](../posts/elevated-world-3.md#validation)
+  * [Lifting to a consistent world](../posts/elevated-world-3.md#consistent)
+  * [Kleisli world](../posts/elevated-world-3.md#kleisli)
 * **Part 4: Mixing lists and elevated values**    
-  * [Mixing lists and elevated values](../posts/elevated-world-4/index.md#mixing)
-  * [The `traverse`/`MapM` function](../posts/elevated-world-4/index.md#traverse)
-  * [The `sequence` function](../posts/elevated-world-4/index.md#sequence)
-  * ["Sequence" as a recipe for ad-hoc implementations](../posts/elevated-world-4/index.md#adhoc)
-  * [Readability vs. performance](../posts/elevated-world-4/index.md#readability)
-  * [Dude, where's my `filter`?](../posts/elevated-world-4/index.md#filter)
+  * [Mixing lists and elevated values](../posts/elevated-world-4.md#mixing)
+  * [The `traverse`/`MapM` function](../posts/elevated-world-4.md#traverse)
+  * [The `sequence` function](../posts/elevated-world-4.md#sequence)
+  * ["Sequence" as a recipe for ad-hoc implementations](../posts/elevated-world-4.md#adhoc)
+  * [Readability vs. performance](../posts/elevated-world-4.md#readability)
+  * [Dude, where's my `filter`?](../posts/elevated-world-4.md#filter)
 * **Part 5: A real-world example that uses all the techniques**    
-  * [Example: Downloading and processing a list of websites](../posts/elevated-world-5/index.md#asynclist)
-  * [Treating two worlds as one](../posts/elevated-world-5/index.md#asyncresult)
+  * [Example: Downloading and processing a list of websites](../posts/elevated-world-5.md#asynclist)
+  * [Treating two worlds as one](../posts/elevated-world-5.md#asyncresult)
 * **Part 6: Designing your own elevated world** 
-  * [Designing your own elevated world](../posts/elevated-world-6/index.md#part6)
-  * [Filtering out failures](../posts/elevated-world-6/index.md#filtering)
-  * [The Reader monad](../posts/elevated-world-6/index.md#readermonad)
+  * [Designing your own elevated world](../posts/elevated-world-6.md#part6)
+  * [Filtering out failures](../posts/elevated-world-6.md#filtering)
+  * [The Reader monad](../posts/elevated-world-6.md#readermonad)
 * **Part 7: Summary** 
-  * [List of operators mentioned](../posts/elevated-world-7/index.md#operators)
-  * [Further reading](../posts/elevated-world-7/index.md#further-reading)
+  * [List of operators mentioned](../posts/elevated-world-7.md#operators)
+  * [Further reading](../posts/elevated-world-7.md#further-reading)
 
 <a id="part5"></a>
 <hr>
@@ -60,7 +60,7 @@ Here's a list of shortcuts to the various functions mentioned in this series:
 
 ## Example: Downloading and processing a list of websites 
 
-The example will be a variant of the one mentioned at the beginning of the [third post](../posts/elevated-world-3/index.md):
+The example will be a variant of the one mentioned at the beginning of the [third post](../posts/elevated-world-3.md):
 
 * Given a list of websites, create an action that finds the site with the largest home page.
 
@@ -98,7 +98,7 @@ Notice that I'm using units of measure for the timeout value. I find that units 
 I once accidentally set a timeout to 2000 seconds rather than 2000 milliseconds and I don't want to make that mistake again!
 
 The next bit of code defines our domain types.  We want to be able to keep the url and the size together as we process them. We could use a tuple,
-but I am a proponent of [using types to model your domain](../posts/designing-with-types-single-case-dus/index.md), if only for documentation.
+but I am a proponent of [using types to model your domain](../posts/designing-with-types-single-case-dus.md), if only for documentation.
 
 ```
 // The content of a downloaded page 
@@ -551,7 +551,7 @@ Again, all the downloads are happening in parallel, and all four failures are re
 
 The `largestPageSizeA` has a series of maps and sequences in it which means that the list is being iterated over three times and the async mapped over twice. 
 
-As [I said earlier](../posts/elevated-world-4/index.md#readability), I prefer clarity over micro-optimizations unless there is proof otherwise, and so this does not bother me.
+As [I said earlier](../posts/elevated-world-4.md#readability), I prefer clarity over micro-optimizations unless there is proof otherwise, and so this does not bother me.
 
 However, let's look at what you *could* do if you wanted to.
 
@@ -855,6 +855,6 @@ Success! The error from the first bad site prevented the rest of the downloads, 
 In this post, we worked through a small practical example. I hope that this example demonstrated that
 `map`, `apply`, `bind`, `traverse`, and `sequence` are not just academic abstractions but essential tools in your toolbelt.
 
-In the [next post](../posts/elevated-world-6/index.md) we'll working through another practical example, but this time
+In the [next post](../posts/elevated-world-6.md) we'll working through another practical example, but this time
 we will end up creating our *own* elevated world.  See you then!
 

@@ -61,7 +61,7 @@ So really, don't worry about them.
 
 So this is why I won't be writing a monad tutorial. I don't think it will help people learn about functional programming. If anything, it just creates confusion and anxiety.
 
-Yes, I will use examples of monads in [many](../posts/recipe-part2/index.md) different [posts](../posts/computation-expressions-wrapper-types/index.md),
+Yes, I will use examples of monads in [many](../posts/recipe-part2.md) different [posts](../posts/computation-expressions-wrapper-types.md),
 but, other than right here, I will try to avoid using the word "monad" anywhere on this site. In fact, it has pride of place on my [list of banned words](../about/index.md#banned)!
 
 

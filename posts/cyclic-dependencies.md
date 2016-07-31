@@ -8,7 +8,7 @@ seriesOrder: 1
 image: "/assets/img/Layering3b.png"
 ---
 
-*One of three related posts on [module organization](../posts/recipe-part3/index.md) and [cyclic dependencies](../posts/removing-cyclic-dependencies/index.md).*
+*One of three related posts on [module organization](../posts/recipe-part3.md) and [cyclic dependencies](../posts/removing-cyclic-dependencies.md).*
 
 One of the most common complaints about F# is that it requires code to be in *dependency order*. That is, you cannot use forward references to code that hasn't been seen by the compiler yet.  
 
@@ -106,7 +106,7 @@ So there is plenty of evidence that circular dependencies between assemblies are
 
 You might say, "Yes, I can understand why circular dependencies are bad for assemblies, but why bother for code inside an assembly?"
 
-Well, for exactly the same reasons!  Layering allows better partitioning, easier testing and cleaner refactoring.  You can see what I mean in a [related post on dependency cycles "in the wild"](../posts/cycles-and-modularity-in-the-wild/index.md) where I compare C# projects and F# projects. The dependencies in the F# projects are a lot less spaghetti-like.
+Well, for exactly the same reasons!  Layering allows better partitioning, easier testing and cleaner refactoring.  You can see what I mean in a [related post on dependency cycles "in the wild"](../posts/cycles-and-modularity-in-the-wild.md) where I compare C# projects and F# projects. The dependencies in the F# projects are a lot less spaghetti-like.
 
 Another quote from Brian's (excellent) comment:
 
@@ -124,5 +124,5 @@ Let's start with detection. There are a number of tools to help you detect circu
 
 "Very funny," you might say, "I already know about F#'s circular dependency prohibition -- it's driving me nuts! What can I do to fix the problem and make the compiler happy?"
 
-For that, you'll need to read the [next post](../posts/removing-cyclic-dependencies/index.md)...
+For that, you'll need to read the [next post](../posts/removing-cyclic-dependencies.md)...
 

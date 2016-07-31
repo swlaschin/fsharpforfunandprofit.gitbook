@@ -30,13 +30,13 @@ First we need to define the data structure for a stack. To keep things simple, w
 type Stack = float list
 ```
 
-But, hold on, let's wrap it in a [single case union type](../posts/discriminated-unions/index.md#single-case) to make it more descriptive, like this:
+But, hold on, let's wrap it in a [single case union type](../posts/discriminated-unions.md#single-case) to make it more descriptive, like this:
 
 ```
 type Stack = StackContents of float list
 ```
 
-For more details on why this is nicer, read the discussion of single case union types in [this post](../posts/discriminated-unions/index.md#single-case).
+For more details on why this is nicer, read the discussion of single case union types in [this post](../posts/discriminated-unions.md#single-case).
 
 Now, to create a new stack, we use `StackContents` as a constructor:
 
@@ -194,7 +194,7 @@ The compiler has caught a case we have overlooked -- what happens if the stack i
 
 So now we have to decide how to handle this. 
 
-* Option 1: Return a special "Success" or "Error" state, as we did in a [post from the "why use F#?" series](../posts/correctness-exhaustive-pattern-matching/index.md).
+* Option 1: Return a special "Success" or "Error" state, as we did in a [post from the "why use F#?" series](../posts/correctness-exhaustive-pattern-matching.md).
 * Option 2: Throw an exception.
 
 Generally, I prefer to use error cases, but in this case, we'll use an exception. So here's the `pop` code changed to handle the empty case:

@@ -8,13 +8,13 @@ seriesOrder: 2
 
 ---
 
-This post is a continuation of the series on [low-risk ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work/index.md).
+This post is a continuation of the series on [low-risk ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work.md).
 I've been suggesting a number of ways you can get your hands dirty with F# in a low-risk, incremental way, without affecting any mission critical code.
 
 In this one, we'll talk about using F# for builds and other development and devops scripts.
 
-If you're new to F#, you might want to read the sections on [getting started](../posts/low-risk-ways-to-use-fsharp-at-work/index.md#getting-started) and
-[working with NuGet](../posts/low-risk-ways-to-use-fsharp-at-work/index.md#working-with-nuget) in the previous post.
+If you're new to F#, you might want to read the sections on [getting started](../posts/low-risk-ways-to-use-fsharp-at-work.md#getting-started) and
+[working with NuGet](../posts/low-risk-ways-to-use-fsharp-at-work.md#working-with-nuget) in the previous post.
 
 ## Series contents
 

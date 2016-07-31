@@ -17,7 +17,7 @@ These methods are:
 
 Remember, as always, that not all methods need to be implemented. If `While` is not relevant to you, don't bother with it.
 
-One important note before we get started: **all the methods discussed here rely on [delays](../posts/computation-expressions-builder-part3/index.md)** being used. If you are not using delay functions, then none of the methods will give the expected results.
+One important note before we get started: **all the methods discussed here rely on [delays](../posts/computation-expressions-builder-part3.md)** being used. If you are not using delay functions, then none of the methods will give the expected results.
 
 ## Implementing "While"
 

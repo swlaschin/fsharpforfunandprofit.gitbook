@@ -10,12 +10,12 @@ image: "/assets/img/specflow_svg.png"
 
 (*Updated 2013-06-15. See comments at the end of the post*)
 
-(*Updated 2014-04-12. A [follow up post](../posts/roslyn-vs-fsharp-compiler/index.md) that applies the same analysis to Roslyn*)
+(*Updated 2014-04-12. A [follow up post](../posts/roslyn-vs-fsharp-compiler.md) that applies the same analysis to Roslyn*)
 
 (*Updated 2015-01-23. A much clearer version of this analysis [has been done by Evelina Gabasova](http://evelinag.com/blog/2014/06-09-comparing-dependency-networks/).
 She knows what she is talking about, so I highly recommend you read her post first!*)
 
-This is a follow up post to two earlier posts on [module organization](../posts/recipe-part3/index.md) and [cyclic dependencies](../posts/cyclic-dependencies/index.md).   
+This is a follow up post to two earlier posts on [module organization](../posts/recipe-part3.md) and [cyclic dependencies](../posts/cyclic-dependencies.md).   
 
 I thought it would be interesting to look at some real projects written in C# and F#, and see how they compare in modularity and number of cyclic dependencies.
 
@@ -284,7 +284,7 @@ Having compared the type counts to the code size, let's now compare them to each
 Again, there is a significant difference. For each unit of modularity in C# there are an average of 1.1 authored types. But in F# the average is 1.9, and for some projects a lot more than that. 
 
 Of course, creating nested types is trivial in F#, and quite uncommon in C#, so you could argue that this is not a fair comparison.
-But surely the ability to create [a dozen types in as many lines](../posts/conciseness-type-definitions/index.md) of F# has some effect on the quality of the design?
+But surely the ability to create [a dozen types in as many lines](../posts/conciseness-type-definitions.md) of F# has some effect on the quality of the design?
 This is harder to do in C#, but there is nothing to stop you. So might this not mean that there is a temptation in C# to not be as fine-grained as you could potentially be?  
 
 The project with the highest ratio (4.9) is my F# business application. I believe that this is due to this being only F# project in this list which is designed around a specific business domain,
@@ -487,7 +487,7 @@ Whether the F# approach is better or worse depends on your preference. It does m
 
 ## Cyclic dependencies
 
-Finally, we can turn our attention to the oh-so-evil cyclic dependencies. (If you want to know why they are bad, [read this post](../posts/cyclic-dependencies/index.md) ).
+Finally, we can turn our attention to the oh-so-evil cyclic dependencies. (If you want to know why they are bad, [read this post](../posts/cyclic-dependencies.md) ).
 
 Here are the cyclic dependency results for the C# projects.
 

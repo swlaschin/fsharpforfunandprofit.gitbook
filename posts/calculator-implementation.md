@@ -12,7 +12,7 @@ In this post, I'll continue developing a simple pocket calculator app, like this
 
 ![Calculator image](../assets/img/calculator_1.png)
 
-In the [previous post](../posts/calculator-design/index.md), we completed a first draft of the design, using only types (no UML diagrams!).
+In the [previous post](../posts/calculator-design.md), we completed a first draft of the design, using only types (no UML diagrams!).
 
 Now it's time to create a trial implementation that uses the design.
 
@@ -215,7 +215,7 @@ So, how can we rewrite it to be more functional?
 
 ## Bumping into bind
 
-The trick is to recognize that the pattern "if something exists, then act on that value" is exactly the `bind` pattern discussed [here](../posts/computation-expressions-continuations/index.md)
+The trick is to recognize that the pattern "if something exists, then act on that value" is exactly the `bind` pattern discussed [here](../posts/computation-expressions-continuations.md)
 and [here](http://fsharpforfunandprofit.com/rop/).
 
 In order to use the bind pattern effectively, it's a good idea to break the code into many small chunks.
@@ -436,7 +436,7 @@ let updateDisplayFromPendingOp services state =
 
 So far, we've being using "bind" directly.  That has helped by removing the cascading `if/else`.
 
-But F# allows you to hide the complexity in a different way, by creating [computation expressions](../posts/computation-expressions-intro/index.md).
+But F# allows you to hide the complexity in a different way, by creating [computation expressions](../posts/computation-expressions-intro.md).
 
 Since we are dealing with Options, we can create a "maybe" computation expression that allows clean handling of options.
 (If we were dealing with other types, we would need to create a different computation expression for each type).
@@ -646,6 +646,6 @@ Not bad -- the whole implementation is less than 60 lines of code.
 
 We have proved that our design is reasonable by making an implementation -- plus we found a missed requirement.
 
-In the [next post](../posts/calculator-complete-v1/index.md), we'll implement the services and the user interface to create a complete application.
+In the [next post](../posts/calculator-complete-v1.md), we'll implement the services and the user interface to create a complete application.
 
 *The code for this post is available in this [gist](https://gist.github.com/swlaschin/0e954cbdc383d1f5d9d3#file-calculator_implementation-fsx) on GitHub.*

@@ -56,7 +56,7 @@ The second option might seem clumsy, but for real code it will probably be both 
 
 At this final level, not only is the code functional, but the design itself has been changed to exploit the power of algebraic data types (especially union types). 
 
-The domain will have been [encoded into types](../posts/designing-with-types-single-case-dus/index.md) such that [illegal states are not even representable](../posts/designing-with-types-making-illegal-states-unrepresentable/index.md), and [correctness is enforced at compile time](../posts/correctness-type-checking/index.md).
+The domain will have been [encoded into types](../posts/designing-with-types-single-case-dus.md) such that [illegal states are not even representable](../posts/designing-with-types-making-illegal-states-unrepresentable.md), and [correctness is enforced at compile time](../posts/correctness-type-checking.md).
 For a concrete demonstration of the power of this approach, see the [shopping cart example](../posts/designing-for-correctness) in the ["why use F#" series](../series/why-use-fsharp.md) and the whole ["Designing with types" series](../series/designing-with-types.md).
 
 This level can only be done in F#, and is not really practical in C#. 
@@ -72,7 +72,7 @@ Here is a diagram to help you visualize the various porting paths described abov
 To see how these three levels work in practice, we'll apply them to some worked examples:
 
 * The first example is a simple system for creating and scoring a ten-pin bowling game, based on the code from the well known "bowling game kata" described by "Uncle" Bob Martin. The original C# code has only one class and about 70 lines of code, but even so, it demonstrates a number of important principles.
-* Next, we'll look at some shopping cart code, based on [this example](../posts/designing-for-correctness/index.md).
+* Next, we'll look at some shopping cart code, based on [this example](../posts/designing-for-correctness.md).
 * The final example is code that represents states for a subway turnstile system, also based on an example from Bob Martin. This example demonstrates how the union types in F# can represent a state transition model more easily than the OO approach. 
 
 But first, before we get started on the detailed examples, we'll go back to basics and do some simple porting of some code snippets. That will be the topic of the next post.

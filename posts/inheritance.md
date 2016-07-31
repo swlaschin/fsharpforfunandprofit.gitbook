@@ -8,7 +8,7 @@ seriesOrder: 3
 categories: [Object-oriented, Classes]
 ---
 
-This is a follow-on from the [previous post on classes](../posts/classes/index.md). This post will focus on inheritance in F#, and how to define and use abstract classes and interfaces.
+This is a follow-on from the [previous post on classes](../posts/classes.md). This post will focus on inheritance in F#, and how to define and use abstract classes and interfaces.
 
 ## Inheritance
 
@@ -192,6 +192,6 @@ printfn "rocket.TopSpeed = %i" <| rocket.TopSpeed()
 
 Abstract methods are basically straightforward and similar to C#. There are only two areas that might be tricky if you are used to C#:
 
-* You must understand how function signatures work and what their syntax is!  For a detailed discussion see the [post on function signatures](../posts/function-signatures/index.md).
+* You must understand how function signatures work and what their syntax is!  For a detailed discussion see the [post on function signatures](../posts/function-signatures.md).
 * There is no all-in-one virtual method. You must define the abstract method and the default implementation separately.
 
