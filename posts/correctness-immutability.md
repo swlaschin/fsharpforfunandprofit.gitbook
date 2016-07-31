@@ -60,7 +60,7 @@ The answer is, of course, that the list is mutable, and it is probable that the 
 
 In other words, when I call the `OddNumbers` function, I am unintentionally creating undesirable side effects.  
 
-Is there a way to ensure that this cannot happen?  Yes ? if the functions had used `IEnumerable` instead:
+Is there a way to ensure that this cannot happen?  Yes -- if the functions had used `IEnumerable` instead:
 
 ```
 public IEnumerable<int> MakeList() {}

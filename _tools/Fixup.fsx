@@ -68,17 +68,30 @@ module FixupText =
         |> replaceRegex @"\(\.\./(.*?)/#(.*?)\)" @"(../$1/index.md#$2)"  // replace (../dir/#id) with (../dir/index.md#id)
         |> replaceRegex @"\(\.\./series/(.*?).html\)" @"(../series/$1.md)"  // replace (../series/xxx.html) with (../series/xxx.md)
 
+    let fixupVideoPaths text = 
+        text
+        |> replace "../cap/index.md" "http://fsharpforfunandprofit.com/cap/"
+        |> replace "../ddd/index.md" "http://fsharpforfunandprofit.com/ddd/"
+        |> replace "../ettt/index.md" "http://fsharpforfunandprofit.com/ettt/"
+        |> replace "../fppatterns/index.md" "http://fsharpforfunandprofit.com/fppatterns/"
+        |> replace "../monadster/index.md" "http://fsharpforfunandprofit.com/monadster/"
+        |> replace "../parser/index.md" "http://fsharpforfunandprofit.com/parser/"
+        |> replace "../pbt/index.md" "http://fsharpforfunandprofit.com/pbt/"
+        |> replace "../rop/index.md" "http://fsharpforfunandprofit.com/rop/"
+
     let fixupSmartQuotes text = 
         text
         |> replace "“" "\""
         |> replace "”" "\""
         |> replace "’" "'"
+        |> replace "–" "--"
 
     let fixupText text = 
         text
         |> replaceCodeBlockDelimiters
         |> fixupLinkPaths
         |> fixupSmartQuotes 
+        |> fixupVideoPaths 
 
     // write to file
     let fixupFile (fi:FileInfo) = 
@@ -204,9 +217,11 @@ module Series =
     let updateSeriesPageContent (seriesInfo:SeriesInfo) =
         let path = seriesInfo.SeriesPage.File.FullName
         let sb = File.ReadAllText(path) |> StringBuilder
+        sb.AppendLine().AppendLine() |> ignore  // some vertical space
+
         seriesInfo.PostPages |> List.iter (fun page ->
             let title = page.Title
-            let desc = page.Description
+            let desc = if page.Description <> "" then page.Description + "." else ""
             let link = """../posts/""" + page.File.Name
             sb.AppendFormat("* [{0}]({1}). {2}",title,link,desc).AppendLine() |> ignore
         )
@@ -221,7 +236,36 @@ module Series =
             )
         |> List.iter updateSeriesPageContent
         
+module Images = 
 
+    let findImagesInFile (fi:FileInfo) =
+        let path = fi.FullName
+        let text = File.ReadAllText(path)
+        let pattern = """![.*]\((.*?)\)"""
+        Regex.Matches(text,pattern)
+        |> Seq.cast<Match>
+        |> Seq.map( fun m -> m.Groups.[1].Value)
+
+        (*
+        let pattern = """![.*]\((.*?)\)"""
+        let text = 
+        Regex.Matches(text,pattern)
+
+        *)
+
+    let rec findImages (d:DirectoryInfo) = 
+        seq {
+        yield! 
+            d.EnumerateFiles("*.md") 
+            |> Seq.collect findImagesInFile
+
+        yield! 
+            d.EnumerateDirectories() 
+            |> Seq.collect findImages 
+        }
+        |> Seq.distinct
+        |> Seq.toList
+        |> List.sort
 
 // process all
 let path = @"..\"
@@ -231,3 +275,5 @@ FixupFiles.fixupFileNames d
 FixupText.fixupDirectory d
 
 // Series.updateSeriesInfoPages()
+
+Images.findImages d

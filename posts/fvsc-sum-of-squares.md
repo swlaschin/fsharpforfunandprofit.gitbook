@@ -156,6 +156,6 @@ public static class FunctionalSumOfSquaresHelper
 However, in addition to the noise of the curly braces and periods and semicolons, the C# version needs to declare the parameter and return types, unlike the F# version. 
 
 Many C# developers may find this a trivial example, but still resort back to loops when the logic becomes more complicated. In F# though, you will almost never see explicit loops like this.
-See for example, [this post on eliminating boilerplate from more complicated loops](http://fsharpforfunandprofit.com/posts/conciseness-extracting-boilerplate/index.md).
+See for example, [this post on eliminating boilerplate from more complicated loops](http://fsharpforfunandprofit.com/posts/conciseness-extracting-boilerplate/).
 
 

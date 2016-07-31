@@ -8,3 +8,8 @@ seriesIndexId: "A recipe for a functional app"
 
 This is a very common question, so I thought that in this series of posts I'd describe a recipe for doing exactly this, covering design, validation, error handling, persistence, dependency management, code organization, and so on.
 
+
+
+* [How to design and code a complete program](../posts/recipe-part1.md). A recipe for a functional app, part 1.
+* [Railway oriented programming](../posts/recipe-part2.md). A recipe for a functional app, part 2.
+* [Organizing modules in a project](../posts/recipe-part3.md). A recipe for a functional app, Part 3.

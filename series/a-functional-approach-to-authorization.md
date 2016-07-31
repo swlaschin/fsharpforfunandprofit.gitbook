@@ -11,3 +11,8 @@ This series will sketch out two different approaches, first using an approach ca
 
 Interestingly, both approaches tend to produce a cleaner, more modular design as a side effect, which is why I like them! 
 
+
+
+* [A functional approach to authorization](../posts/capability-based-security.md). Capability based security and more.
+* [Constraining capabilities based on identity and role](../posts/capability-based-security-2.md). A functional approach to authorization, part 2.
+* [Using types as access tokens](../posts/capability-based-security-3.md). A functional approach to authorization, part 3.

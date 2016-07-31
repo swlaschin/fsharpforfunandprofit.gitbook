@@ -78,7 +78,7 @@ genericLogger
     2                                 // parameter 
 ```
 
-This is a lot more flexible. I don't have to create a new function every time I want to change the behavior ? I can define the behavior on the fly. 
+This is a lot more flexible. I don't have to create a new function every time I want to change the behavior -- I can define the behavior on the fly. 
 
 But you might be thinking that this is a bit ugly. A library function might expose a number of callback functions and it would be inconvenient to have to pass the same functions in over and over.
 

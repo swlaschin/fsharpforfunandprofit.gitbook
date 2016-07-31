@@ -10,3 +10,8 @@ Monoids are not really a design pattern; more an approach to working with many d
 In fact, once you understand monoids, you will start seeing them everywhere!
 
 
+
+
+* [Monoids without tears](../posts/monoids-without-tears.md). A mostly mathless discussion of a common functional pattern.
+* [Monoids in practice](../posts/monoids-part2.md). Monoids without tears - Part 2.
+* [Working with non-monoids](../posts/monoids-part3.md). Monoids without tears - Part 3.

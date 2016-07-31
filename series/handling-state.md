@@ -13,3 +13,7 @@ The Doctor then devised ways to work with these recipes using functions such as 
 In the final post, we'll see how we can use a computation expression to make the coding cleaner, and how these techniques can be generalized into the so-called "state monad".
 
 *Warning! These posts contains gruesome topics, strained analogies, discussion of monads*
+
+* [Dr Frankenfunctor and the Monadster](../posts/monadster.md). Or, how a 19th century scientist nearly invented the state monad.
+* [Completing the body of the Monadster](../posts/monadster-2.md). Dr Frankenfunctor and the Monadster, part 2.
+* [Refactoring the Monadster](../posts/monadster-3.md). Dr Frankenfunctor and the Monadster, part 3.

@@ -55,7 +55,7 @@ Again note that this is not an optimized implementation, but is designed to mirr
 Let's go through this code:
 
 * There are no type declarations anywhere. This function will work on any list that has comparable items (which is almost all F# types, because they automatically have a default comparison function).
-* The whole function is recursive ? this is signaled to the compiler using the `rec` keyword in "`let rec quicksort list =`".
+* The whole function is recursive -- this is signaled to the compiler using the `rec` keyword in "`let rec quicksort list =`".
 * The `match..with` is sort of like a switch/case statement. Each branch to test is signaled with a vertical bar, like so:
 
 ```

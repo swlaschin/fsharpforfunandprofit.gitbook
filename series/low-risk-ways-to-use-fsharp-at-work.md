@@ -27,3 +27,10 @@ What can you do?
 
 Well, don't worry! This series will suggest a number of ways you can get your hands dirty with F# in a low-risk, incremental way, without affecting any mission critical code.
 
+
+
+* [Twenty six low-risk ways to use F# at work](../posts/low-risk-ways-to-use-fsharp-at-work.md). You can start right now -- no permission needed.
+* [Using F# for development and devops scripts](../posts/low-risk-ways-to-use-fsharp-at-work-2.md). Twenty six low-risk ways to use F# at work (part 2).
+* [Using F# for testing](../posts/low-risk-ways-to-use-fsharp-at-work-3.md). Twenty six low-risk ways to use F# at work (part 3).
+* [Using F# for database related tasks](../posts/low-risk-ways-to-use-fsharp-at-work-4.md). Twenty six low-risk ways to use F# at work (part 4).
+* [Other interesting ways of using F# at work](../posts/low-risk-ways-to-use-fsharp-at-work-5.md). Twenty six low-risk ways to use F# at work (part 5).
