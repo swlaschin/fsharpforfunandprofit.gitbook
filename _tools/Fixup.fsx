@@ -12,78 +12,210 @@ open System.IO
 open System.Text
 open System.Text.RegularExpressions
 
-let replaceRegex (pattern:string) (replacement:string) (input:string) = 
-    Regex.Replace(input,pattern,replacement)
+module Fixup = 
+    let replaceRegex (pattern:string) (replacement:string) (input:string) = 
+        Regex.Replace(input,pattern,replacement)
 
-(*
-replaceRegex @"(?m)^\{\%\s+highlight.*?$" "```" "{% highlight fsharp %}\r\nabc"
-replaceRegex @"(?m)^\d\d\d\d-\d\d-\d\d-(.*?$)" "$1" "2012-09-01-myfile.md"
+    (*
+    replaceRegex @"(?m)^\{\%\s+highlight.*?$" "```" "{% highlight fsharp %}\r\nabc"
+    replaceRegex @"(?m)^\d\d\d\d-\d\d-\d\d-(.*?$)" "$1" "2012-09-01-myfile.md"
 
-replaceRegex @"\(\\(.*?)\)" "(..\$1)" @"(\posts\abc\) )"
-replaceRegex @"\((.*?)\\\)" @"($1\index.md)" @"(\posts\abc\) )"
-*)
+    replaceRegex @"\(\\(.*?)\)" "(..\$1)" @"(\posts\abc\) )"
+    replaceRegex @"\((.*?)\\\)" @"($1\index.md)" @"(\posts\abc\) )"
+    replaceRegex @"\((.*?)html\)" @"($1md)"  @"(\posts\abc.html) )"
 
-let replace (find:string) replacement (input:string) = 
-    input.Replace(find,replacement)
+    *)
 
-
-let replaceCodeBlockDelimiters text = 
-    text
-    |> replaceRegex "(?m)^\{\%\s+highlight.*?$" "```"
-    |> replaceRegex "(?m)^\{\%\s+endhighlight.*?$" "```"
-
-let fixupLinkPaths text = 
-    text
-    |> replaceRegex @"\(\\(.*?)\)" "(..\$1)" 
-    |> replaceRegex @"\((.*?)\\\)" @"($1\index.md)" 
-
-let fixupSmartQuotes text = 
-    text
-    |> replace "“" "\""
-    |> replace "”" "\""
-    |> replace "’" "'"
-
-let fixupText text = 
-    text
-    |> replaceCodeBlockDelimiters
-    |> fixupLinkPaths
-    |> fixupSmartQuotes 
-
-// write to file
-let fixupFile (fi:FileInfo) = 
-    let path = fi.FullName
-    File.ReadAllText(path,Text.Encoding.Default)
-    |> fixupText
-    |> fun text -> File.WriteAllText(path,text,Text.Encoding.ASCII)
-
-let rec fixupDirectory (d:DirectoryInfo) = 
-
-    d.EnumerateFiles("*.md") 
-    |> Seq.iter fixupFile
-
-    d.EnumerateDirectories() 
-    |> Seq.iter fixupDirectory
+    let replace (find:string) replacement (input:string) = 
+        input.Replace(find,replacement)
 
 
-let rec fixupFileNames (d:DirectoryInfo) = 
+    let replaceCodeBlockDelimiters text = 
+        text
+        |> replaceRegex "(?m)^\{\%\s+highlight.*?$" "```"
+        |> replaceRegex "(?m)^\{\%\s+endhighlight.*?$" "```"
 
-    let renameIfNeeded (fi:FileInfo) =
-        let oldName = fi.Name
-        let newName = replaceRegex "(?m)^\d\d\d\d-\d\d-\d\d-(.*?$)" "$1" oldName 
-        if newName <> oldName  then
-            let path = fi.FullName.Replace(oldName,newName)
-            fi.MoveTo(path)
+    let fixupLinkPaths text = 
+        text
+        |> replaceRegex @"\(\\(.*?)\)" "(..\$1)" 
+        |> replaceRegex @"\((.*?)\\\)" @"($1\index.md)" 
+        |> replaceRegex @"\((.*?)html\)" @"($1md)"  // replace series.html with series.md 
 
-    d.EnumerateFiles("*.md") 
-    |> Seq.iter renameIfNeeded 
+    let fixupSmartQuotes text = 
+        text
+        |> replace "“" "\""
+        |> replace "”" "\""
+        |> replace "’" "'"
 
-    d.EnumerateDirectories() 
-    |> Seq.iter fixupFileNames 
+    let fixupText text = 
+        text
+        |> replaceCodeBlockDelimiters
+        |> fixupLinkPaths
+        |> fixupSmartQuotes 
+
+    // write to file
+    let fixupFile (fi:FileInfo) = 
+        let path = fi.FullName
+        File.ReadAllText(path,Text.Encoding.Default)
+        |> fixupText
+        |> fun text -> File.WriteAllText(path,text,Text.Encoding.ASCII)
+
+    let rec fixupDirectory (d:DirectoryInfo) = 
+
+        d.EnumerateFiles("*.md") 
+        |> Seq.iter fixupFile
+
+        d.EnumerateDirectories() 
+        |> Seq.iter fixupDirectory
+
+
+    let rec fixupFileNames (d:DirectoryInfo) = 
+
+        let renameIfNeeded (fi:FileInfo) =
+            let oldName = fi.Name
+            let newName = replaceRegex "(?m)^\d\d\d\d-\d\d-\d\d-(.*?$)" "$1" oldName 
+            if newName <> oldName  then
+                let path = fi.FullName.Replace(oldName,newName)
+                fi.MoveTo(path)
+
+        d.EnumerateFiles("*.md") 
+        |> Seq.iter renameIfNeeded 
+
+        d.EnumerateDirectories() 
+        |> Seq.iter fixupFileNames 
+
+module Series = 
+
+    type PageInfo = {
+        File : FileInfo
+        Title: string
+        Description: string
+        SeriesId: string option
+        SeriesIndexId : string option
+        SeriesOrder: int option
+        }
+
+    let findField fieldName (line:string) = 
+        let dquotedPattern = "(?i)" + fieldName + """\s*:\s*"([^"]*)"\s*"""
+        let squotedPattern = "(?i)" + fieldName + """\s*:\s*'([^']*)'\s*"""
+        let unquotedPattern = "(?i)" + fieldName + """\s*:\s*(\S+)\s*"""
+        [dquotedPattern; squotedPattern; unquotedPattern]
+        |> List.tryPick (fun pattern ->
+            let m = Regex.Match(line,pattern)
+            if m.Success then
+                Some <| m.Groups.[1].Value
+            else
+                None
+            )
+        (*
+        let pattern = """title:\s*"([^"]+)"\s*"""
+        let m = Regex.Match("""title:"abc" """,pattern) in m.Value
+        let m = Regex.Match("""title:"abc" """,pattern) in m.Groups.[1].Value
+        let pattern = """title:\s*(\S+)\s*"""
+        let m = Regex.Match("""title: abc """,pattern) in m.Groups.[1].Value
+        let m = Regex.Match("""title:"abc" """,pattern) in m.Groups.[1].Value
+
+        findField "title" """title:"" """
+        findField "title" """title:"abc" """
+        findField "title" """title: abc """
+        findField "title" """desc: abc """
+        *)
+
+    let ifNone v opt = defaultArg opt v
+
+    let parsePageText fi (lines:string seq) = 
+        let title = lines |> Seq.tryPick (findField "title") |> ifNone ""
+        let description = lines |> Seq.tryPick (findField "description") |> ifNone ""
+        let seriesId = lines |> Seq.tryPick (findField "seriesId") 
+        let seriesIndexId = lines |> Seq.tryPick (findField "seriesIndexId") 
+        let seriesOrder = lines |> Seq.tryPick (findField "seriesOrder") |> Option.map int
+        {
+        File = fi
+        Title = title
+        Description = description
+        SeriesId = seriesId
+        SeriesIndexId = seriesIndexId
+        SeriesOrder = seriesOrder
+        }
+
+        (*
+        let fi = FileInfo("..")
+        let lines = 
+            [
+            """layout: post"""
+            """title: "Comparing F# with C#: A simple sum" """
+            """description: "In which we attempt to sum the squares from 1 to N without using a loop" """
+            """nav: why-use-fsharp"""
+            """seriesId: "Why use F#?" """
+            """seriesOrder: 3"""
+            """categories: [F# vs C#]"""
+            ]
+        parsePageText fi lines
+
+        *)
+
+    let parsePage (fi:FileInfo) =
+        let path = fi.FullName
+        File.ReadAllLines(path,Text.Encoding.Default)
+        |> Seq.truncate 10
+        |> parsePageText fi
+        
+
+    let seriesIdToPostPages()  = 
+        let path = @"..\posts"
+        let d = DirectoryInfo(path)
+        d.EnumerateFiles("*.md") 
+        |> Seq.map parsePage 
+        |> Seq.toList
+        |> List.groupBy (fun page -> page.SeriesId)
+        |> List.map (fun (keyOpt,vals) -> keyOpt, vals |> List.sortBy (fun page -> page.SeriesOrder) )
+        |> List.choose (fun (keyOpt,vals) -> keyOpt |> Option.map (fun key -> key,vals))
+        |> Map.ofList
+
+    // Series.seriesIdToPostPages()
+
+    let seriesIdToSeriesIndexPages()  = 
+        let path = @"..\series"
+        let d = DirectoryInfo(path)
+        d.EnumerateFiles("*.md") 
+        |> Seq.map parsePage 
+        |> Seq.toList
+        |> List.choose (fun page -> page.SeriesIndexId |> Option.map (fun key -> key,page))
+
+    // Series.seriesIdToSeriesIndexPages()
+
+    type SeriesInfo = {
+        SeriesPage : PageInfo
+        PostPages : PageInfo list
+        }
+
+    let updateSeriesPageContent (seriesInfo:SeriesInfo) =
+        let path = seriesInfo.SeriesPage.File.FullName
+        let sb = File.ReadAllText(path) |> StringBuilder
+        seriesInfo.PostPages |> List.iter (fun page ->
+            let title = page.Title
+            let desc = page.Description
+            let link = """../posts/""" + page.File.Name
+            sb.AppendFormat("* [{0}]({1}). {2}",title,link,desc).AppendLine() |> ignore
+        )
+        File.WriteAllText(path,sb.ToString()) 
+
+    let updateSeriesInfoPages()  = 
+        let seriesIdToPostPages = seriesIdToPostPages()
+        seriesIdToSeriesIndexPages() 
+        |> List.map (fun (id,seriesPage) -> 
+            let postPages = seriesIdToPostPages |> Map.tryFind id |> ifNone []
+            {SeriesPage=seriesPage; PostPages=postPages}
+            )
+        |> List.iter updateSeriesPageContent
+        
+
 
 // process all
 let path = @"..\"
 let d = DirectoryInfo(path)
 
-fixupFileNames d
-fixupDirectory d
+Fixup.fixupFileNames d
+Fixup.fixupDirectory d
 
+Series.updateSeriesInfoPages()
