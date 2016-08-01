@@ -19,6 +19,7 @@
 
 * [The "Why use F#?" Series](series/why-use-fsharp.md) 
     * [Introduction to the 'Why use F#' series](posts/why-use-fsharp-intro.md) 
+    * [F# syntax in 60 seconds](posts/fsharp-in-60-seconds.md) 
     * [Comparing F# with C#: A simple sum](posts/fvsc-sum-of-squares.md) 
     * [Comparing F# with C#: Sorting](posts/fvsc-quicksort.md) 
     * [Comparing F# with C#: Downloading a web page](posts/fvsc-download.md)
