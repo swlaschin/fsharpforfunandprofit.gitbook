@@ -18,8 +18,8 @@ F# is free and open source, and runs on Linux, Mac, Windows and more. To downloa
 
 ## Getting started
 
-Next, before randomly dipping into the posts, you should read the ["why use F#?"](./why-use-fsharp/index.md) page and then the whole "why use F#" series.
-After that the "site contents" page provides suggestions for further reading on functions, types and more.
+Next, before randomly dipping into the posts, you should read the ["why use F#?"](./why-use-fsharp/index.md) page and then the whole ["why use F#" series](series/why-use-fsharp.md).
+After that the ["site contents"](./site-contents/index.md) page provides suggestions for further reading on functions, types and more.
 
 There is a page with some advice on [learning F#](./learning-fsharp/index.md),
 and if you have problems trying to get your code to compile, the [troubleshooting F#](./troubleshooting-fsharp/index.md) page might be helpful.

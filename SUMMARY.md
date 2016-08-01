@@ -3,6 +3,7 @@
 
 ### Getting started
 
+* [Contents of the book](site-contents/index.md) 
 * ["Why use F#?" in one page](why-use-fsharp/index.md) 
 * [Installing and using F#](installing-and-using/index.md)
 * [F# syntax in 60 seconds](posts/fsharp-in-60-seconds.md) 
