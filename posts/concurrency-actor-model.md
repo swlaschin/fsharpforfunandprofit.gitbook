@@ -38,7 +38,7 @@ But these are minor issues, and can be worked around. In a future series, I will
 
 Let's see a simple agent implementation in F#:
 
-```
+```fsharp
 
 #nowarn "40"
 let printerAgent = MailboxProcessor.Start(fun inbox-> 
@@ -68,7 +68,7 @@ The `MailboxProcessor.Start` function takes a simple function parameter. That fu
 
 Here's the example in use:
 
-```
+```fsharp
 // test it
 printerAgent.Post "hello" 
 printerAgent.Post "hello again" 
@@ -98,7 +98,7 @@ Using locks or mutexes is a common solution for these requirements, so let's wri
 
 First let's write a static `LockedCounter` class that protects the state with locks.  
 
-```
+```fsharp
 open System
 open System.Threading
 open System.Diagnostics
@@ -157,7 +157,7 @@ Some notes on this code:
 
 Let's test it in isolation:
 
-```
+```fsharp
 // test in isolation
 LockedCounter.Add 4
 LockedCounter.Add 5
@@ -165,7 +165,7 @@ LockedCounter.Add 5
 
 Next, we'll create a task that will try to access the counter:
 
-```
+```fsharp
 let makeCountingTask addFunction taskId  = async {
     let name = sprintf "Task%i" taskId
     for i in [1..3] do 
@@ -181,7 +181,7 @@ In this case, when there is no contention at all, the wait times are all 0.
 
 But what happens when we create 10 child tasks that all try to access the counter at once:
 
-```
+```fsharp
 let lockedExample5 = 
     [1..10]
         |> List.map (fun i -> makeCountingTask LockedCounter.Add i)
@@ -198,7 +198,7 @@ And if we add more and more tasks, the contention will increase, and the tasks w
 
 Let's see how a message queue might help us. Here's the message based version:
         
-```
+```fsharp
 type MessageBasedCounter () = 
 
     static let updateState (count,sum) msg = 
@@ -248,7 +248,7 @@ The code only has to focus on the business logic, and is consequently much easie
 
 Let's test it in isolation:
 
-```
+```fsharp
 // test in isolation
 MessageBasedCounter.Add 4
 MessageBasedCounter.Add 5
@@ -256,14 +256,14 @@ MessageBasedCounter.Add 5
 
 Next, we'll reuse a task we defined earlier, but calling `MessageBasedCounter.Add` instead:
 
-```
+```fsharp
 let task = makeCountingTask MessageBasedCounter.Add 1
 Async.RunSynchronously task
 ```
 
 Finally let's create 5 child tasks that try to access the counter at once.
 
-```
+```fsharp
 let messageExample5 = 
     [1..5]
         |> List.map (fun i -> makeCountingTask MessageBasedCounter.Add i)
@@ -294,7 +294,7 @@ In order to make the corruption very obvious and repeatable, let's first create 
 and pauses for a millisecond between each character. During that millisecond, another thread could be writing as well, causing an undesirable
 interleaving of messages.
 
-```
+```fsharp
 let slowConsoleWrite msg = 
     msg |> String.iter (fun ch->
         System.Threading.Thread.Sleep(1)
@@ -307,7 +307,7 @@ slowConsoleWrite "abc"
 
 Next, we will create a simple task that loops a few times, writing its name each time to the logger:
 
-```
+```fsharp
 let makeTask logger taskId = async {
     let name = sprintf "Task%i" taskId
     for i in [1..3] do 
@@ -323,7 +323,7 @@ Async.RunSynchronously task
 
 Next, we write a logging class that encapsulates access to the slow console. It has no locking or serialization, and is basically not thread-safe:
 
-```
+```fsharp
 type UnserializedLogger() = 
     // interface
     member this.Log msg = slowConsoleWrite msg
@@ -335,7 +335,7 @@ unserializedLogger.Log "hello"
 
 Now let's combine all these into a real example. We will create five child tasks and run them in parallel, all trying to write to the slow console.
 
-```
+```fsharp
 let unserializedExample = 
     let logger = new UnserializedLogger()
     [1..5]
@@ -353,7 +353,7 @@ So what happens when we replace `UnserializedLogger` with a `SerializedLogger` c
 
 The agent inside `SerializedLogger` simply reads a message from its input queue and writes it to the slow console.  Again there is no code dealing with concurrency and no locks are used.
 
-```
+```fsharp
 type SerializedLogger() = 
 
     // create the mailbox processor
@@ -386,7 +386,7 @@ serializedLogger.Log "hello"
 
 So now we can repeat the earlier unserialized example but using the `SerializedLogger` instead. Again, we create five child tasks and run them in parallel:
 
-```
+```fsharp
 let serializedExample = 
     let logger = new SerializedLogger()
     [1..5]

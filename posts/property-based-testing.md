@@ -12,7 +12,7 @@ categories: ["TDD"]
 
 Let's start with a discussion that I hope never to have:
 
-```
+```text
 Me to co-worker: "We need a function that will add two numbers together, would you mind implementing it?" 
 (a short time later) 
 Co-worker: "I just finished implementing the 'add' function" 
@@ -42,7 +42,7 @@ You are practising test-driven-development, enterprise-style, which means that y
  
 So you start with a test like this (using vanilla NUnit style):
 
-```
+```fsharp
 [<Test>]
 let ``When I add 1 + 2, I expect 3``()=
     let result = add 1 2
@@ -51,7 +51,7 @@ let ``When I add 1 + 2, I expect 3``()=
 
 The EDFH then implements the `add` function like this:
 
-```
+```fsharp
 let add x y =
     if x=1 && y=2 then 
         3
@@ -65,7 +65,7 @@ When you complain to the EDFH, they say that they are doing TDD properly, and on
 
 Fair enough. So you write another test:
 
-```
+```fsharp
 [<Test>]
 let ``When I add 2 + 2, I expect 4``()=
     let result = add 2 2
@@ -74,7 +74,7 @@ let ``When I add 2 + 2, I expect 4``()=
 
 The EDFH then changes the implementation of the `add` function to this:
 
-```
+```fsharp
 let add x y =
     if x=1 && y=2 then 
         3
@@ -94,7 +94,7 @@ So the question is, what kind of test could you write so that a malicious progra
 
 Well, you could start with a much larger list of known results, and mix them up a bit.
 
-```
+```fsharp
 [<Test>]
 let ``When I add two numbers, I expect to get their sum``()=
     for (x,y,expected) in [ (1,2,3); (2,2,4); (3,5,8); (27,15,42); ]
@@ -106,7 +106,7 @@ But the EDFH is tireless, and will update the implementation to include all of t
 
 A much better approach is to generate random numbers and use those for inputs, so that a malicious programmer could not possibly know what to do in advance.
 
-```
+```fsharp
 let rand = System.Random()
 let randInt() = rand.Next()
 
@@ -124,7 +124,7 @@ If the test looks like this, then the EDFH will be *forced* to implement the `ad
 
 One final improvement -- the EDFH might just get lucky and have picked numbers that work by chance, so let's repeat the random number test a number of times, say 100 times.
 
-```
+```fsharp
 [<Test>]
 let ``When I add two random numbers (100 times), I expect their sum``()=
     for _ in [1..100] do
@@ -160,7 +160,7 @@ So for example, what is the difference between `add` and `subtract`? Well, for `
 
 So there's a good property to start with. It doesn't depend on addition itself, but it does eliminate a whole class of incorrect implementations.
 
-```
+```fsharp
 [<Test>]
 let ``When I add two numbers, the result should not depend on parameter order``()=
     for _ in [1..100] do
@@ -177,7 +177,7 @@ So now what about the difference between `add` and `multiply`? What does additio
 
 We could start by testing with something like this, which says that `x + x` should the same as `x * 2`:
 
-```
+```fsharp
 let result1 = add x x   
 let result2 = x * 2     
 Assert.AreEqual(result1,result2)
@@ -189,7 +189,7 @@ One very useful approach is to see what happens when the function is repeated mo
 
 That leads to the idea that two `add 1`s is the same as one `add 2`. Here's the test:
 
-```
+```fsharp
 [<Test>]
 let ``Adding 1 twice is the same as adding 2``()=
     for _ in [1..100] do
@@ -209,7 +209,7 @@ So the combination of both of these tests should narrow it down so that there is
 
 After submitting this test suite we find out the EDFH has written an implementation that passes both these tests. Let's have a look:
 
-```
+```fsharp
 let add x y = 0  // malicious implementation
 ```
 
@@ -226,7 +226,7 @@ Yes!
 
 What happens when you add zero to a number? You always get the same number back.
 
-```
+```fsharp
 [<Test>]
 let ``Adding zero is the same as doing nothing``()=
     for _ in [1..100] do
@@ -246,7 +246,7 @@ First, we'll write a function called `propertyCheck` that does the work of gener
 
 `propertyCheck` will also need a parameter for the property itself. This will be a function that takes two ints and returns a bool:
 
-```
+```fsharp
 let propertyCheck property = 
     // property has type: int -> int -> bool
     for _ in [1..100] do
@@ -258,7 +258,7 @@ let propertyCheck property =
 
 With this in place, we can redefine one of the tests by pulling out the property into a separate function, like this:
 
-```
+```fsharp
 let commutativeProperty x y = 
     let result1 = add x y
     let result2 = add y x // reversed params
@@ -273,7 +273,7 @@ We can also do the same thing for the other two properties.
 
 After the refactoring, the complete code looks like this:
 
-```
+```fsharp
 let rand = System.Random()
 let randInt() = rand.Next()
 
@@ -385,7 +385,7 @@ First, you need to install FsCheck and load the DLL (FsCheck can be a bit finick
 
 The top of your script file should look something like this:
 
-```
+```fsharp
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 #I @"Packages\FsCheck.1.0.3\lib\net45"
 //#I @"Packages\FsCheck.0.9.2.0\lib\net40-Client"  // use older version for VS2012
@@ -400,7 +400,7 @@ open NUnit.Framework
 
 Once FsCheck is loaded, you can use `Check.Quick` and pass in any "property" function. For now, let's just say that a "property" function is any function (with any parameters) that returns a boolean.
 
-```
+```fsharp
 let add x y = x + y  // correct implementation
 
 let commutativeProperty (x,y) = 
@@ -429,7 +429,7 @@ Check.Quick identityProperty
 
 If you check one of the properties interactively, say with `Check.Quick commutativeProperty`,  you'll see the message:
 
-```
+```text
 Ok, passed 100 tests.
 ```
 
@@ -439,7 +439,7 @@ Let's see what happens when we have a malicious implementation of `add`. In the 
 
 That implementation *will* satisfy the commutative property, but what about the `adding1TwiceIsAdding2OnceProperty`?
 
-```
+```fsharp
 let add x y =
 	x * y // malicious implementation
 
@@ -454,7 +454,7 @@ Check.Quick adding1TwiceIsAdding2OnceProperty
 
 The result from FsCheck is:
 
-```
+```text
 Falsifiable, after 1 test (1 shrink) (StdGen (1657127138,295941511)):
 1
 ```
@@ -468,7 +468,7 @@ By using random testing, we have made it harder for a malicious implementor. The
 The EDFH notes that we are still using some magic numbers in the `adding1TwiceIsAdding2OnceProperty` -- namely 1 and 2,
 and decides to create an implementation that exploits this. They'll use a correct implementation for low input values and an incorrect implementation for high input values:
 
-```
+```fsharp
 let add x y = 
 	if (x < 10) || (y < 10) then
 		x + y  // correct for low values
@@ -482,7 +482,7 @@ That'll teach us to use magic numbers in our tests!
 
 What's the alternative? Well, let's steal from the mathematicians and create an associative property test.
 
-```
+```fsharp
 let associativeProperty x y z = 
 	let result1 = add x (add y z)    // x + (y + z)
 	let result2 = add (add x y) z    // (x + y) + z
@@ -494,7 +494,7 @@ Check.Quick associativeProperty
 
 Aha! Now we get a falsification:
 
-```
+```text
 Falsifiable, after 38 tests (4 shrinks) (StdGen (127898154,295941554)):
 8
 2
@@ -517,7 +517,7 @@ The precise meaning of "size" depends on the type being generated and the contex
 
 Here's some code that generates ints:
 
-```
+```fsharp
 // get the generator for ints
 let intGenerator = Arb.generate<int>
 
@@ -534,7 +534,7 @@ Gen.sample 100 3 intGenerator  // e.g. [-37; 24; -62]
 In this example, the ints are not generated uniformly, but clustered around zero.
 You can see this for yourself with a little code:
 
-```
+```fsharp
 // see how the values are clustered around the center point
 intGenerator 
 |> Gen.sample 10 1000 
@@ -546,7 +546,7 @@ intGenerator
 
 The result is something like this:
 
-```
+```fsharp
 [(-10, 3); (-9, 14); (-8, 18); (-7, 10); (-6, 27); (-5, 42); (-4, 49);
    (-3, 56); (-2, 76); (-1, 119); (0, 181); (1, 104); (2, 77); (3, 62);
    (4, 47); (5, 44); (6, 26); (7, 16); (8, 14); (9, 12); (10, 3)]
@@ -556,7 +556,7 @@ You can see that most of the values are in the center (0 is generated 181 times,
 
 You can repeat with larger samples too. This one generates 10000 elements in the range [-30,30]
 
-```
+```fsharp
 intGenerator 
 |> Gen.sample 30 10000 
 |> Seq.groupBy id 
@@ -573,7 +573,7 @@ What's great about the generator logic is that it will automatically generate co
 
 For example, here is a generator for a tuple of three ints: 
 
-```
+```fsharp
 let tupleGenerator = Arb.generate<int*int*int>
 
 // generate 3 tuples with a maximum size of 1
@@ -593,7 +593,7 @@ Gen.sample 100 3 tupleGenerator
 Once you have a generator for a base type, `option` and `list` generators follow.
 Here is a generator for `int option`s:
 
-```
+```fsharp
 let intOptionGenerator = Arb.generate<int option>
 // generate 10 int options with a maximum size of 5
 Gen.sample 5 10 intOptionGenerator 
@@ -603,7 +603,7 @@ Gen.sample 5 10 intOptionGenerator
 
 And here is a generator for `int list`s:
 
-```
+```fsharp
 let intListGenerator = Arb.generate<int list>
 // generate 10 int lists with a maximum size of 5
 Gen.sample 5 10 intListGenerator 
@@ -613,7 +613,7 @@ Gen.sample 5 10 intListGenerator
 
 And of course you can generate random strings too!
 	
-```
+```fsharp
 let stringGenerator = Arb.generate<string>
 
 // generate 3 strings with a maximum size of 1
@@ -628,7 +628,7 @@ Gen.sample 10 3 stringGenerator
 The best thing is that the generator will work with your own user-defined types too!
 
 
-```
+```fsharp
 type Color = Red | Green of int | Blue of bool
 
 let colorGenerator = Arb.generate<Color>
@@ -642,7 +642,7 @@ Gen.sample 50 10 colorGenerator
 
 Here's one that generates a user-defined record type containing another user-defined type.
 
-```
+```fsharp
 type Point = {x:int; y:int; color: Color}
 
 let pointGenerator = Arb.generate<Point>
@@ -677,14 +677,14 @@ The exact process for shrinking varies depending on the type (and you can overri
 
 For example, let's say that you have a silly property `isSmallerThan80`:
 
-```
+```fsharp
 let isSmallerThan80 x = x < 80
 ```
 
 You have generated random numbers and found that then property fails for `100`, and you want to try a smaller number. `Arb.shrink` will generate a sequence of ints, all of which are smaller than 100.
 Each one of these is tried with the property in turn until the property fails again.
 
-```
+```fsharp
 isSmallerThan80 100 // false, so start shrinking
 
 Arb.shrink 100 |> Seq.toList 
@@ -693,7 +693,7 @@ Arb.shrink 100 |> Seq.toList
 
 For each element in the list, test the property against it until you find another failure:
 
-```
+```fsharp
 isSmallerThan80 0 // true
 isSmallerThan80 50 // true
 isSmallerThan80 75 // true
@@ -702,7 +702,7 @@ isSmallerThan80 88 // false, so shrink again
 
 The property failed with `88`, so shrink again using that as a starting point:
 
-```
+```fsharp
 Arb.shrink 88 |> Seq.toList 
 //  [0; 44; 66; 77; 83; 86; 87]
 isSmallerThan80 0 // true
@@ -714,7 +714,7 @@ isSmallerThan80 83 // false, so shrink again
 
 The property failed with `83` now, so shrink again using that as a starting point:
 
-```
+```fsharp
 Arb.shrink 83 |> Seq.toList 
 //  [0; 42; 63; 73; 78; 81; 82]
 // smallest failure is 81, so shrink again
@@ -722,7 +722,7 @@ Arb.shrink 83 |> Seq.toList
 
 The property failed with `81`, so shrink again using that as a starting point:
 
-```
+```fsharp
 Arb.shrink 81 |> Seq.toList 
 //  [0; 41; 61; 71; 76; 79; 80]
 // smallest failure is 80
@@ -735,7 +735,7 @@ In this case then, FsCheck will report that `80` falsifies the property and that
 Just as with generators, FsCheck will generate shrink sequences for almost any type:
 
 
-```
+```fsharp
 Arb.shrink (1,2,3) |> Seq.toList 
 //  [(0, 2, 3); (1, 0, 3); (1, 1, 3); (1, 2, 0); (1, 2, 2)]
 
@@ -752,7 +752,7 @@ And, as with generators, there are ways to customize how shrinking works if need
 
 I mentioned a silly property `isSmallerThan80` -- let's see how FsCheck does with it.
 
-```
+```fsharp
 // silly property to test
 let isSmallerThan80 x = x < 80
 
@@ -768,7 +768,7 @@ We do this by changing the default ("Quick") configuration. There is a field cal
 
 Finally, to use a specific config, you'll need to use `Check.One(config,property)` rather than just `Check.Quick(property)`.
 
-```
+```fsharp
 let config = {
 	Config.Quick with 
 		MaxTest = 1000
@@ -779,7 +779,7 @@ Check.One(config,isSmallerThan80 )
 
 Oops! FsCheck didn't find a counter-example with 1000 tests either! Let's try once more with 10000 tests:
 
-```
+```fsharp
 let config = {
 	Config.Quick with 
 		MaxTest = 10000
@@ -800,7 +800,7 @@ But, as we saw, even if the size is 100, very few numbers are generated at the e
 
 So let's change the `EndSize` to something larger and see what happens!
 
-```
+```fsharp
 let config = {
 	Config.Quick with 
 		EndSize = 1000
@@ -818,7 +818,7 @@ I mentioned that one of the benefits of FsCheck over a home-grown solution is th
 
 We'll tweak the malicious implementation to have a boundary of `25`. Let's see how FsCheck detects this boundary via logging.
 
-```
+```fsharp
 let add x y = 
 	if (x < 25) || (y < 25) then
 		x + y  // correct for low values
@@ -836,7 +836,7 @@ Check.Quick associativeProperty
 
 The result is:
 
-```
+```text
 Falsifiable, after 66 tests (12 shrinks) (StdGen (1706196961,295941556)):
 1
 24
@@ -847,7 +847,7 @@ Again, FsCheck has found that `25` is the exact boundary point quite quickly.  B
 
 First, the simplest way to see what FsCheck is doing is to use "verbose" mode. That is, use `Check.Verbose` rather than `Check.Quick`:
 
-```
+```fsharp
 // check the property interactively            
 Check.Quick associativeProperty 
 
@@ -857,7 +857,7 @@ Check.Verbose associativeProperty
 
 When do this, you'll see an output like that shown below. I've added all the comments to explain the various elements.
 
-```
+```text
 0:    // test 1
 -1    // param 1
 -1    // param 2 
@@ -921,7 +921,7 @@ And again, to use a specific config, you'll need to use `Check.One(config,proper
 
 Here's the code with the default tracing functions changed, and the replay seed set explicitly.
 
-```
+```fsharp
 // create a function for displaying a test
 let printTest testNum [x;y;z] = 
 	sprintf "#%-3i %3O %3O %3O\n" testNum x y z
@@ -944,7 +944,7 @@ Check.One(config,associativeProperty)
 
 The output is now much more compact, and looks like this:
 
-```
+```text
 #0    -1  -1   0
 #1     0   0   0
 #2    -2   0  -3
@@ -981,7 +981,7 @@ So there you go -- it's quite easy to customize the FsCheck logging if you need 
 Let's look at how the shrinking was done in detail.
 The last set of inputs (46,-4,50) was false, so shrinking started.
  
-```
+```fsharp
 // The last set of inputs (46,-4,50) was false, so shrinking started
 associativeProperty 46 -4 50  // false, so shrink
 
@@ -992,7 +992,7 @@ Arb.shrink 46 |> Seq.toList
 
 We'll loop through the list `[0; 23; 35; 41; 44; 45]` stopping at the first element that causes the property to fail:
 
-```
+```fsharp
 // find the next test that fails when shrinking the x parameter 
 let x,y,z = (46,-4,50) 
 Arb.shrink x
@@ -1004,7 +1004,7 @@ The first element that caused a failure was `x=35`, as part of the inputs `(35, 
 
 So now we start at 35 and shrink that:
 
-```
+```fsharp
 // find the next test that fails when shrinking the x parameter 
 let x,y,z = (35,-4,50) 
 Arb.shrink x
@@ -1016,7 +1016,7 @@ The first element that caused a failure was now `x=27`, as part of the inputs `(
 
 So now we start at 27 and keep going:
 
-```
+```fsharp
 // find the next test that fails when shrinking the x parameter 
 let x,y,z = (27,-4,50) 
 Arb.shrink x
@@ -1041,7 +1041,7 @@ So we're finished with the `x` parameter!
 
 Now we just repeat this process with the `y` parameter
 
-```
+```fsharp
 // find the next test that fails when shrinking the y parameter 
 let x,y,z = (25,-4,50) 
 Arb.shrink y
@@ -1072,7 +1072,7 @@ So we're finished with the `y` parameter!
 
 Finally, we repeat this process with the `z` parameter
 
-```
+```fsharp
 // find the next test that fails when shrinking the z parameter 
 let x,y,z = (25,1,50) 
 Arb.shrink z
@@ -1107,14 +1107,14 @@ The final counter-example after shrinking is `(25,1,26)`.
 Let's say that we have a new idea for a property to check. We'll create a property called `addition is not multiplication` which will help to stop any malicious (or even accidental) mixup in the implementations.
 
 Here's our first attempt:
-```
+```fsharp
 let additionIsNotMultiplication x y = 
 	x + y <> x * y
 ```
 
 Bt when we run this test, we get a failure!
 
-```
+```fsharp
 Check.Quick additionIsNotMultiplication 
 // Falsifiable, after 3 tests (0 shrinks) (StdGen (2037191079,295941699)):
 // 0
@@ -1127,7 +1127,7 @@ This is done via a "condition" or filter expression that is prepended to the pro
 
 Here's an example:
 
-```
+```fsharp
 let additionIsNotMultiplication x y = 
 	x + y <> x * y
 
@@ -1140,7 +1140,7 @@ let additionIsNotMultiplication_withPreCondition x y =
 
 The new property is `additionIsNotMultiplication_withPreCondition` and can be passed to `Check.Quick` just like any other property.
 
-```
+```fsharp
 Check.Quick additionIsNotMultiplication_withPreCondition
 // Falsifiable, after 38 tests (0 shrinks) (StdGen (1870180794,295941700)):
 // 2
@@ -1149,7 +1149,7 @@ Check.Quick additionIsNotMultiplication_withPreCondition
 
 Oops! We forgot another case! Let's fix up our precondition again:
 
-```
+```fsharp
 let preCondition x y = 
 	(x,y) <> (0,0)
 	&& (x,y) <> (2,2)
@@ -1160,7 +1160,7 @@ let additionIsNotMultiplication_withPreCondition x y =
 
 And now this works.
 
-```
+```fsharp
 Check.Quick additionIsNotMultiplication_withPreCondition
 // Ok, passed 100 tests.
 ```
@@ -1187,7 +1187,7 @@ You can then do `Check.QuickAll` and pass in the name of the class.
 
 For example, here are our three addition properties:
 
-```
+```fsharp
 let add x y = x + y // good implementation
 
 let commutativeProperty x y = 
@@ -1205,7 +1205,7 @@ let rightIdentityProperty x =
 
 And here's the corresponding static class to be used with `Check.QuickAll`:
  
-```
+```fsharp
 type AdditionSpecification =
 	static member ``Commutative`` x y = commutativeProperty x y
 	static member ``Associative`` x y z = associativeProperty x y z 
@@ -1225,7 +1225,7 @@ An example-based test is often easier to understand because it is less abstract,
 
 Here's an example:
 
-```
+```fsharp
 type AdditionSpecification =
 	static member ``Commutative`` x y = commutativeProperty x y
 	static member ``Associative`` x y z = associativeProperty x y z 
@@ -1252,7 +1252,7 @@ And unlike normal tests, these tests can have parameters!
 
 Here's an example of some tests.
 
-```
+```fsharp
 open NUnit.Framework
 open FsCheck
 open FsCheck.NUnit
@@ -1309,7 +1309,7 @@ The easiest way to make FsCheck available to you is to create an F# project and 
 
 If you are using a FSX script file for interactive development, you'll need to load the DLLs from the appropriate package location, like this:
 
-```
+```fsharp
 // sets the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 
@@ -1329,7 +1329,7 @@ open NUnit.Framework
 
 Next, test that FsCheck is working correctly by running the following:
 
-```
+```fsharp
 let revRevIsOrig (xs:list<int>) = List.rev(List.rev xs) = xs
 
 Check.Quick revRevIsOrig 

@@ -25,7 +25,7 @@ Say that you have a union type. You might consider overloading `Return` or `Yiel
 
 For example, here's a very simple example where `Return` has two overloads:
 
-```
+```fsharp
 type SuccessOrError = 
 | Success of int
 | Error of string
@@ -54,7 +54,7 @@ let successOrError = new SuccessOrErrorBuilder()
 
 And here it is in use:
 
-```
+```fsharp
 successOrError { 
     return 42
     } |> printfn "Result for success: %A" 
@@ -72,7 +72,7 @@ Well, first, if we go back to the [discussion on wrapper types](../posts/computa
 
 What that means in this case is that the union type should be resigned to look like this:  
 
-```
+```fsharp
 type SuccessOrError<'a,'b> = 
 | Success of 'a
 | Error of 'b
@@ -82,7 +82,7 @@ But as a consequence of the generics, the `Return` method can't be overloaded an
 
 Second, it's probably not a good idea to expose the internals of the type inside the expression like this anyway. The concept of "success" and "failure" cases is useful, but a better way would be to hide the "failure" case and handle it automatically inside `Bind`, like this:
 
-```
+```fsharp
 type SuccessOrError<'a,'b> = 
 | Success of 'a
 | Error of 'b
@@ -107,7 +107,7 @@ let successOrError = new SuccessOrErrorBuilder()
 
 In this approach, `Return` is only used for success, and the failure cases are hidden.
 
-```
+```fsharp
 successOrError { 
     return 42
     } |> printfn "Result for success: %A" 
@@ -132,7 +132,7 @@ But what if we change our requirements, and say that:
 
 A first attempt using combine might look this:
 
-```
+```fsharp
 member this.Combine (a,b) = 
     match a,b with
     | Some a', Some b' ->
@@ -153,7 +153,7 @@ In the `Combine` method, we unwrap the value from the passed-in option and combi
 
 For two yields it works as expected:
 
-```
+```fsharp
 trace { 
     yield 1
     yield 2
@@ -164,7 +164,7 @@ trace {
 
 And for a yielding a `None`, it also works as expected:
 
-```
+```fsharp
 trace { 
     yield 1
     yield! None
@@ -175,7 +175,7 @@ trace {
 
 But what happens if there are *three* values to combine? Like this:
 
-```
+```fsharp
 trace { 
     yield 1
     yield 2
@@ -185,7 +185,7 @@ trace {
 
 If we try this, we get a compiler error:
 
-```
+```text
 error FS0001: Type mismatch. Expecting a
     int option    
 but given a
@@ -201,7 +201,7 @@ But, here's where we might want use our overloading trick. We can create *two* d
 
 So here are the two methods, with different parameter types:
 
-```
+```fsharp
 /// combine with a list option
 member this.Combine (a, listOption) = 
     match a,listOption with
@@ -237,7 +237,7 @@ member this.Combine (a,b) =
 
 Now if we try combining three results, as before, we get what we expect.
 
-```
+```fsharp
 trace { 
     yield 1
     yield 2
@@ -249,7 +249,7 @@ trace {
 
 Unfortunately, this trick has broken some previous code! If you try yielding a `None` now, you will get a compiler error.
 
-```
+```fsharp
 trace { 
     yield 1
     yield! None
@@ -258,7 +258,7 @@ trace {
 
 The error is:
 
-```
+```text
 error FS0041: A unique overload for method 'Combine' could not be determined based on type information prior to this program point. A type annotation may be needed. 
 ```
 
@@ -268,7 +268,7 @@ There is no correct answer, because a `None` could be passed as the second param
 
 As the compiler reminds us, a type annotation will help, so let's give it one. We'll force the None to be an `int option`.
         
-```
+```fsharp
 trace { 
     yield 1
     let x:int option = None
@@ -284,7 +284,7 @@ That is, if we *do* want to allow multiple `yield`s, then we should use `'a list
 
 Here's the code for our third version:
 
-```
+```fsharp
 type TraceBuilder() =
     member this.Bind(m, f) = 
         match m with 
@@ -331,7 +331,7 @@ let trace = new TraceBuilder()
 
 And now the examples work as expected without any special tricks:
 
-```
+```fsharp
 trace { 
     yield 1
     yield 2
@@ -367,7 +367,7 @@ One legitimate case where overloading might be needed is the `For` method.  Some
 
 Here's an example of our list builder that has been extended to support sequences as well as lists:
 
-```
+```fsharp
 type ListBuilder() =
     member this.Bind(m, f) = 
         m |> List.collect f
@@ -391,7 +391,7 @@ let listbuilder = new ListBuilder()
 
 And here is it in use:
 
-```
+```fsharp
 listbuilder { 
     let list = [1..10]
     for i in list do yield i

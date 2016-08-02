@@ -14,7 +14,7 @@ The rule was: *"A contact must have an email or a postal address"*.
 
 And the type we designed was:
 
-```
+```fsharp
 type ContactInfo = 
     | EmailOnly of EmailContactInfo
     | PostOnly of PostalContactInfo
@@ -33,7 +33,7 @@ Let's hold that thought and look at a different but related problem.
 
 Here's the problem. Say that you have a contact structure which contains a list of email addresses and also a list of postal addresses, like so:
 
-```
+```fsharp
 type ContactInformation = 
     {
     EmailAddresses : EmailContactInfo list;
@@ -43,7 +43,7 @@ type ContactInformation =
 
 And, also let's say that you have created a `printReport` function that loops through the information and prints it out in a report:
 
-```
+```fsharp
 // mock code            
 let printEmail emailAddress = 
     printfn "Email Address is %s" emailAddress 
@@ -67,7 +67,7 @@ Crude, but simple and understandable.
 
 Now if the new business rule comes into effect, we might decide to change the structure to have some new lists for the phone numbers.  The updated structure will now look something like this:
 
-```
+```fsharp
 type PhoneContactInfo = string // dummy for now
 
 type ContactInformation = 
@@ -85,7 +85,7 @@ Certainly, you will be forced to fix any pattern matches that break. But in many
 
 For example, here's `printReport` updated to work with the new lists:
 
-```
+```fsharp
 let printReport contactInfo = 
     let {
         EmailAddresses = emailAddresses; 
@@ -113,7 +113,7 @@ This is a key insight into how the domain should be modelled.  It creates a whol
 
 We can immediately refactor the types to use this new concept:
 
-```
+```fsharp
 type ContactMethod = 
     | Email of EmailContactInfo 
     | PostalAddress of PostalContactInfo 
@@ -128,7 +128,7 @@ type ContactInformation =
 
 And the reporting code must now be changed to handle the new type as well:
 
-```
+```fsharp
 // mock code            
 let printContactMethod cm = 
     match cm with
@@ -165,7 +165,7 @@ With the "contact method" concept in our heads, we can rephase the requirement a
 
 So let's redesign the `Contact` type to have a list of contact methods:
 
-```
+```fsharp
 type Contact = 
     {
     Name: PersonalName;
@@ -177,7 +177,7 @@ But this is still not quite right. The list could be empty.  How can we enforce 
 
 The simplest way is to create a new field that is required, like this:
 
-```
+```fsharp
 type Contact = 
     {
     Name: PersonalName;

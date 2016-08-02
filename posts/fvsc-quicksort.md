@@ -29,7 +29,7 @@ Note that this is a simplified algorithm and is not optimized (and it does not s
 
 Here is the code in F#:
 
-```
+```fsharp
 let rec quicksort list =
    match list with
    | [] ->                            // If the list is empty
@@ -58,7 +58,7 @@ Let's go through this code:
 * The whole function is recursive -- this is signaled to the compiler using the `rec` keyword in "`let rec quicksort list =`".
 * The `match..with` is sort of like a switch/case statement. Each branch to test is signaled with a vertical bar, like so:
 
-```
+```fsharp
 match x with
 | caseA -> something
 | caseB -> somethingElse
@@ -76,7 +76,7 @@ match x with
 
 For comparison here is an old-style C# implementation (without using LINQ).
 
-```
+```csharp
 public class QuickSortHelper
 {
    public static List<T> QuickSort<T>(List<T> values) 
@@ -125,7 +125,7 @@ Furthermore, the F# code reads almost exactly like the actual algorithm, unlike 
 
 Here's a more modern "functional-style" implementation using LINQ and an extension method:
 
-```
+```csharp
 public static class QuickSortExtension
 {
     /// <summary>
@@ -170,19 +170,19 @@ Indeed, when coding these samples, the old-style C# code was incorrect initially
 
 But even the functional C# version has drawbacks compared to the F# version. For example, because F# uses pattern matching, it is not possible to branch to the "non-empty list" case with an empty list. On the other hand, in the C# code, if we forgot the test:
 
-```
+```csharp
 if (values == null || !values.Any()) ...
 ```
 
 then the extraction of the first element:
 
-```
+```csharp
 var firstElement = values.First();
 ```
 
 would fail with an exception. The compiler cannot enforce this for you.  In your own code, how often have you used `FirstOrDefault` rather than `First` because you are writing "defensive" code. Here is an example of a code pattern that is very common in C# but is rare in F#:
 
-```
+```csharp
 var item = values.FirstOrDefault();  // instead of .First()
 if (item != null) 
 { 
@@ -198,7 +198,7 @@ The example implementation in F# above is actually pretty verbose by F# standard
 
 For fun, here is what a more typically concise version would look like:
 
-```
+```fsharp
 let rec quicksort2 = function
    | [] -> []                         
    | first::rest -> 

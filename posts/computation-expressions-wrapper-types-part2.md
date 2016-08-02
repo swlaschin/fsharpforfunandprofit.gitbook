@@ -41,7 +41,7 @@ How does this guide the implementation?
 
 Here's the implementation of the builder class:
 
-```
+```fsharp
 type StringIntBuilder() =
 
     member this.Bind(m, f) = 
@@ -58,7 +58,7 @@ let stringint = new StringIntBuilder()
 
 Now we can try using it:
 
-```
+```fsharp
 let good = 
     stringint {
         let! i = "42"
@@ -70,7 +70,7 @@ printfn "good=%s" good
 
 And what happens if one of the strings is invalid?
 
-```
+```fsharp
 let bad = 
     stringint {
         let! i = "42"
@@ -86,7 +86,7 @@ But hold on, there is a problem.
 
 Let's say we give the workflow an input, unwrap it (with `let!`) and then immediately rewrap it (with `return`) without doing anything else. What should happen?
 
-```
+```fsharp
 let g1 = "99"
 let g2 = stringint {
             let! i = g1
@@ -99,7 +99,7 @@ No problem. The input `g1` and the output `g2` are the same value, as we would e
 
 But what about the error case?
 
-```
+```fsharp
 let b1 = "xxx"
 let b2 = stringint {
             let! i = b1
@@ -117,7 +117,7 @@ Would this be a problem in practice? I don't know. But I would avoid it and use 
 
 Here's a question? What is the difference between these two code fragments, and should they behave differently?
 
-```
+```fsharp
 // fragment before refactoring
 myworkflow {
     let wrapped = // some wrapped value
@@ -142,7 +142,7 @@ This rule and the next are about not losing information as you wrap and unwrap t
 
 In code, this would be expressed as something like this:
 
-```
+```fsharp
 myworkflow {
     let originalUnwrapped = something
     
@@ -163,7 +163,7 @@ This is the rule that the `stringInt` workflow broke above. As with rule 1, this
 
 In code, this would be expressed as something like this:
 
-```
+```fsharp
 myworkflow {
     let originalWrapped = something
 
@@ -189,7 +189,7 @@ In general, you will get this for free if you follow some guidelines (which will
 
 In code, this would be expressed as something like this:
 
-```
+```fsharp
 // inlined
 let result1 = myworkflow { 
     let! x = originalWrapped
@@ -221,13 +221,13 @@ As we have seen, the `bind` function "unwraps" the type, and applies the continu
 
 In other words, we should be able to write a `bind` that takes a list and a continuation function, where the continuation function processes one element at a time, like this:
 
-```
+```fsharp
 bind( [1;2;3], fun elem -> // expression using a single element )
 ```
 
 And with this concept, we should be able to chain some binds together like this:
 
-```
+```fsharp
 let add = 
     bind( [1;2;3], fun elem1 -> 
     bind( [10;11;12], fun elem2 -> 
@@ -239,13 +239,13 @@ But we've missed something important.  The continuation function passed into `bi
 
 In other words, the continuation function must *always create a new list* as its result.
 
-```
+```fsharp
 bind( [1;2;3], fun elem -> // expression using a single element, returning a list )
 ```
 
 And the chained example would have to be written like this, with the `elem1 + elem2` result turned into a list:
 
-```
+```fsharp
 let add = 
     bind( [1;2;3], fun elem1 -> 
     bind( [10;11;12], fun elem2 -> 
@@ -255,7 +255,7 @@ let add =
 
 So the logic for our bind method now looks like this:
 
-```
+```fsharp
 let bind(list,f) =
     // 1) for each element in list, apply f
     // 2) f will return a list (as required by its signature)
@@ -268,7 +268,7 @@ But that is easy enough -- there is a list module function that does just that, 
 
 So putting it together, we have this:
 
-```
+```fsharp
 let bind(list,f) =
     list 
     |> List.map f 
@@ -287,7 +287,7 @@ Now that we understand how the `bind` works on its own, we can create a "list wo
 * `Bind` applies the continuation function to each element of the passed in list, and then flattens the resulting list of lists into a one-level list. `List.collect` is a library function that does exactly that.
 * `Return` converts from unwrapped to wrapped. In this case, that just means wrapping a single element in a list.
 
-```
+```fsharp
 type ListWorkflowBuilder() =
 
     member this.Bind(list, f) = 
@@ -301,7 +301,7 @@ let listWorkflow = new ListWorkflowBuilder()
 
 Here is the workflow in use:
 
-```
+```fsharp
 let added = 
     listWorkflow {
         let! i = [1;2;3]
@@ -321,7 +321,7 @@ printfn "multiplied=%A" multiplied
 
 And the results show that every element in the first collection has been combined with every element in the second collection:
 
-```
+```fsharp
 val added : int list = [11; 12; 13; 12; 13; 14; 13; 14; 15]
 val multiplied : int list = [10; 11; 12; 20; 22; 24; 30; 33; 36]
 ```
@@ -334,7 +334,7 @@ If we treat lists and sequences as a special case, we can add some nice syntacti
 
 What we can do is replace the `let!` with a `for..in..do` expression:
 
-```
+```fsharp
 // let version
 let! i = [1;2;3] in [some expression]
 
@@ -346,7 +346,7 @@ Both variants mean exactly the same thing, they just look different.
 
 To enable the F# compiler to do this, we need to add a `For` method to our builder class. It generally has exactly the same implementation as the normal `Bind` method, but is required to accept a sequence type.
 
-```
+```fsharp
 type ListWorkflowBuilder() =
 
     member this.Bind(list, f) = 
@@ -363,7 +363,7 @@ let listWorkflow = new ListWorkflowBuilder()
 
 And here is how it is used:
 
-```
+```fsharp
 let multiplied = 
     listWorkflow {
         for i in [1;2;3] do
@@ -401,7 +401,7 @@ But if a "wrapper type" is just a function that maps one type to another type, s
 
 Going back to some real code then, we can define the "identity workflow" as the simplest possible implementation of a workflow builder.
 
-```
+```fsharp
 type IdentityBuilder() =
     member this.Bind(m, f) = f m
     member this.Return(x) = x

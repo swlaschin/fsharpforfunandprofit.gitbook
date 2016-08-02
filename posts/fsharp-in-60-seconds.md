@@ -33,7 +33,7 @@ and send it to the interactive window. See the ["installing and using F#"](../in
 the interpreter that you are done entering and ready to evaluate.
 
 
-```
+```fsharp
 // single line comments use a double slash
 (* multi line comments use (* . . . *) pair
 

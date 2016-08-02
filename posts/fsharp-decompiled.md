@@ -56,7 +56,7 @@ In F#, most types that contain fields or properties are defined as record types 
 
 Here is an example of a simple immutable record in F#, with comments attached to the type and each property.
 
-```
+```fsharp
 /// Example of a simple immutable record 
 type FinalGameScore = { 
     /// Game property
@@ -68,7 +68,7 @@ type FinalGameScore = {
 
 In C# the equivalent of the generated code would look like this (I'll discuss the code in detail below).
 
-```
+```csharp
 /// <summary>
 ///  Example of a simple immutable record 
 /// </summary>
@@ -192,7 +192,7 @@ Let's go through the generated C# code in sections.
 
 The first thing to notice is that the generated code implements a number of interfaces:
 
-```
+```csharp
 public sealed class FinalGameScore :
     IEquatable<FinalGameScore>,
     IStructuralEquatable,
@@ -207,7 +207,7 @@ In particular it overrides equality (both the generic one from `Object` and `IEq
 
 The first part of the class body is similar to what we would write ourselves. Two get-only properties and a constructor.
 
-```
+```csharp
 /// <summary>
 /// Game property
 /// </summary>
@@ -233,7 +233,7 @@ and there is no special behavior in the getter or setter, this makes no practica
 
 The next section implements `GetHashCode` and three kinds of `Equals`. 
 
-```
+```csharp
 /// <summary>
 ///  Needed for custom equality
 /// </summary>
@@ -288,7 +288,7 @@ and to be more like the code that someone would write by hand, I have removed it
 
 Finally, the various kinds of comparisons are implemented. Again I have removed the duplicated logic and tidied up the code to be a bit more idiomatic.
 
-```
+```csharp
 /// <summary>
 ///  Implement custom comparison
 /// </summary>
@@ -335,7 +335,7 @@ We'll see `NoComparisonAttribute` used in the next example.
 
 Let's have a look at how you would implement a record with one mutable property, such as a mutable `CurrentScore`, and without generating comparison code:
 
-```
+```fsharp
 /// Example of a simple mutable record 
 [<NoComparisonAttribute>]
 type UpdatableGameScore = {
@@ -349,7 +349,7 @@ type UpdatableGameScore = {
 In the generated C# code, the `CurrentScore` property now has a setter as well as a getter, and the `IComparable` interfaces and the `CompareTo` implementations have been eliminated. 
 Here is the relevant excerpt:
 
-```
+```csharp
 [Serializable]
 public sealed class UpdatableGameScore :
     IEquatable<UpdatableGameScore>,
@@ -386,7 +386,7 @@ Finally, we often want to add extra properties or methods to a type.
 In the example below, I've defined a `Person` type that has a `FullName` property and a `IsBirthday` method
 in addition to the core properties of `FirstName`, `LastName` and `DateOfBirth`.
 
-```
+```fsharp
 /// Definition of a Person
 type Person = {
     /// Stores first name
@@ -410,7 +410,7 @@ type Person = {
 
 The first part of the generated C# code looks like this:
 
-```
+```csharp
 /// <summary>
 ///  Definition of a Person
 /// </summary>
@@ -471,7 +471,7 @@ public sealed class Person :
 
 and of course there is the usual extra code for equality and comparison. Here is just one piece of that:
 
-```
+```csharp
 /// <summary>
 ///  Implement custom equality
 /// </summary>
@@ -498,7 +498,7 @@ Sometimes you need inheritance or other OO features. So let's see what F# classe
 
 Here's a simple class `Product` with one immutable property (`Id`), two mutable properties, a secondary constructor, two methods, and a static property containing a constant.
 
-```
+```fsharp
 /// Example of a simple class
 type Product(id, name, price) = 
 
@@ -532,7 +532,7 @@ type Product(id, name, price) =
 
 Here's what that looks like in the generated C#:
 
-```
+```csharp
 /// <summary>
 ///  Example of a simple class
 /// </summary>
@@ -626,7 +626,7 @@ Other than that, the generated code looks mostly as you would expect.
 
 Now what happens if we want a class with a custom implementation of equality, let's say an `Entity` class that compares using an `Id`?
 
-```
+```fsharp
 /// Example of custom equality
 type Entity(id:int, name:string) = 
 
@@ -657,7 +657,7 @@ Note that I have annotated the class constructor `type Entity(id:int, name:strin
 
 Here's the corresponding generated C#:
 
-```
+```csharp
 /// <summary>
 ///  Example of custom equality
 /// </summary>
@@ -716,7 +716,7 @@ Again, this code looks like standard C# code.
 
 Finally, let's look at some OO code in F# and C#.  We'll start with an interface:
 
-```
+```fsharp
 /// Interface
 type IShape =
     abstract Name : string
@@ -725,7 +725,7 @@ type IShape =
 
 And the generated C# is similar:
 
-```
+```csharp
 /// <summary>
 ///  Interface
 /// </summary>
@@ -738,7 +738,7 @@ public interface IShape
 
 Next, we'll define an abstract base class that implements `IShape`. The `Name` property is concrete, but the subclasses are expected to provide their own `Draw` method.
 
-```
+```fsharp
 /// Abstract Base Class
 [<AbstractClass>]
 type ShapeBase(name) as self = 
@@ -757,7 +757,7 @@ type ShapeBase(name) as self =
 
 And the generated C#:
 
-```
+```csharp
 /// <summary>
 ///  Abstract Base Class
 /// </summary>
@@ -782,7 +782,7 @@ public abstract class ShapeBase : IShape
 
 And finally, here's a subclass of `ShapeBase` in F#:
 
-```
+```fsharp
 /// Concrete class Square
 type Square(name,size) =
     inherit ShapeBase(name)
@@ -797,7 +797,7 @@ type Square(name,size) =
 
 And in C#:
 
-```
+```csharp
 /// <summary>
 ///  Concrete class Square
 /// </summary>
@@ -843,7 +843,7 @@ Now to discriminated unions, a feature that C# does not have. So how are they re
 
 We'll start with a single-case union, typically used to wrap a more primitive type to avoid [primitive obsession](http://blog.ploeh.dk/2015/01/19/from-primitive-obsession-to-domain-modelling/).
 
-```
+```fsharp
 /// example of single-case union as a wrapper round a primitive
 type ProductId = ProductId of int
 ```
@@ -852,7 +852,7 @@ One of the nice things about F# is that this type gets implementations of equali
 
 This means that the generated C# code is going to be very long again, alas.  
 
-```
+```csharp
 /// <summary>
 ///  example of single-case union as a wrapper round a primitive
 /// </summary>
@@ -979,7 +979,7 @@ I know that, personally, I am *much* less likely to create a wrapper class in C#
 
 Anyway, ignoring the equality and comparison code, we can see that the meat of the implementation is just a wrapper around a `Item` property, along with a static constructor `NewProductId`.
 
-```
+```csharp
 public class ProductId 
 {
     /// <summary>
@@ -1011,14 +1011,14 @@ Another common use of discriminated unions is to emulate an Enum.
 
 For example, here's one with three colors:
 
-```
+```fsharp
 /// example of simple "enum"
 type Color = Red | Green | Blue
 ```
 
 This generates the following C# code:
 
-```
+```csharp
 /// <summary>
 ///  example of simple "enum"
 /// </summary>
@@ -1198,14 +1198,14 @@ The C# implementation creates a set of static singleton instances (`_unique_Red`
 
 In F#, you can also create a "real" enum by assigning int values to each case, like this:
 
-```
+```fsharp
 /// example of a real C# enum
 type ColorEnum = Red=1 | Green=2 | Blue=3
 ```
 
 When decompiled into C# the definition is exactly an `enum`:
 
-```
+```csharp
 [Serializable]
 public enum ColorEnum
 {
@@ -1227,7 +1227,7 @@ Finally, let's look at a more complex union type.
 
 Say that we have a `PaymentMethod` type that can be cash, check or credit card. We might model it like this:
     
-```
+```fsharp
 type CheckNumber = CheckNumber of int
 type CardType = MasterCard | Visa
 type CardNumber = CardNumber of string
@@ -1251,7 +1251,7 @@ First we need to define classes for the three helper types `CheckNumber`, `CardT
 
 For example, here's the first few lines of `CheckNumber`:
 
-```
+```csharp
 [Serializable]
 public class CheckNumber : 
     IEquatable<CheckNumber>, 
@@ -1297,7 +1297,7 @@ I'm going to ignore all the equality and comparison code, and just focus on how 
 
 Here's the core code:
 
-```
+```csharp
 /// <summary>
 ///  PaymentMethod is cash, check or card
 /// </summary>
@@ -1526,7 +1526,7 @@ Now let's look at modules.
 
 In F#, a module is the standard technique for grouping standalone functions.
 
-```
+```fsharp
 module ModuleExample
 
 /// add two numbers
@@ -1538,7 +1538,7 @@ let Add1 x = x + 1
 
 Behind the scenes, this code is implemented as static methods on a static class. Here's the generated C# code:
 
-```
+```csharp
 public static class ModuleExample
 {
     /// <summary>
@@ -1562,7 +1562,7 @@ public static class ModuleExample
 
 In F#, types can also be defined in modules:
 
-```
+```fsharp
 module ModuleExample
 
 /// define a empty class inside a module
@@ -1571,7 +1571,7 @@ type Something() = class end
 
 This is represented in C# as a inner class -- defined inside the static module class:
 
-```
+```csharp
 public static class ModuleExample
 {
     // [snipped Add and Add1]
@@ -1589,7 +1589,7 @@ public static class ModuleExample
 
 In F#, a module can contain submodules. For example, I might want to group some functions that work with the `FinalGameScore` type defined at the top of this post.
 
-```
+```fsharp
 module ModuleExample
 
 // [snipped Add and Add1]
@@ -1612,7 +1612,7 @@ module GameFunctions =
 
 In the generated C#, this code becomes another inner static class:
 
-```
+```csharp
 public static class ModuleExample
 {
     // [snipped Add and Add1]
@@ -1673,7 +1673,7 @@ Finally, let's see what F# pattern matching code looks like when turned into C# 
 
 Let's start with a simple integer pattern match.  The code below has some integer pattern matching, plus a guard `when x%2 = 0`, and finally the wildcard.
 
-```
+```fsharp
 /// demonstrates some simple pattern matching
 let IntPatternMatching x = 
     match x with
@@ -1689,7 +1689,7 @@ let IntPatternMatching x =
 
 The generated code is a straightforward switch statement.
 
-```
+```csharp
 public static string IntPatternMatching(int x)
 {
     switch (x)
@@ -1718,7 +1718,7 @@ But what if the value being matching on is not a primitive? In F# we can do nest
 
 For example, let's say that we have a `Person` type that contains a `Name` type. Then in F# we can write:
 
-```
+```fsharp
 type Name= {First:string; Last:string}
 type Person = {Name:Name; Age:int}
 
@@ -1736,7 +1736,7 @@ let NestedPatternMatching person =
 
 The generated code looks like this in C#, which is quite clunky, but similar to what you would have to write by hand: 
 
-```
+```csharp
 public static string NestedPatternMatching(Person person)
 {
     if (string.Equals(person.Name.First, "Jane"))
@@ -1770,7 +1770,7 @@ F# supports pattern matching in function parameters as well. This is a great way
 
 For example, in the following code, we extract the inner string from the `Email` value, lowercase it, and return a new `Email` value.
 
-```
+```fsharp
 /// demonstrates some in-parameter pattern matching
 let LowercaseEmail (Email e) = 
     e.ToLowerInvariant() |> Email
@@ -1778,7 +1778,7 @@ let LowercaseEmail (Email e) =
 
 The C# for this is very similar, except that the parameter type must be given explicitly:
 
-```
+```csharp
 /// <summary>
 /// demonstrates some in-parameter pattern matching
 /// </summary>
@@ -1794,7 +1794,7 @@ public static Email LowercaseEmail(Email email)
 
 When it comes to pattern matching on lists, F# provides some nice syntax for fixed sized lists (e.g. `[a;b]`) or heads and tails (e.g. `a::b::rest`).
 
-```
+```fsharp
 /// demonstrates some list-testing pattern matching
 let ListTesting list = 
     match list with 
@@ -1810,7 +1810,7 @@ let ListTesting list =
 
 When we look at the generated code this pattern matching consists of a series of `if` statements as shown below.  
 
-```
+```csharp
 public static string ListTesting<T>(FSharpList<T> list)
 {
     // test for empty
@@ -1860,7 +1860,7 @@ Notes:
 
 So, replacing the F# printing with `string.Format`, a more idiomatic C# version would look like this:
 
-```
+```csharp
 public static string ListTesting<T>(FSharpList<T> list)
 {
     // test for empty
@@ -1898,7 +1898,7 @@ public static string ListTesting<T>(FSharpList<T> list)
 
 Finally, let's look at how pattern matching on types is done using the `:?` operator.
 
-```
+```fsharp
 /// demonstrates some type-testing pattern matching
 let TypeTesting obj = 
     match box obj with
@@ -1914,7 +1914,7 @@ let TypeTesting obj =
 
 The generated code looks like this:
 
-```
+```csharp
 public static string TypeTesting<T>(T obj)
 {
     // NOTE: This is a simplified version of the real generated code

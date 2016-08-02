@@ -21,7 +21,7 @@ In this series, we are looking at how applicative parsers and parser combinators
 
 In some of the failing code examples from earlier posts, we got confusing errors:
 
-```
+```fsharp
 let parseDigit = anyOf ['0'..'9']
 run parseDigit "|ABC"  // Failure "Expecting '9'. Got '|'"
 ```
@@ -34,13 +34,13 @@ That is, what we need is a way of labeling parsers with a word like "digit" and 
 
 As a reminder, this is how the `Parser` type was defined in earlier posts:
 
-```
+```fsharp
 type Parser<'a> = Parser of (string -> Result<'a * string>)
 ```
 
 In order to add a label, we need to change it into a record structure:
 
-```
+```fsharp
 type ParserLabel = string
 
 /// A Parser structure has a parsing function & label
@@ -56,7 +56,7 @@ One problem is that the label is in the parser itself, but not in the `Result`, 
 
 So let's add it to the `Failure` case of `Result` as well, in addition to the error message:
 
-```
+```fsharp
 // Aliases 
 type ParserLabel = string
 type ParserError = string
@@ -68,7 +68,7 @@ type Result<'a> =
 
 And while we are at it, let's define a helper function to display the result of a parse:
 
-```
+```fsharp
 let printResult result =
     match result with
     | Success (value,input) -> 
@@ -81,7 +81,7 @@ let printResult result =
 
 With this change to the definition of `Parser` and `Result`, we have to change some of the basic functions, such as `bindP`:
 
-```
+```fsharp
 /// "bindP" takes a parser-producing function f, and a parser p
 /// and passes the output of p into f, to create a new parser
 let bindP f p =
@@ -105,7 +105,7 @@ In order to do this, we replace the original `parseFn` with another one that ret
 
 Here's the code:
 
-```
+```fsharp
 /// Update the label in the parser
 let setLabel parser newLabel = 
     // change the inner function to use the new label
@@ -124,14 +124,14 @@ let setLabel parser newLabel =
 
 And let's create an infix version of this called `<?>`:
 
-```
+```fsharp
 /// infix version of setLabel
 let ( <?> ) = setLabel
 ```
 
 Let's test our new toy!
 
-```
+```fsharp
 let parseDigit_WithLabel = 
     anyOf ['0'..'9'] 
     <?> "digit"
@@ -142,7 +142,7 @@ run parseDigit_WithLabel "|ABC"
 
 And the output is:
 
-```
+```text
 Error parsing digit
 Unexpected '|'
 ```
@@ -153,7 +153,7 @@ The error message is now `Error parsing digit` rather than `Expecting '9'`. Much
 
 We can also set the default labels for certain combinators such as `andThen` and `orElse` based on the inputs:
 
-```
+```fsharp
 /// Combine two parsers as "A andThen B"
 let andThen p1 p2 =         
     let label = sprintf "%s andThen %s" (getLabel p1) (getLabel p2)
@@ -194,7 +194,7 @@ we would be set up for parsing *any* stream of tokens, and that would make me ha
 At this point, I'll repeat one of my favorite FP slogans: "parameterize all the things!" In the case of `pchar`, we'll remove the `charToMatch` parameter and
 replace it with a function -- a predicate. We'll call the new function `satisfy`:
 
-```
+```fsharp
 /// Match an input token if the predicate is satisfied
 let satisfy predicate label =
     let innerFn input =
@@ -214,7 +214,7 @@ let satisfy predicate label =
 
 Other than the parameters, the only thing that has changed from the `pchar` implementation is this one line: 
 
-```
+```fsharp
 let satisfy predicate label =
     ...
     if predicate first then
@@ -223,7 +223,7 @@ let satisfy predicate label =
 
 With `satisfy` available, we can rewrite `pchar`:
 
-```
+```fsharp
 /// parse a char 
 let pchar charToMatch = 
     let predicate ch = (ch = charToMatch) 
@@ -236,7 +236,7 @@ and so `pchar` would not have been able to return a useful error message.
 
 The `satisfy` function also lets us write more efficient versions of other parsers. For example, parsing a digit looked like this originally:
 
-```
+```fsharp
 /// parse a digit
 let digitChar = 
     anyOf ['0'..'9']
@@ -244,7 +244,7 @@ let digitChar =
 
 But now we can rewrite it using a predicate directly, making it a lot more efficient:
 
-```
+```fsharp
 /// parse a digit
 let digitChar = 
     let predicate = Char.IsDigit 
@@ -254,7 +254,7 @@ let digitChar =
 
 Similarly, we can create a more efficient whitespace parser too:
 
-```
+```fsharp
 /// parse a whitespace char
 let whitespaceChar = 
     let predicate = Char.IsWhiteSpace 
@@ -275,7 +275,7 @@ so let's start with that.
 
 First, we will need a `Position` type to store the line and column, with helper functions to increment one column and one line:
 
-```
+```fsharp
 type Position = {
     line : int
     column : int
@@ -296,7 +296,7 @@ let incrLine pos =
 Next, we'll need to combine the input string with a position into a single "input state" type.  Since we are line oriented, we can make our
 lives easier and store the input string as a array of lines rather than as one giant string:
 
-```
+```fsharp
 /// Define the current input state
 type InputState = {
     lines : string[]
@@ -306,7 +306,7 @@ type InputState = {
 
 We will also need a way to convert a string into a initial `InputState`:
 
-```
+```fsharp
 /// Create a new InputState from a string
 let fromStr str = 
     if String.IsNullOrEmpty(str) then
@@ -335,7 +335,7 @@ The logic for returning the next char will be as follows then:
 
 Here's the code:
 
-```
+```fsharp
 // return the current line
 let currentLine inputState = 
     let linePos = inputState.position.line
@@ -381,7 +381,7 @@ making a new state each time the position changes should be reasonably efficient
 Let's quickly test that the implementation works. We'll create a helper function `readAllChars` and then see what it returns
 for different inputs:
 
-```
+```fsharp
 let rec readAllChars input =
     [
         let remainingInput,charOpt = nextChar input 
@@ -399,7 +399,7 @@ let rec readAllChars input =
 
 Here it is with some example inputs:
 
-```
+```fsharp
 fromStr "" |> readAllChars       // []
 fromStr "a" |> readAllChars      // ['a'; '\n']
 fromStr "ab" |> readAllChars     // ['a'; 'b'; '\n']
@@ -416,7 +416,7 @@ To start with, the `Failure` case needs to return some kind of data that indicat
 
 We could just use the `InputState` as is, but let's be good and define a new type specially for this use, called `ParserPosition`:
 
-```
+```fsharp
 /// Stores information about the parser position for error messages
 type ParserPosition = {
     currentLine : string
@@ -427,7 +427,7 @@ type ParserPosition = {
 
 We'll need some way to convert a `InputState` into a `ParserPosition`:
 
-```
+```fsharp
 let parserPositionFromInputState (inputState:Input) = {
     currentLine = TextInput.currentLine inputState
     line = inputState.position.line
@@ -437,7 +437,7 @@ let parserPositionFromInputState (inputState:Input) = {
 
 And finally, we can update the `Result` type to include `ParserPosition`:
 
-```
+```fsharp
 // Result type
 type Result<'a> =
     | Success of 'a
@@ -446,7 +446,7 @@ type Result<'a> =
 
 In addition, the `Parser` type needs to change from `string` to `InputState`:
 
-```
+```fsharp
 type Input = TextInput.InputState  // type alias
 
 /// A Parser structure has a parsing function & label
@@ -458,7 +458,7 @@ type Parser<'a> = {
 
 With all this extra information available, the `printResult` function can be enhanced to print the text of the current line, along with a caret where the error is:
 
-```
+```fsharp
 let printResult result =
     match result with
     | Success (value,input) -> 
@@ -473,7 +473,7 @@ let printResult result =
 
 Let's test `printResult` with a dummy error value:
 
-```
+```fsharp
 let exampleError = 
     Failure ("identifier", "unexpected |",
              {currentLine = "123 ab|cd"; line=1; column=6})
@@ -483,7 +483,7 @@ printResult exampleError
 
 The output is shown below:
 
-```
+```text
 Line:1 Col:6 Error parsing identifier
 123 ab|cd
       ^unexpected |
@@ -496,7 +496,7 @@ Much nicer than before!
 The `run` function now needs to take an `InputState` not a string.  But we also want the convenience of running against string input,
 so let's create two `run` functions, one that takes an `InputState` and one that takes a `string`:
 
-```
+```fsharp
 /// Run the parser on a InputState
 let runOnInput parser input = 
     // call inner function with input
@@ -515,7 +515,7 @@ so that it never happens again, but for now, I'll just fix up the errors.
 
 Here's a new version of `satisfy`:
 
-```
+```fsharp
 /// Match an input token if the predicate is satisfied
 let satisfy predicate label =
     let innerFn input =
@@ -542,7 +542,7 @@ Note that the failure case code is now `Failure (label,err,pos)` where the parse
 
 And here is `bindP`:
 
-```
+```fsharp
 /// "bindP" takes a parser-producing function f, and a parser p
 /// and passes the output of p into f, to create a new parser
 let bindP f p =
@@ -567,7 +567,7 @@ We can fix up the other functions in the same way.
 
 Let's test with a real parser now:
 
-```
+```fsharp
 let parseAB = 
     pchar 'A' .>>. pchar 'B' 
     <?> "AB"
@@ -578,7 +578,7 @@ run parseAB "A|C"
 
 And the output is:
 
-```
+```text
 // Line:0 Col:1 Error parsing AB
 // A|C
 //  ^Unexpected '|'
@@ -594,7 +594,7 @@ These parsers are based on those in the [the FParsec library](http://www.quantte
 
 Let's start with some string-related parsers. I will present them without comment -- I hope that the code is self-explanatory by now.
 
-```
+```fsharp
 /// parse a char 
 let pchar charToMatch = 
     // label is just the character
@@ -646,7 +646,7 @@ let pstring str =
 
 Let's test `pstring`, for example:
 
-```
+```fsharp
 run (pstring "AB") "ABC"  
 |> printResult   
 // Success
@@ -663,7 +663,7 @@ run (pstring "AB") "A|C"
 
 Whitespace is important in parsing, even if we do end up mostly throwing it away!
 
-```
+```fsharp
 /// parse a whitespace char
 let whitespaceChar = 
     let predicate = Char.IsWhiteSpace 
@@ -679,7 +679,7 @@ let spaces1 = many1 whitespaceChar
 
 And here's some whitespace tests:
 
-```
+```fsharp
 run spaces " ABC"  
 |> printResult   
 // [' ']
@@ -703,7 +703,7 @@ run spaces1 "A"
 
 Finally, we need a parser for ints and floats.
 
-```
+```fsharp
 /// parse a digit
 let digitChar = 
     let predicate = Char.IsDigit 
@@ -751,7 +751,7 @@ let pfloat =
 
 And some tests:
 
-```
+```fsharp
 run pint "-123Z" 
 |> printResult   
 // -123

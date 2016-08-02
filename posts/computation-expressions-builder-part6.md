@@ -26,7 +26,7 @@ To understand, we have to revisit the concept of continuations again.
 
 In previous posts, we saw that a series of expressions is converted into a chain of continuations like this:
 
-```
+```fsharp
 Bind(1,fun x -> 
    Bind(2,fun y -> 
      Bind(x + y,fun z -> 
@@ -44,7 +44,7 @@ First, some terminology. A while loop has two parts:
 
 With this in place, we can create pseudo-code for a while loop using continuations:
 
-```
+```fsharp
 // evaluate test function
 let bool = guard()  
 if not bool 
@@ -88,7 +88,7 @@ The next thing is that the `body()` result is being discarded. Yes, it is a unit
 
 So here is a revised version of the pseudo-code, using `Zero` and `Bind`:
 
-```
+```fsharp
 // evaluate test function
 let bool = guard()  
 if not bool 
@@ -126,7 +126,7 @@ In this case, the continuation function passed into `Bind` has a unit parameter,
 
 Finally, the pseudo-code can be simplified by collapsing it into a recursive function like this:
 
-```
+```fsharp
 member this.While(guard, body) =
     // evaluate test function
     if not (guard()) 
@@ -150,7 +150,7 @@ Also note that, although this is a recursive function, we didn't need the `rec` 
 
 Let's look at it being used in the `trace` builder.  Here's the complete builder class, with the `While` method:
 
-```
+```fsharp
 type TraceBuilder() =
     member this.Bind(m, f) = 
         match m with 
@@ -194,7 +194,7 @@ let trace = new TraceBuilder()
 
 If you look at the signature for `While`, you will see that the `body` parameter is `unit -> unit option`, that is, a delayed function. As noted above, if you don't implement `Delay` properly, you will get unexpected behavior and cryptic compiler errors.
 
-```
+```fsharp
 type TraceBuilder =
     // other members
     member
@@ -204,7 +204,7 @@ type TraceBuilder =
 
 And here is a simple loop using a mutable value that is incremented each time round.
 
-```
+```fsharp
 let mutable i = 1
 let test() = i < 5
 let inc() = i <- i + 1
@@ -227,7 +227,7 @@ If we look at a `try..with` expression for example, it has two parts:
 
 With this in place, we can create pseudo-code for the exception handler:
 
-```
+```fsharp
 try
     let wrapped = delayedBody()  
     wrapped  // return a wrapped value
@@ -237,7 +237,7 @@ with
 
 And this maps exactly to a standard implementation:
 
-```
+```fsharp
 member this.TryWith(body, handler) =
     try 
         printfn "TryWith Body"
@@ -252,7 +252,7 @@ As you can see, it is common to use pass the returned value through `ReturnFrom`
 
 Here is an example snippet to test how the handling works:
 
-```
+```fsharp
 trace { 
     try
         failwith "bang"
@@ -271,7 +271,7 @@ trace {
 
 Just as with `try..with`, the standard implementation is obvious.
 
-```
+```fsharp
 member this.TryFinally(body, compensation) =
     try 
         printfn "TryFinally Body"
@@ -283,7 +283,7 @@ member this.TryFinally(body, compensation) =
 
 Another little snippet:
 
-```
+```fsharp
 trace { 
     try
         failwith "bang"
@@ -298,13 +298,13 @@ The final method to implement is `Using`.  This is the builder method for implem
 
 This is what the MSDN documentation says about `use!`:
 
-```
+```text
 {| use! value = expr in cexpr |} 
 ```
 
 is translated to:
 
-```
+```text
 builder.Bind(expr, (fun value -> builder.Using(value, (fun value -> {| cexpr |} ))))
 ```
 
@@ -317,7 +317,7 @@ Of course we want to ensure that the disposable value is always disposed no matt
 
 Here's a standard implementation:
 
-```
+```fsharp
 member this.Using(disposable:#System.IDisposable, body) =
     let body' = fun () -> body disposable
     this.TryFinally(body', fun () -> 
@@ -334,7 +334,7 @@ Notes:
 Here's a demonstration of `Using` in action. Note that the `makeResource` makes a *wrapped* disposable.  If it wasn't wrapped, we wouldn't need the special
 `use!` and could just use a normal `use` instead.
 
-```
+```fsharp
 let makeResource name =
     Some { 
     new System.IDisposable with
@@ -355,7 +355,7 @@ Finally, we can revisit how `For` is implemented.  In the previous examples, `Fo
 
 Here's the standard implementation for `For` now:
 
-```
+```fsharp
 member this.For(sequence:seq<_>, body) =
        this.Using(sequence.GetEnumerator(),fun enum -> 
             this.While(enum.MoveNext, 
@@ -377,7 +377,7 @@ but it can obscure the simplicity of the methods.
 
 So as a final step, let's have a look at the complete code for the "trace" builder class, but this time without any extraneous code at all.  Even though the code is cryptic, the purpose and implementation of each method should now be familiar to you.
 
-```
+```fsharp
 type TraceBuilder() =
 
     member this.Bind(m, f) = 

@@ -14,7 +14,7 @@ In F#, this is done using a feature called "type extensions".  And any F# type, 
 
 Here's an example of attaching a function to a record type.
 
-```
+```fsharp
 module Person = 
     type T = {First:string; Last:string} with
         // member defined with type declaration
@@ -39,7 +39,7 @@ There is no requirement to use a particular word, just as long as it is consiste
 
 You don't have to add a member at the same time that you declare the type, you can always add it later in the same module:
 
-```
+```fsharp
 module Person = 
     type T = {First:string; Last:string} with
        // member defined with type declaration
@@ -73,7 +73,7 @@ These are called "optional extensions". They are not compiled into the type itse
 
 For example, let's say we have a `Person` type defined:
 
-```
+```fsharp
 module Person = 
     type T = {First:string; Last:string} with
        // member defined with type declaration
@@ -92,7 +92,7 @@ module Person =
 
 The example below demonstrates how to add an `UppercaseName` extension to it in a different module:
             
-```
+```fsharp
 // in a different module
 module PersonExtensions = 
 
@@ -103,7 +103,7 @@ module PersonExtensions =
 
 So now let's test this extension:
 
-```
+```fsharp
 let person = Person.create "John" "Doe"
 let uppercaseName = person.UppercaseName 
 ```
@@ -113,7 +113,7 @@ Just as for C#, any extensions have to be brought into scope in order to be used
 
 Once we do that, everything is fine:
 
-```
+```fsharp
 // bring the extension into scope first!
 open PersonExtensions
 
@@ -128,14 +128,14 @@ You can extend types that are in the .NET libraries as well. But be aware that w
 
 For example, if you try to extend `int`, you will fail, because `int` is not the true name of the type:
 
-```
+```fsharp
 type int with
     member this.IsEven = this % 2 = 0
 ```
 
 You must use `System.Int32` instead:
 
-```
+```fsharp
 type System.Int32 with
     member this.IsEven = this % 2 = 0
 
@@ -151,7 +151,7 @@ You can make the member functions static by:
 * adding the keyword `static` 
 * dropping the `this` placeholder
 
-```
+```fsharp
 module Person = 
     type T = {First:string; Last:string} with
         // member defined with type declaration
@@ -169,7 +169,7 @@ let fullname = person.FullName
 
 And you can create static members for system types as well:
 
-```
+```fsharp
 type System.Int32 with
     static member IsOdd x = x % 2 = 1
     
@@ -191,7 +191,7 @@ A very common pattern is to attach pre-existing standalone functions to a type. 
 
 One example of this in the F# libraries is the function that calculates a list's length. It is available as a standalone function in the `List` module, but also as a method on a list instance.
 
-```
+```fsharp
 let list = [1..10]
 
 // functional style
@@ -203,7 +203,7 @@ let len2 = list.Length
 
 In the following example, we start with a type with no members initially, then define some functions, then finally attach the `fullName` function to the type.
 
-```
+```fsharp
 module Person = 
     // type with no members initially
     type T = {First:string; Last:string} 
@@ -234,7 +234,7 @@ One nice thing is that when the previously defined function has multiple paramet
 
 In the example below, the `hasSameFirstAndLastName` function has three parameters. Yet when we attach it, we only need to specify one! 
 
-```
+```fsharp
 module Person = 
     // type with no members initially
     type T = {First:string; Last:string} 
@@ -275,7 +275,7 @@ The tuple form is also how F# interacts with the standard .NET libraries, so let
 As a testbed, here is a Product type with two methods, each implemented using one of the approaches.
 The `CurriedTotal` and `TupleTotal` methods each do the same thing: work out the total price for a given quantity and discount.
 
-```
+```fsharp
 type Product = {SKU:string; Price: float} with
 
     // curried style
@@ -289,7 +289,7 @@ type Product = {SKU:string; Price: float} with
 
 And here's some test code:
 
-```
+```fsharp
 let product = {SKU="ABC"; Price=2.0}
 let total1 = product.CurriedTotal 10 1.0 
 let total2 = product.TupleTotal(10,1.0)
@@ -299,7 +299,7 @@ No difference so far.
 
 We know that curried version can be partially applied:
 
-```
+```fsharp
 let totalFor10 = product.CurriedTotal 10
 let discounts = [1.0..5.0] 
 let totalForDifferentDiscounts 
@@ -316,7 +316,7 @@ But the tuple approach can do a few things that that the curried one can't, name
 
 The tuple-style approach supports named parameters:
 
-```
+```fsharp
 let product = {SKU="ABC"; Price=2.0}
 let total3 = product.TupleTotal(qty=10,discount=1.0)
 let total4 = product.TupleTotal(discount=1.0, qty=10)
@@ -335,7 +335,7 @@ For tuple-style methods, you can specify an optional parameter by prefixing the 
 
 Here's an example:
 
-```
+```fsharp
 type Product = {SKU:string; Price: float} with
 
     // optional discount
@@ -348,7 +348,7 @@ type Product = {SKU:string; Price: float} with
 
 And here's a test:
 
-```
+```fsharp
 let product = {SKU="ABC"; Price=2.0}
 
 // discount not specified
@@ -365,7 +365,7 @@ And if not, the default value is returned.
 
 Let's see the same code rewritten to use `defaultArg` 
 
-```
+```fsharp
 type Product = {SKU:string; Price: float} with
 
     // optional discount
@@ -389,7 +389,7 @@ However, F# *does* support method overloading, but only for methods (that is fun
 
 Here's an example, with yet another variant on the `TupleTotal` method!
 
-```
+```fsharp
 type Product = {SKU:string; Price: float} with
 
     // no discount
@@ -409,7 +409,7 @@ Normally, the F# compiler would complain that there are two methods with the sam
 And here's a test:
 
 
-```
+```fsharp
 let product = {SKU="ABC"; Price=2.0}
 
 // discount not specified
@@ -437,7 +437,7 @@ Let's see what I mean.
 
 Let's go back to our Person example again, the one that had the same logic implemented both as a standalone function and as a method:
 
-```
+```fsharp
 module Person = 
     // type with no members initially
     type T = {First:string; Last:string} 
@@ -459,7 +459,7 @@ Now let's see how well each one works with type inference.  Say that I want to p
 
 Here's the code using the module level standalone function.
 
-```
+```fsharp
 open Person
 
 // using standalone function            
@@ -474,7 +474,7 @@ This compiles without problems, and the type inference has correctly deduced tha
 
 Now let's try the "dotted" version:
 
-```
+```fsharp
 open Person
 
 // using method with "dotting into"
@@ -492,7 +492,7 @@ A similar problem happens with higher order functions. For example, let's say th
 
 With a standalone function, this is trivial:
 
-```
+```fsharp
 open Person
 
 let list = [
@@ -506,7 +506,7 @@ list |> List.map fullName
 
 With object methods, we have to create special lambdas everywhere:
 
-```
+```fsharp
 open Person
 
 let list = [

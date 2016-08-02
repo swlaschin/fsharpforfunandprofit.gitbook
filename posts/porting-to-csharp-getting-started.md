@@ -36,24 +36,24 @@ F# does not use commas for separating parameters or list elements, so remember n
 
 *For separating list elements, use semicolons rather than commas.*
 
-```
+```csharp
 // C# example
 var list = new int[] { 1,2,3}
 ```
 
-```
+```fsharp
 // F# example
 let list = [1;2;3] // semicolons
 ```
 
 *For separating parameters for native F# functions, use white space.*
 
-```
+```csharp
 // C# example 
 int myFunc(int x, int y, int z) { ... function body ...}
 ```
 
-```
+```fsharp
 // F# example 
 let myFunc (x:int) (y:int) (z:int) :int = ... function body ...
 let myFunc x y z = ... function body ...
@@ -65,13 +65,13 @@ Commas are generally only used for tuples, or for separating parameters when cal
 
 In F#, definitions of both variables and functions use the form:
 
-```
+```fsharp
 let someName = // the definition
 ```
 
 Definitions for all types (classes, structures, interfaces, etc.) use the form:
 
-```
+```fsharp
 type someName = // the definition
 ```
 
@@ -82,13 +82,13 @@ The use of the `=` sign is an important difference between F# and C#. Where C# u
 In F#, values are immutable by default. If you are doing a direct imperative port, you probably need to make some of the values mutable, using the `mutable` keyword.
 Then to assign to the values, use the `<-` operator, not the equals sign.
 
-```
+```csharp
 // C# example 
 var variableName = 42
 variableName = variableName + 1
 ```
 
-```
+```fsharp
 // F# example 
 let mutable variableName = 42
 variableName <- variableName + 1
@@ -100,7 +100,7 @@ In C#, the equals sign is used for assignment, and the double equals `==` is use
 
 However in F#, the equals sign is used for testing equality, and is also used to initially bind values to other values when declared,
 
-```
+```fsharp
 let mutable variableName = 42     // Bound to 42 on declaration
 variableName <- variableName + 1  // Mutated (reassigned)
 variableName = variableName + 1   // Comparison not assignment! 
@@ -108,7 +108,7 @@ variableName = variableName + 1   // Comparison not assignment!
 
 To test for inequality, use SQL-style `<>` rather than `!=`
 
-```
+```fsharp
 let variableName = 42             // Bound to 42 on declaration
 variableName <> 43                // Comparison will return true.
 variableName != 43                // Error FS0020.
@@ -122,7 +122,7 @@ With these basic guidelines in place, let's look at some real code examples, and
 
 This first example has some very simple code, which we will port line by line. Here's the C# code.
 
-```
+```csharp
 using System;
 using System.Collections.Generic;
 
@@ -160,7 +160,7 @@ Note that the namespace, if used, must come before anything else, such as "open"
 
 To declare a simple class, use:
 
-```
+```fsharp
 type myClassName() = 
    ... code ...  
 ```
@@ -184,13 +184,13 @@ For function/method signatures:
 
 Here's a C# function signature:
 
-```
+```csharp
 int Square(int input) { ... code ...}
 ```
 
 and here's the corresponding F# function signature with explicit types:
 
-```
+```fsharp
 let Square (input:int) :int =  ... code ...
 ```
 
@@ -198,7 +198,7 @@ However, because F# can normally infer the parameter and return types, you rarel
 
 Here's a more typical F# signature, with inferred types:
 
-```
+```fsharp
 let Square input =  ... code ...
 ```
 
@@ -208,19 +208,19 @@ The `void` keyword in C# is generally not needed, but if required, would be conv
 
 So the C# code:
 
-```
+```csharp
 void PrintSquare(int input) { ... code ...}
 ```
 
 could be converted to the F# code:
 
-```
+```fsharp
 let PrintSquare (input:int) :unit =  ... code ...
 ```
 
 but again, the specific types are rarely needed, and so the F# version is just:
 
-```
+```fsharp
 let PrintSquare input =  ... code ...
 ```
 
@@ -239,24 +239,24 @@ We'll have a quick look at porting each of these in turn, except for control flo
 
 Almost always, you can use `let` on its own, just like `var` in C#:
 
-```
+```csharp
 // C# variable declaration
 var result = input * input;
 ```
 
-```
+```fsharp
 // F# value declaration
 let result = input * input
 ```
 
 Unlike C#, you must always assign ("bind") something to an F# value as part of its declaration.
 
-```
+```csharp
 // C# example 
 int unassignedVariable; //valid
 ```
 
-```
+```fsharp
 // F# example 
 let unassignedVariable // not valid
 ```
@@ -265,12 +265,12 @@ As noted above, if you need to change the value after its declaration, you must 
 
 If you need to specify a type for a value, the type name comes after the value or parameter, preceded by a colon.
 
-```
+```csharp
 // C# example 
 int variableName = 42;
 ```
 
-```
+```fsharp
 // F# example 
 let variableName:int = 42
 ```
@@ -281,7 +281,7 @@ When calling a native F# function, there is no need for parentheses or commas. I
 
 Here's C# code for defining a function, then calling it:
 
-```
+```csharp
 // define a method/function 
 int Square(int input) { ... code  ...}
 
@@ -292,7 +292,7 @@ var result = Square(input);
 However, because F# can normally infer the parameter and return types, you rarely need to specify them explicitly
 So here's typical F# code for defining a function and then calling it:
 
-```
+```fsharp
 // define a function 
 let Square input = ... code ...
 
@@ -306,7 +306,7 @@ In C#, you use the `return` keyword. But in F#, the last value in the block is a
 
 Here's the C# code returning the `result` variable.
 
-```
+```csharp
 public int Square(int input)
 {
     var result = input * input;
@@ -316,7 +316,7 @@ public int Square(int input)
 
 And here's the F# equivalent.
 
-```
+```fsharp
 let Square input = 
     let result = input * input
     result        // implicit "return" value
@@ -335,7 +335,7 @@ To print output in C#, you generally use `Console.WriteLine` or similar. In F#, 
 Putting it all together, here is the complete direct port of example #1 to F#.
 
 The C# code again:
-```
+```csharp
 using System;
 using System.Collections.Generic;
 
@@ -360,7 +360,7 @@ namespace PortingToFsharp
 
 And the equivalent F# code:
 
-```
+```fsharp
 namespace PortingToFsharp
 
 open System

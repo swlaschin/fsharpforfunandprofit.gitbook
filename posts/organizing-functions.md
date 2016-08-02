@@ -24,7 +24,7 @@ In F#, you can define functions inside other functions. This is a great way to e
 
 In the example below `add` is nested inside `addThreeNumbers`:
 
-```
+```fsharp
 let addThreeNumbers x y z  = 
 
     //create a nested helper function
@@ -41,7 +41,7 @@ addThreeNumbers 2 3 4
 A nested function can access its parent function parameters directly, because they are in scope. 
 So, in the example below, the `printError` nested function does not need to have any parameters of its own -- it can access the `n` and `max` values directly.
 
-```
+```fsharp
 let validateSize max n  = 
 
     //create a nested helper function with no params
@@ -59,7 +59,7 @@ validateSize 10 11
 A very common pattern is that the main function defines a nested recursive helper function, and then calls it with the appropriate initial values.
 The code below is an example of this:
 
-```
+```fsharp
 let sumNumbersUpTo max = 
 
     // recursive helper function with accumulator    
@@ -81,7 +81,7 @@ A badly nested function will be just as confusing as the worst kind of deeply ne
 
 Here's how *not* to do it:
 
-```
+```fsharp
 // wtf does this function do?
 let f x = 
     let f2 y = 
@@ -107,7 +107,7 @@ The contents of the module *must* be indented, just as expressions in a function
 
 Here's a module that contains two functions:
 
-```
+```fsharp
 module MathStuff = 
 
     let add x y  = x + y
@@ -118,7 +118,7 @@ Now if you try this in Visual Studio, and you hover over the `add` function, you
 
 Actually, that's exactly what is going on. Behind the scenes, the F# compiler creates a static class with static methods. So the C# equivalent would be:
 
-```
+```csharp
 static class MathStuff
 {
     static public int add(int x, int y)
@@ -142,7 +142,7 @@ And, just as in C# every standalone function must be part of a class, in F# ever
 
 If you want to access a function in another module, you can refer to it by its qualified name.
 
-```
+```fsharp
 module MathStuff = 
 
     let add x y  = x + y
@@ -157,7 +157,7 @@ module OtherStuff =
 You can also import all the functions in another module with the `open` directive, 
 after which you can use the short name, rather than having to specify the qualified name.
 
-```
+```fsharp
 module OtherStuff = 
     open MathStuff  // make all functions accessible
 
@@ -171,7 +171,7 @@ and you can use relative names or unqualified names based on what other modules 
 
 Just like static classes, modules can contain child modules nested within them, as shown below:
 
-```
+```fsharp
 module MathStuff = 
 
     let add x y  = x + y
@@ -186,7 +186,7 @@ module MathStuff =
         
 And other modules can reference functions in the nested modules using either a full name or a relative name as appropriate:
 
-```
+```fsharp
 module OtherStuff = 
     open MathStuff
 
@@ -216,7 +216,7 @@ For `.FSX` script files, the module declaration is not needed, in which case the
 
 Here is an example of `MathStuff` declared as a top level module:
 
-```
+```fsharp
 // top level module
 module MathStuff
 
@@ -236,7 +236,7 @@ Note the lack of indentation for the top level code (the contents of `module Mat
 
 A module can contain other declarations as well as functions, including type declarations, simple values and initialization code (like static constructors)
 
-```
+```fsharp
 module MathStuff = 
 
     // functions
@@ -265,7 +265,7 @@ module MathStuff =
 
 Here's our example module again. Notice that `MathStuff` has an `add` function and `FloatLib` *also* has an `add` function.
 
-```
+```fsharp
 module MathStuff = 
 
     let add x y  = x + y
@@ -280,7 +280,7 @@ module MathStuff =
 
 Now what happens if I bring *both* of them into scope, and then use `add`?
 
-```
+```fsharp
 open  MathStuff
 open  MathStuff.FloatLib
 
@@ -296,7 +296,7 @@ Unfortunately, this is invisible and easy to overlook. Sometimes you can do cool
 
 If you don't want this to happen, there is a way to stop it by using the `RequireQualifiedAccess` attribute. Here's the same example where both modules are decorated with it.
 
-```
+```fsharp
 [<RequireQualifiedAccess>]
 module MathStuff = 
 
@@ -313,14 +313,14 @@ module MathStuff =
 
 Now the `open` isn't allowed:
         
-```
+```fsharp
 open  MathStuff   // error
 open  MathStuff.FloatLib // error
 ```
 
 But we can still access the functions (without any ambiguity) via their qualified name:
 
-```
+```fsharp
 let result = MathStuff.add 1 2  
 let result = MathStuff.FloatLib.add 1.0 2.0
 ```
@@ -343,7 +343,7 @@ Namespaces in F# are similar to namespaces in C#.  They can be used to organize 
 
 A namespace is declared with a `namespace` keyword, as shown below.
 
-```
+```fsharp
 namespace Utilities
 
 module MathStuff = 
@@ -360,7 +360,7 @@ With the namespace, the indentation rules apply, so that the module defined abov
 
 You can also declare a namespace implicitly by adding dots to the module name. That is, the code above could also be written as:
 
-```
+```fsharp
 module Utilities.MathStuff  
 
 // functions
@@ -383,7 +383,7 @@ If you are planning to create reusable libraries, be sure to add some sort of na
 
 You can create a namespace hierarchy by simply separating the names with periods:
 
-```
+```fsharp
 namespace Core.Utilities
 
 module MathStuff = 
@@ -392,7 +392,7 @@ module MathStuff =
 
 And if you want to put *two* namespaces in the same file, you can. Note that all namespaces *must* be fully qualified -- there is no nesting.
 
-```
+```fsharp
 namespace Core.Utilities
 
 module MathStuff = 
@@ -407,7 +407,7 @@ module MoreMathStuff =
 One thing you can't do is have a naming collision between a namespace and a module.
 
 
-```
+```fsharp
 namespace Core.Utilities
 
 module MathStuff = 
@@ -438,7 +438,7 @@ There are two common patterns for mixing types and functions together:
 In the first approach, the type is declared *outside* any module (but in a namespace) and then the functions that work on the type
 are put in a module with a similar name.
 
-```
+```fsharp
 // top-level module
 namespace Example
 
@@ -465,7 +465,7 @@ In the alternative approach, the type is declared *inside* the module and given 
 So the functions are accessed with names like `MyModule.Func1` and `MyModule.Func2` while the type itself is
 accessed with a name like `MyModule.T`. Here's an example:
 
-```
+```fsharp
 module Customer = 
 
     // Customer.T is the primary type for this module
@@ -501,7 +501,7 @@ If you have a set of types that you need to declare without any associated funct
 
 For example, here is how you might think to do it:
 
-```
+```fsharp
 // top-level module
 module Example
 
@@ -513,7 +513,7 @@ type PersonType = {First:string; Last:string}
 
 And here is a alternative way to do it. The `module` keyword has simply been replaced with `namespace`.
 
-```
+```fsharp
 // use a namespace 
 namespace Example
 

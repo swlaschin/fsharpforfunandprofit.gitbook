@@ -21,14 +21,14 @@ As we have already seen, these pairs are called tuples in F#. And now you can se
 
 Let's see how they might be used in practice:
 
-```
+```fsharp
 let t1 = (2,3)
 let t2 = (-2,7)
 ```
 
 Now if you evaluate the code above you will see that the types of t1 and t2 are `int*int` as expected. 
 
-```
+```fsharp
 val t1 : int * int = (2, 3)
 val t2 : int * int = (-2, 7)
 ```
@@ -39,7 +39,7 @@ This "product" approach can be used to make tuples out of any mixture of types. 
 
 And here is the usage in F#. The tuple type above has the signature "`int*bool`".
 
-```
+```fsharp
 let t3 = (2,true)
 let t4 = (7,false)
 
@@ -54,7 +54,7 @@ Strings can be used as well, of course. The universe of all possible strings is 
 
 Test the usage and signatures:
 
-```
+```fsharp
 let t5 = ("hello",42)
 let t6 = ("goodbye",99)
 
@@ -69,7 +69,7 @@ And there is no reason to stop at multiplying just two types together. Why not t
  
 Test the usage and signatures:
  
-```
+```fsharp
 let t7 = (42,true,"hello")
 
 // the signature is:
@@ -84,7 +84,7 @@ Generics can be used in tuples too.
 
 The usage is normally associated with functions:
 
-```
+```fsharp
 let genericTupleFn aTuple = 
    let (x,y) = aTuple
    printfn "x is %A and y is %A" x y
@@ -92,7 +92,7 @@ let genericTupleFn aTuple =
 
 And the function signature is:
 
-```
+```fsharp
 val genericTupleFn : 'a * 'b -> unit
 ```
 
@@ -102,7 +102,7 @@ which means that "`genericTupleFn`" takes a generic tuple `('a * 'b)` and return
 
 Any kind of type can be used in a tuple: other tuples, classes, function types, etc.  Here are some examples:
 
-```
+```fsharp
 // define some types
 type Person = {First:string; Last:string}
 type Complex = float * float
@@ -128,7 +128,7 @@ These points are very important -- if you don't understand them you will get con
 
 And it is worth re-iterating the point made in [previous posts](../posts/defining-functions.md): *don't mistake tuples for multiple parameters in a function*.
 
-```
+```fsharp
 // a function that takes a single tuple parameter 
 // but looks like it takes two ints
 let addConfusingTuple (x,y) = x + y
@@ -140,7 +140,7 @@ The tuple types in F# are somewhat more primitive than the other extended types.
 
 It is easy to make a tuple -- just use a comma!
 
-```
+```fsharp
 let x = (1,2)                 
 let y = 1,2        // it's the comma you need, not the parentheses!      
 let z = 1,true,"hello",3.14   // create arbitrary tuples as needed
@@ -148,27 +148,27 @@ let z = 1,true,"hello",3.14   // create arbitrary tuples as needed
 
 And as we have seen, to "deconstruct" a tuple, use the same syntax:
 
-```
+```fsharp
 let z = 1,true,"hello",3.14   // "construct"
 let z1,z2,z3,z4 = z           // "deconstruct"
 ```
 
 When pattern matching like this, you must have the same number of elements, otherwise you will get an error:
 
-```
+```fsharp
 let z1,z2 = z     // error FS0001: Type mismatch. 
                   // The tuples have differing lengths
 ```
 
 If you don't need some of the values, you can use the "don't care" symbol (the underscore) as a placeholder.
 
-```
+```fsharp
 let _,z5,_,z6 = z     // ignore 1st and 3rd elements
 ```
 
 As you might guess, a two element tuple is commonly called a "pair" and a three element tuple is called a "triple" and so on.  In the special case of pairs, there are functions `fst` and `snd` which extract the first and second element. 
 
-```
+```fsharp
 let x = 1,2
 fst x
 snd x
@@ -176,7 +176,7 @@ snd x
 
 They only work on pairs. Trying to use `fst` on a triple will give an error.
 
-```
+```fsharp
 let x = 1,2,3
 fst x              // error FS0001: Type mismatch. 
                    // The tuples have differing lengths of 2 and 3
@@ -192,7 +192,7 @@ It is a common scenario that you want to return two values from a function rathe
 
 Here is an implementation of `TryParse` for integers (assuming it did not already exist, of course):
 
-```
+```fsharp
 let tryParse intStr = 
    try
       let i = System.Int32.Parse intStr
@@ -206,7 +206,7 @@ tryParse "abc"
 
 Here's another simple example that returns a pair of numbers:
 
-```
+```fsharp
 // return word count and letter count in a tuple
 let wordAndLetterCount (s:string) = 
    let words = s.Split [|' '|]
@@ -223,7 +223,7 @@ As with most F# values, tuples are immutable and the elements within them cannot
 
 Say that you need to write a function that, given a tuple, adds one to each element. Here's an obvious implementation:
 
-```
+```fsharp
 let addOneToTuple aTuple =
    let (x,y,z) = aTuple
    (x+1,y+1,z+1)   // create a new one
@@ -234,7 +234,7 @@ addOneToTuple (1,2,3)
 
 This seems a bit long winded -- is there a more compact way?  Yes, because you can deconstruct a tuple directly in the parameters of a function, so that the function becomes a one liner:
 
-```
+```fsharp
 let addOneToTuple (x,y,z) = (x+1,y+1,z+1)
 
 // try it
@@ -245,7 +245,7 @@ addOneToTuple (1,2,3)
 
 Tuples have an automatically defined equality operation: two tuples are equal if they have the same length and the values in each slot are equal.
 
-```
+```fsharp
 (1,2) = (1,2)                      // true
 (1,2,3,"hello") = (1,2,3,"bye")    // false
 (1,(2,3),4) = (1,(2,3),4)          // true
@@ -253,13 +253,13 @@ Tuples have an automatically defined equality operation: two tuples are equal if
 
 Trying to compare tuples of different lengths is a type error:
 
-```
+```fsharp
 (1,2) = (1,2,3)                    // error FS0001: Type mismatch
 ```
 
 And the types in each slot must be the same as well:
 
-```
+```fsharp
 (1,2,3) = (1,2,"hello")   // element 3 was expected to have type
                           // int but here has type string    
 (1,(2,3),4) = (1,2,(3,4)) // elements 2 & 3 have different types
@@ -267,7 +267,7 @@ And the types in each slot must be the same as well:
 
 Tuples also have an automatically defined hash value based on the values in the tuple, so that tuples can be used as dictionary keys without problems.
 
-```
+```fsharp
 (1,2,3).GetHashCode()
 ```
 
@@ -275,6 +275,6 @@ Tuples also have an automatically defined hash value based on the values in the 
 
 And as noted in a [previous post](../posts/convenience-types.md), tuples have a nice default string representation, and can be serialized easily.
 
-```
+```fsharp
 (1,2,3).ToString()
 ```

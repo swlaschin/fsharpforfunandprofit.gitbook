@@ -13,7 +13,7 @@ Just like other .NET languages, F# supports throwing and catching exceptions.  A
 
 When raising/throwing exceptions, you can use the standard system ones such as `InvalidOperationException`, or you can define your own exception types using the simple syntax shown below, where the "content" of the exception is any F# type:
 
-```
+```fsharp
 exception MyFSharpError1 of string
 exception MyFSharpError2 of string * int
 ```
@@ -39,7 +39,7 @@ There are four useful exception keywords built into F#:
 
 These four probably cover most of the exceptions you would regularly throw. Here is how they are used:
 
-```
+```fsharp
 // throws a generic System.Exception
 let f x = 
    if x then "ok"
@@ -63,7 +63,7 @@ let f x =
 
 By the way, there's a very useful variant of `failwith` called `failwithf` that includes `printf` style formatting, so that you can make custom messages easily:
 
-```
+```fsharp
 open System
 let f x = 
     if x = "bad" then
@@ -80,7 +80,7 @@ f "bad"
 
 You can `raise` any .NET exception explicitly:
 
-```
+```fsharp
 // you control the exception type
 let f x = 
    if x then "ok"
@@ -91,7 +91,7 @@ let f x =
 
 Finally, you can use your own types, as defined earlier.
 
-```
+```fsharp
 // using your own F# exception types
 let f x = 
    if x then "ok"
@@ -108,7 +108,7 @@ The answer is that any code that raises exceptions is ignored for the purposes o
 
 For example, in the code below, the exceptions are ignored, and the overall function has signature `bool->int`, as you would expect.
 
-```
+```fsharp
 let f x = 
    if x then 42
    elif true then failwith "message"
@@ -117,7 +117,7 @@ let f x =
 
 Question: what do you think the function signature will be if both branches raise exceptions?  
 
-```
+```fsharp
 let f x = 
    if x then failwith "error in true branch"
    else failwith "error in false branch"
@@ -129,7 +129,7 @@ Try it and see!
 
 Exceptions are caught using a try-catch block, as in other languages. F# calls it `try-with` instead, and testing for each type of exception uses the standard pattern matching syntax.
 
-```
+```fsharp
 try
     failwith "fail"
 with
@@ -142,7 +142,7 @@ If the exception to catch was thrown with `failwith` (e.g. a System.Exception) o
 
 On the other hand, to catch a specific .NET exception class, you have to match using the more complicated syntax:
 
-```
+```fsharp
 :? (exception class) as ex 
 ```
 
@@ -150,7 +150,7 @@ Again, as with if-then-else and the loops, the try-with block is an expression t
 
 Consider this example:
 
-```
+```fsharp
 let divide x y=
     try
         (x+1) / y                      // error here -- see below
@@ -167,7 +167,7 @@ The reason is that the "`with`" branch is of type `unit`, while the "`try`" bran
 
 To fix this, we need to make the "`with`" branch also return type `int`. We can do this easily using the semicolon trick to chain expressions on one line.
 
-```
+```fsharp
 let divide x y=
     try
         (x+1) / y                      
@@ -188,7 +188,7 @@ As before, if any branch throws an exception, it doesn't count when types are be
 
 If needed, you can call the "`reraise()`" function in a catch handler to propagate the same exception up the call chain. This is the same as the C# `throw` keyword.
 
-```
+```fsharp
 let divide x y=
     try
         (x+1) / y                      
@@ -206,7 +206,7 @@ divide 1 0
 
 Another familiar expression is `try-finally`.  As you might expect, the "finally" clause will be called no matter what.
 
-```
+```fsharp
 let f x = 
     try
         if x then "ok" else failwith "fail"
@@ -218,7 +218,7 @@ The return type of the try-finally expression as a whole is always the same as r
 
 The "finally" clause must always return unit, so any non-unit values will be flagged by the compiler.
 
-```
+```fsharp
 let f x = 
     try
         if x then "ok" else failwith "fail"
@@ -230,7 +230,7 @@ let f x =
 
 The try-with and the try-finally expressions are distinct and cannot be combined directly into a single expression. Instead, you will have to nest them as circumstances require.
 
-```
+```fsharp
 let divide x y=
    try
       try       
@@ -252,7 +252,7 @@ One approach is to provide two functions: one which assumes everything works and
 
 For example, we might want to design two distinct library functions for division, one that doesn't handle exceptions and one that does:
 
-```
+```fsharp
 // library function that doesn't handle exceptions
 let divideExn x y = x / y
 
@@ -268,7 +268,7 @@ Note the use of `Some` and `None` Option types in the `tryDivide` code to signal
 
 With the first function, the client code must handle the exception explicitly. 
 
-```
+```fsharp
 // client code must handle exceptions explicitly
 try
     let n = divideExn 1 0
@@ -281,7 +281,7 @@ Note that there is no constraint that forces the client to do this, so this appr
 
 With the second function the client code is simpler, and the client is constrained to handle both the normal case and the error case.
 
-```
+```fsharp
 // client code must test both cases
 match tryDivide 1 0 with
 | Some n -> printfn "result is %i" n
@@ -315,7 +315,7 @@ But sometimes there is more than one possible error, and each should be handled 
 
 In the following example, we want to execute a SqlCommand. Three very common error cases are login errors, constraint errors and foreign key errors, so we build them into the result structure. All other errors are raised as exceptions.
 
-```
+```fsharp
 open System.Data.SqlClient
 
 type NonQueryResult =
@@ -346,7 +346,7 @@ let executeNonQuery (sqlCommmand:SqlCommand) =
 
 The client is then forced to handle the common cases, while uncommon exceptions will be caught by a handler higher up the call chain.
 
-```
+```fsharp
 let myCmd = new SqlCommand("DELETE Product WHERE ProductId=1")
 let result =  executeNonQuery myCmd
 match result with
@@ -358,7 +358,7 @@ match result with
 
 Unlike a traditional error code approach, the caller of the function does not have to handle any errors immediately, and can simply pass the structure around until it gets to someone who knows how to handle it, as shown below:
 
-```
+```fsharp
 let lowLevelFunction commandString = 
   let myCmd = new SqlCommand(commandString)
   executeNonQuery myCmd          //returns result    
@@ -376,7 +376,7 @@ let presentationLayerFunction =
 
 On the other hand, unlike C#, the result of a expression cannot be accidentally thrown away. So if a function returns an error result, the caller must handle it (unless it really wants to be badly behaved and send it to `ignore`)
 
-```
+```fsharp
 let presentationLayerFunction = 
   do deleteProduct 1    // error: throwing away a result code!
 ```

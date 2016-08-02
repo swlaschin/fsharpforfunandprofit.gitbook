@@ -49,7 +49,7 @@ We'll set it up so that the type can only be created by an Authorization Service
 For example, here's an F# implementation of the `AccessToken` type. The constructor is private, and there's a static member that returns an instance if
 authorization is allowed.
 
-```
+```fsharp
 type AccessToken private() = 
 
     // create an AccessToken that allows access to a particular customer
@@ -65,7 +65,7 @@ Next, in the database module, we will add an extra parameter to each function, w
 
 Because the AccessToken token is required, we can safely make the database module public now, as no unauthorized client can call the functions.
 
-```
+```fsharp
 let getCustomer (accessToken:AccessToken) (id:CustomerId) = 
     // get customer data
 
@@ -77,7 +77,7 @@ Note that the accessToken is not actually used in the implementation. It is just
 
 So let's look at how this might be used in practice.
 
-```
+```fsharp
 let principal = // from context
 let id = // from context
 
@@ -88,14 +88,14 @@ let accessToken = AuthorizationService.AccessToken.getAccessToCustomer id princi
 At this point we have an optional access token. Using `Option.map`, we can apply it to `CustomerDatabase.getCustomer` to get an optional capability.
 And by partially applying the access token, the user of the capability is isolated from the authentication process.
 
-```
+```fsharp
 let getCustomerCapability = 
     accessToken |> Option.map CustomerDatabase.getCustomer
 ```
 
 And finally, we can attempt to use the capability, if present.
 
-```
+```fsharp
 match getCustomerCapability with
 | Some getCustomer -> getCustomer id
 | None -> Failure AuthorizationFailed // error
@@ -133,7 +133,7 @@ First we will define a *distinct type* for each capability. The type will also c
 For example, here are two types that represent access to capabilities, one for accessing a customer (both read and update), and another one updating a password.
 Both of these will store the `CustomerId` that was provided at authorization time.
 
-```
+```fsharp
 type AccessCustomer = AccessCustomer of CustomerId
 type UpdatePassword = UpdatePassword of CustomerId
 ```
@@ -141,7 +141,7 @@ type UpdatePassword = UpdatePassword of CustomerId
 Next, the `AccessToken` type is redefined to be a generic container with a `data` field.
 The constructor is still private, but a public getter is added so clients can access the data field.
 
-```
+```fsharp
 type AccessToken<'data> = private {data:'data} with 
     // but do allow read access to the data
     member this.Data = this.data
@@ -149,7 +149,7 @@ type AccessToken<'data> = private {data:'data} with
 
 The authorization implementation is similar to the previous examples, except that this time the capability type and customer id are stored in the token.
 
-```
+```fsharp
 // create an AccessToken that allows access to a particular customer
 let getAccessCustomerToken id principal = 
     if customerIdBelongsToPrincipal id principal ||
@@ -174,7 +174,7 @@ The `customerId` is no longer needed as an explicit parameter, because it will b
 
 Note also that both `getCustomer` and `updateCustomer` can use the same type of token (`AccessCustomer`), but `updatePassword` requires a different type (`UpdatePassword`).
 
-```
+```fsharp
 let getCustomer (accessToken:AccessToken<AccessCustomer>) = 
     // get customer id
     let (AccessCustomer id) = accessToken.Data
@@ -208,7 +208,7 @@ The steps to getting a customer are:
 
 Note that, as always, the `getCustomer` capability does not take a customer id parameter. It was baked in when the capability was created.
 
-```
+```fsharp
 let principal =  // from context
 let customerId = // from context
 
@@ -231,7 +231,7 @@ match getCustomerCap with
 
 Now what happens if we accidentally get the *wrong* type of access token? For example, let us try to access the `updatePassword` function with an `AccessCustomer` token.
 
-```
+```fsharp
 // attempt to get a capability
 let getUpdatePasswordCap = 
     let accessToken = AuthorizationService.getAccessCustomerToken customerId principal
@@ -250,7 +250,7 @@ match getUpdatePasswordCap with
 
 This code will not even compile!  The line `CustomerDatabase.updatePassword token password` has an error.
 
-```
+```text
 error FS0001: Type mismatch. Expecting a
     AccessToken<Capabilities.UpdatePassword>    
 but given a
@@ -274,7 +274,7 @@ Since this is an update of the example, I'll focus on just the changes.
 
 The capabilities are as before except that we have defined the two new types (`AccessCustomer` and `UpdatePassword`) to be stored inside the access tokens.
 
-```
+```fsharp
 module Capabilities = 
     open Rop
     open Domain
@@ -302,7 +302,7 @@ module Capabilities =
 
 The authorization implementation must be changed to return `AccessTokens` now.  The `onlyIfDuringBusinessHours` restriction applies to capabilities, not access tokens, so it is unchanged.
 
-```
+```fsharp
 // the constructor is protected
 type AccessToken<'data> = private {data:'data} with 
     // but do allow read access to the data
@@ -340,7 +340,7 @@ Compared with the example from the previous post, the database functions have th
 
 Here's what the database implementation looked like *before* using access tokens:
 
-```
+```fsharp
 let getCustomer id = 
     // code
 
@@ -353,7 +353,7 @@ let updatePassword (id:CustomerId,password:Password) =
 
 And here's what the code looks like *after* using access tokens:
 
-```
+```fsharp
 let getCustomer (accessToken:AccessToken<AccessCustomer>) = 
     // get customer id
     let (AccessCustomer id) = accessToken.Data
@@ -385,7 +385,7 @@ The major change in the top-level module is how the capabilities are fetched.  W
 
 Here's what the code looked like *before* using access tokens:
 
-```
+```fsharp
 let getCustomerOnlyForSameId id principal  = 
     onlyForSameId id principal CustomerDatabase.getCustomer
 
@@ -397,7 +397,7 @@ let getCustomerOnlyForAgentsInBusinessHours id principal =
 
 And here's what the code looks like *after* using access tokens:
 
-```
+```fsharp
 let getCustomerOnlyForSameId id principal  = 
     let accessToken = Authorization.onlyForSameId id principal
     accessToken |> tokenToCap CustomerDatabase.getCustomer 
@@ -411,7 +411,7 @@ let getCustomerOnlyForAgentsInBusinessHours id principal =
 
 The `tokenToCap` function is a little utility that applies the (optional) token to a given function as the first parameter. The output is an (equally optional) capability.
 
-```
+```fsharp
 let tokenToCap f token =
     token 
     |> Option.map (fun token -> 

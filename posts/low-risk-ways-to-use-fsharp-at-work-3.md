@@ -85,7 +85,7 @@ Just like C#, F# can be used to write standard unit tests using the standard fra
 
 Here's an example of a test class written for use with NUnit. 
 
-```
+```fsharp
 [<TestFixture>]
 type TestClass() = 
 
@@ -100,7 +100,7 @@ All very standard.
 But there are some nice extras you get when you use F# rather than C#. First you can use the double backtick syntax to create more readable names,
 and second, you can use `let` bound functions in modules rather than classes, which simplifies the code.
 
-```
+```fsharp
 [<Test>]
 let ``When 2 is added to 2 expect 4``() = 
     Assert.AreEqual(4, 2+2)
@@ -108,14 +108,14 @@ let ``When 2 is added to 2 expect 4``() =
 
 The double backtick syntax makes the test results much easier to read. Here is the output of the test with a standard class name:
 
-```
+```text
 TestClass.When2IsAddedTo2Expect4
 Result: Success
 ```
 
 vs. the output using the more friendly name:
 
-```
+```text
 MyUnitTests.When 2 is added to 2 expect 4
 Result: Success
 ```
@@ -134,7 +134,7 @@ complex test attributes.
 
 Here's an example:
 
-```
+```fsharp
 let add1 x = x + 1
 
 // a simple test using any assertion framework:
@@ -157,7 +157,7 @@ You can run these tests directly in F# interactive using code like this: `run si
 
 You can also combine these tests into one or more lists, or hierarchical lists of lists:
 
-```
+```fsharp
 // create a hierarchy of tests 
 // mark it as the start point with the "Tests" attribute
 [<Fuchu.Tests>]
@@ -173,7 +173,7 @@ let tests =
 
 Finally, with Fuchu, the test assembly becomes its own test runner. Just make the assembly a console app instead of a library and add this code to the `program.fs` file:
 
-```
+```fsharp
 [<EntryPoint>]
 let main args = 
     let exitCode = defaultMainThisAssembly args
@@ -197,7 +197,7 @@ I've made a little example, below, using the `Nunit.Runners` package.
 All right, this might not be the most exciting use of F#, but it does show off F#'s "object expression" syntax to 
 create the `NUnit.Core.EventListener` interface, so I thought I'd leave it in as a demo.
 
-```
+```fsharp
 // sets the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 
@@ -306,7 +306,7 @@ First up is [FsUnit](http://github.com/fsharp/FsUnit), which replaces `Assert` w
 
 Here's a snippet:
 
-```
+```fsharp
 open NUnit.Framework
 open FsUnit
 
@@ -334,7 +334,7 @@ This information could potentially give you much more insight in why the assert 
 
 Here's a very simple example:
  
-```
+```fsharp
 [<Test>]
 let ``When 2 is added to 2 expect 4``() = 
     test <@ 2 + 2 = 4 @>
@@ -342,7 +342,7 @@ let ``When 2 is added to 2 expect 4``() =
 
 There are also a number of shortcut operators such as `=?` and `>?` that allow you to write your tests even more simply -- no asserts anywhere!
 
-```
+```fsharp
 [<Test>]
 let ``2 + 2 is 4``() = 
    let result = 2 + 2
@@ -365,7 +365,7 @@ Let's say that we have written a function that converts numbers to Roman numeral
 
 We might start writing tests like this:
 
-```
+```fsharp
 [<Test>]
 let ``Test that 497 is CDXCVII``() = 
     arabicToRoman 497 |> should equal "CDXCVII"
@@ -386,7 +386,7 @@ So, let's see how we'd use FsCheck for our Roman numerals.
 
 First, we define some properties that we expect to hold for all Roman numerals.
 
-```
+```fsharp
 let maxRepetitionProperty ch count (input:string) = 
     let find = String.replicate (count+1) ch
     input.Contains find |> not
@@ -405,7 +405,7 @@ With this in place we create tests that:
 1. Create a property checker function suitable for passing to FsCheck.
 1. Use the `Check.Quick` function to generate hundreds of random test cases and send them into that property checker.
 
-```
+```fsharp
 [<Test>]
 let ``Test that roman numerals have no more than one V``() = 
     let property num = 
@@ -425,7 +425,7 @@ let ``Test that roman numerals have no more than three Xs``() =
 
 Here are the results of the test. You can see that 100 random numbers have been tested, not just one.
 
-```
+```text
 Test that roman numerals have no more than one V
    Ok, passed 100 tests.
 
@@ -435,7 +435,7 @@ Test that roman numerals have no more than three Xs
 
 If we changed the test to be "Test that roman numerals have no more than TWO Xs", then the test result is false, and looks like this:
 
-```
+```text
 Falsifiable, after 33 tests 
 
 30
@@ -498,7 +498,7 @@ Or you can use it with the JSON type provider to call a web service for testing 
 
 *(Dont worry about not understanding the code -- this sample is just to show you how easy it is!)*
 
-```
+```fsharp
 // domain objects
 type EmailAddress = EmailAddress of string
 type PhoneNumber = PhoneNumber of string
@@ -572,7 +572,7 @@ let printRandomCustomers() =
 
 And here is a sampling of the results:
 
-```
+```text
 {name = "Georgianne Stephan";
  email = EmailAddress "d@outlook.com";
  phone = PhoneNumber "(420)330-2080";
@@ -603,7 +603,7 @@ Both are easy to do, and in a way that is similar to Moq.
 
 Here's some Moq code in C#:
 
-```
+```csharp
 // Moq Method
 var mock = new Mock<IFoo>();
 mock.Setup(foo => foo.DoSomething("ping")).Returns(true);
@@ -618,7 +618,7 @@ mock.Setup(foo => foo.Name ).Returns("bar");
 
 And here's the equivalent Foq code in F#:
 
-```
+```fsharp
 // Foq Method
 let mock = 
     Mock<IFoo>()
@@ -657,7 +657,7 @@ Below is a snippet taken from the Canopy site. As you can see, the code is simpl
 
 Also, FAKE integrates with Canopy, so you can [run automated browser tests as part of a CI build](http://fsharp.github.io/FAKE/canopy.html).
 
-```
+```fsharp
 //start an instance of the firefox browser
 start firefox
 
@@ -697,7 +697,7 @@ If you're not familiar with Behaviour Driven Development (BDD), the idea is that
 
 The standard format (Gherkin) for writing these tests uses the Given/When/Then syntax -- here's an example:
 
-```
+```text
 Feature: Refunded or replaced items should be returned to stock
 
 Scenario 1: Refunded items should be returned to stock
@@ -714,7 +714,7 @@ because, as with all things F#, the syntax is much more lightweight.
 
 For example, here's the full implementation of the scenario above. 
 
-```
+```fsharp
 type StockItem = { Count : int }
 
 let mutable stockItem = { Count = 0 }
@@ -735,7 +735,7 @@ let [<Then>] ``I should have (.*) black jumpers in stock`` (n:int) =
  
 The C# equivalent has a lot more clutter, and the lack of double backtick syntax really hurts:
 
-```
+```csharp
 [Given(@"a customer buys a black jumper")]
 public void GivenACustomerBuysABlackJumper()
 {

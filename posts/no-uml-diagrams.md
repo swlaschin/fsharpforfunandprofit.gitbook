@@ -33,7 +33,7 @@ Here's the UML diagram:
 
 And here's the F# equivalent:
 
-```
+```fsharp
 type RegularExpression =
     | Literal of string
     | Sequence of RegularExpression list
@@ -57,7 +57,7 @@ Here's the UML diagram:
 
 And here's the F# equivalent:
 
-```
+```fsharp
 type Student = {
     Name: string
     Address: string
@@ -109,7 +109,7 @@ Instead, for the functional version, I created an `EnrollmentRepository` to deco
 
 Similarly, it's not clear how enrollment actually works, so I created an `EnrollStudent` function to make it clear what inputs are needed.
 
-```
+```fsharp
 type EnrollStudent = Student -> Seminar -> Enrollment option
 ```
 
@@ -124,7 +124,7 @@ Here's another one (*[source](http://www.tutorialspoint.com/uml/uml_class_diagra
 
 And here's the F# equivalent:
 
-```
+```fsharp
 type Customer = {name:string; location:string}
 
 type NormalOrder = {date: DateTime; number: string; customer: Customer}
@@ -155,7 +155,7 @@ Here's a much better version of orders and customers (*[source](http://edn.embar
 
 And here's the F# equivalent:
 
-```
+```fsharp
 type Date = System.DateTime
 
 // == Customer related ==
@@ -229,7 +229,7 @@ and a separate `PaidOrder` type (e.g. to stop you paying for the same order twic
 
 Here's the kind of thing I mean:
 
-```
+```fsharp
 // Try to authorize a payment. Note that it might fail
 type Authorize =  UnauthorizedPayment -> AuthorizedPayment option
 
@@ -246,7 +246,7 @@ Here's one from the JetBrains IntelliJ documentation (*[source](https://www.jetb
 
 Here's the F# equivalent:
 
-```
+```fsharp
 type Date = System.DateTime
 
 type User = {
@@ -335,7 +335,7 @@ Here's the F# equivalent. Note that because it is code, I can add comments to sp
 
 Note also that I can say `ISBN: string option` to indicate an optional ISBN rather that the awkward `[0..1]` syntax.
 
-```
+```fsharp
 type Author = {
     name: string
     biography: string
@@ -411,7 +411,7 @@ and History = {
 
 Since the Search and Manage interfaces are undefined, we can just use placeholders (`unit`) for the inputs and outputs.
 
-```
+```fsharp
 type Librarian = {
     name: string
     address: string
@@ -436,7 +436,7 @@ type ManageInterface = Librarian -> Catalogue -> ManageRequest -> ManageResult
 
 Again, this might not be the perfect design. For example, it's not clear that only `Active` accounts could borrow a book, which I might represent in F# as: 
 
-```
+```fsharp
 type Account = 
     | Active of ActiveAccount
     | Closed of ClosedAccount
@@ -456,7 +456,7 @@ The final example is from a software licensing domain (*[source](http://www.uml-
 
 Here's the F# equivalent. 
 
-```
+```fsharp
 open System
 type Date = System.DateTime
 type String50 = string

@@ -5,7 +5,7 @@ description: "Three ways to implement FizzBuzz"
 categories: []
 ---
 
-As a follow up to the [Railway Oriented Programming](../posts/recipe-part2.md) post, I thought I'd apply the same technique to the [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/index.md) problem,
+As a follow up to the [Railway Oriented Programming](../posts/recipe-part2.md) post, I thought I'd apply the same technique to the [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/) problem,
 and compare it with other implementations.
 
 A large part of this post was directly <s>stolen from</s> inspired by [Dave Fayram's post on FizzBuzz](http://dave.fayr.am/posts/2012-10-4-finding-fizzbuzz.html), with some additional ideas from
@@ -15,7 +15,7 @@ A large part of this post was directly <s>stolen from</s> inspired by [Dave Fayr
 
 As a reminder, here are the requirements for the FizzBuzz problem:
 
-```
+```text
 Write a program that prints the numbers from 1 to 100. 
 * For multiples of three print "Fizz" instead of the number.
 * For multiples of five print "Buzz". 
@@ -24,7 +24,7 @@ Write a program that prints the numbers from 1 to 100.
 
 And here is a basic F# solution:
 
-```
+```fsharp
 module FizzBuzz_Match = 
 
     let fizzBuzz i = 
@@ -56,7 +56,7 @@ And again, if we need to add new cases, we must always remember to put the large
 
 Let's try another implementation, where we reuse the code for the "three" and "five" case, and eliminate the need for a "fifteen" case altogether:
 
-```
+```fsharp
 module FizzBuzz_IfPrime = 
 
     let fizzBuzz i = 
@@ -89,7 +89,7 @@ However, this version *does* have the advantage that it can be easily refactored
 Below is a version that does just this. We pass in a list of "rules" to `fizzBuzz`. Each rule consists of a factor and a corresponding label to print out.
 The `fizzBuzz` function then just iterates through these rules, processing each in turn.
 
-```
+```fsharp
 module FizzBuzz_UsingFactorRules = 
 
     let fizzBuzz rules i  = 
@@ -112,7 +112,7 @@ module FizzBuzz_UsingFactorRules =
 
 If we want additional numbers to be processed, we just add them to the list of rules, like this:
 
-```
+```fsharp
 module FizzBuzz_UsingFactorRules = 
 
     // existing code as above
@@ -131,7 +131,7 @@ In this design, I envision a pipeline of functions, one to handle the "three" ca
 
 Here is some pseudocode to demonstrate the concept:
 
-```
+```fsharp
 data |> handleThreeCase |> handleFiveCase |> handleAllOtherCases |> printResult
 ```
 
@@ -160,7 +160,7 @@ One way would be to use an empty string (or, horrors, a null string), but let's 
 
 So, here's the final data type that we will be using:
 
-```
+```fsharp
 type Data = {i:int; label:string option}
 ```
 
@@ -176,7 +176,7 @@ With this data structure, we can define how `handleThreeCase` and `handleFiveCas
 Given this design, here's the implementation. It's a generic function that I will call `carbonate` (after [raganwald](http://weblog.raganwald.com/2007/01/dont-overthink-fizzbuzz.html))
 because it works with both "Fizz" and "Buzz":
 
-```
+```fsharp
 let carbonate factor label data = 
     let {i=i; label=labelSoFar} = data
     if i % factor = 0 then
@@ -198,7 +198,7 @@ The design for the `handleAllOtherCases` function is slightly different:
 
 Here's the code -- I will call it `labelOrDefault`:
 
-```
+```fsharp
 let labelOrDefault data = 
     let {i=i; label=labelSoFar} = data
     match labelSoFar with
@@ -208,7 +208,7 @@ let labelOrDefault data =
 
 Now that we have the components, we can assemble the pipeline:
 
-```
+```fsharp
 let fizzBuzz i = 
     {i=i; label=None}
     |> carbonate 3 "Fizz"
@@ -221,7 +221,7 @@ Note that we have to create an initial record using `{i=i; label=None}` for pass
 
 Finally, here is all the code put together:
 
-```
+```fsharp
 module FizzBuzz_Pipeline_WithRecord = 
 
     type Data = {i:int; label:string option}
@@ -262,7 +262,7 @@ to just use a tuple rather than creating a special data structure.
 
 So here's a modified implementation that uses tuples. 
 
-```
+```fsharp
 module FizzBuzz_Pipeline_WithTuple = 
 
     // type Data = int * string option
@@ -303,7 +303,7 @@ In the tuple code above, I have also replaced the explicit Option matching code 
 
 Here are the changes in `carbonate` :
 
-```
+```fsharp
 // before
 let newLabel = 
     match labelSoFar with
@@ -319,7 +319,7 @@ let newLabel =
 
 and in `labelOrDefault`:
 
-```
+```fsharp
 // before
 match labelSoFar with
 | Some s -> s
@@ -336,7 +336,7 @@ I am using it because the option is the *first* parameter to `defaultArg`, not t
 
 Here's what I mean:
 
-```
+```fsharp
 // OK - normal usage
 defaultArg myOption defaultValue
 
@@ -353,7 +353,7 @@ Our `carbonate` function is generic for any factor, so we can easily extend the 
 
 But one issue seems to be that we have hard-coded the "3" and "5" cases into the pipeline, like this:
 
-```
+```fsharp
 |> carbonate 3 "Fizz"
 |> carbonate 5 "Buzz"
 ```
@@ -364,7 +364,7 @@ The answer is quite simple. We dynamically create a function for each rule, and 
 
 Here's a snippet to demonstrate:
 
-```
+```fsharp
 let allRules = 
     rules
     |> List.map (fun (factor,label) -> carbonate factor label)
@@ -375,7 +375,7 @@ Each rule is mapped into a function. And then the list of functions is combined 
 
 Putting it all together, we have this final implementation: 
 
-```
+```fsharp
 module FizzBuzz_Pipeline_WithRules = 
 
     let carbonate factor label data = 
@@ -435,7 +435,7 @@ These switch functions are converted into two-track functions using a glue funct
 
 Here is a module containing definitions of the functions we will need.
 
-```
+```fsharp
 module RailwayCombinatorModule = 
 
     let (|Success|Failure|) =
@@ -470,7 +470,7 @@ In other words, the Success track contains the labels, and the Failure track con
 
 Our `carbonate` "switch" function will therefore look like this:
 
-```
+```fsharp
 let carbonate factor label i = 
     if i % factor = 0 then
         succeed label
@@ -487,7 +487,7 @@ Next, we need to connect the components together. The logic will be:
 
 Here is the implementation:
 
-```
+```fsharp
 let connect f = 
     function
     | Success x -> succeed x 
@@ -496,7 +496,7 @@ let connect f =
 
 Another way of writing this is to use the `either` function we defined in the library module:
 
-```
+```fsharp
 let connect' f = 
     either succeed f
 ```
@@ -505,7 +505,7 @@ Make sure you understand that both of these implementations do exactly the same 
 
 Next, we can create our "two-track" pipeline, like this:  
 
-```
+```fsharp
 let fizzBuzz = 
     carbonate 15 "FizzBuzz"      // need the 15-FizzBuzz rule because of short-circuit
     >> connect (carbonate 3 "Fizz")
@@ -526,7 +526,7 @@ A few other things have changed as well:
 
 Here is the complete implementation:
 
-```
+```fsharp
 module FizzBuzz_RailwayOriented_CarbonationIsSuccess = 
 
     open RailwayCombinatorModule 
@@ -569,7 +569,7 @@ By doing this, we also get to reuse the pre-defined `bind` function, rather than
 
 Here's the code with the tracks switched around:
 
-```
+```fsharp
 module FizzBuzz_RailwayOriented_CarbonationIsFailure = 
 
     open RailwayCombinatorModule 
@@ -603,7 +603,7 @@ Instead, we can call one track "Carbonated" and the other "Uncarbonated".
 
 To make this work, we can define an active pattern and constructor methods, just as we did for "Success/Failure".
 
-```
+```fsharp
 let (|Uncarbonated|Carbonated|) =
     function 
     | Choice1Of2 u -> Uncarbonated u
@@ -619,7 +619,7 @@ rather than language that is not applicable.
 
 In this case, if FizzBuzz was our domain, then our functions could now use the domain-friendly terminology of `carbonated` and `uncarbonated` rather than "success" or "failure".
 
-```
+```fsharp
 let carbonate factor label i = 
     if i % factor = 0 then
         carbonated label
@@ -634,14 +634,14 @@ let connect f =
 
 Note that, as before, the `connect` function can be rewritten using `either` (or we can just use the predefined `bind` as before):
 
-```
+```fsharp
 let connect' f = 
     either f carbonated 
 ```
 
 Here's all the code in one module:
 
-```
+```fsharp
 module FizzBuzz_RailwayOriented_UsingCustomChoice = 
 
     open RailwayCombinatorModule 
@@ -705,7 +705,7 @@ Well, here are the possible cases:
 
 Here's the code:
 
-```
+```fsharp
 // concat two carbonation functions
 let (<+>) switch1 switch2 x = 
     match (switch1 x),(switch2 x) with
@@ -717,7 +717,7 @@ let (<+>) switch1 switch2 x =
 
 As an aside, notice that this code is almost like math, with `uncarbonated` playing the role of "zero", like this:
 
-```
+```text
 something + something = combined somethings
 zero + something = something
 something + zero = something
@@ -728,7 +728,7 @@ This is not a coincidence! We will see this kind of thing pop up over and over i
 
 Anyway, with this "concat" function in place, we can rewrite the main `fizzBuzz` like this:
 
-```
+```fsharp
 let fizzBuzz = 
     let carbonateAll = 
         carbonate 3 "Fizz" <+> carbonate 5 "Buzz"
@@ -741,7 +741,7 @@ The two `carbonate` functions are added and then passed to `either` as before.
 
 Here is the complete code:
 
-```
+```fsharp
 module FizzBuzz_RailwayOriented_UsingAppend = 
 
     open RailwayCombinatorModule 
@@ -786,7 +786,7 @@ Just as with the earlier "pipeline" implementation, we can use `reduce` to add a
 
 Here's the version with rules:
 
-```
+```fsharp
 module FizzBuzz_RailwayOriented_UsingAddition = 
 
     // code as above
@@ -831,7 +831,7 @@ Be careful with `List.reduce` -- it will fail with empty lists. So if you have a
 
 In the pipeline case, you can see this by adding the following snippet to the module:
 
-```
+```fsharp
 module FizzBuzz_Pipeline_WithRules = 
 
     // code as before
@@ -846,7 +846,7 @@ In this case, we can use the identity function, `id`, as the initial value.
 
 Here is the fixed version of the code:
 
-```
+```fsharp
 let allRules = 
     rules
     |> List.map (fun (factor,label) -> carbonate factor label)
@@ -855,7 +855,7 @@ let allRules =
 
 Similarly, in the railway oriented example, we had:
 
-```
+```fsharp
 let allRules = 
     rules
     |> List.map (fun (factor,label) -> carbonate factor label)
@@ -864,7 +864,7 @@ let allRules =
 
 which should be corrected to:
 
-```
+```fsharp
 let allRules = 
     rules
     |> List.map (fun (factor,label) -> carbonate factor label)

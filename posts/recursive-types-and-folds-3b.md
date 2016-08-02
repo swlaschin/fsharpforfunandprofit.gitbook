@@ -64,7 +64,7 @@ In this post, we'll be working with a generic `Tree` inspired by the `FileSystem
 
 Here was the original design:
 
-```
+```fsharp
 type FileSystemItem =
     | File of FileInfo
     | Directory of DirectoryInfo
@@ -74,7 +74,7 @@ and DirectoryInfo = {name:string; dirSize:int; subitems:FileSystemItem list}
 
 We can separate out the data from the recursion, and create a generic `Tree` type like this:
 
-```
+```fsharp
 type Tree<'LeafData,'INodeData> =
     | LeafNode of 'LeafData
     | InternalNode of 'INodeData * Tree<'LeafData,'INodeData> seq
@@ -84,7 +84,7 @@ Notice that I have used `seq` to represent the subitems rather than `list`. The 
 
 The file system domain can then be modelled using `Tree` by specifying `FileInfo` as data associated with a leaf node and `DirectoryInfo` as data associated with an internal node:
 
-```
+```fsharp
 type FileInfo = {name:string; fileSize:int}
 type DirectoryInfo = {name:string; dirSize:int}
 
@@ -95,7 +95,7 @@ type FileSystemItem = Tree<FileInfo,DirectoryInfo>
 
 We can define `cata` and `fold` in the usual way:
 
-```
+```fsharp
 module Tree = 
 
     let rec cata fLeaf fNode (tree:Tree<'LeafData,'INodeData>) :'r = 
@@ -127,7 +127,7 @@ Functions that need inner data can use `cata`.
 
 Let's test it with the same values that we used before:
 
-```
+```fsharp
 let fromFile (fileInfo:FileInfo) = 
     LeafNode fileInfo 
 
@@ -144,7 +144,7 @@ let root = fromDir {name="root"; dirSize=5} [src; bin]
 
 The `totalSize` function is almost identical to the one in the previous post:
 
-```
+```fsharp
 let totalSize fileSystemItem =
     let fFile acc (file:FileInfo) = 
         acc + file.fileSize
@@ -159,7 +159,7 @@ root |> totalSize    // 31 = 5 + 16 + 10
 
 And so is the `largestFile` function:
 
-```
+```fsharp
 let largestFile fileSystemItem =
     let fFile (largestSoFarOpt:FileInfo option) (file:FileInfo) = 
         match largestSoFarOpt with
@@ -199,7 +199,7 @@ The source code for this section is available at [this gist](https://gist.github
 We can use the `Tree` to model the *real* file system too!  To do this,
 just set the leaf node type to `System.IO.FileInfo` and the internal node type to `System.IO.DirectoryInfo`.
 
-```
+```fsharp
 open System
 open System.IO
 
@@ -208,7 +208,7 @@ type FileSystemTree = Tree<IO.FileInfo,IO.DirectoryInfo>
 
 And let's create some helper methods to create the various nodes:
 
-```
+```fsharp
 let fromFile (fileInfo:FileInfo) = 
     LeafNode fileInfo 
 
@@ -225,7 +225,7 @@ without actually hitting the disk.
 
 Here's the `totalSize` function again, this time using the real file information:
 
-```
+```fsharp
 let totalSize fileSystemItem =
     let fFile acc (file:FileInfo) = 
         acc + file.Length
@@ -236,7 +236,7 @@ let totalSize fileSystemItem =
 
 Let's see what the size of the current directory is:
 
-```
+```fsharp
 // set the current directory to the current source directory
 Directory.SetCurrentDirectory __SOURCE_DIRECTORY__
 
@@ -249,7 +249,7 @@ currentDir  |> totalSize
 
 Similarly, we can get the largest file:
 
-```
+```fsharp
 let largestFile fileSystemItem =
     let fFile (largestSoFarOpt:FileInfo option) (file:FileInfo) = 
         match largestSoFarOpt with
@@ -293,7 +293,7 @@ The implementation of `map` can also be done mechanically, using the following r
 
 Here's the implementation of `map` for `Tree`, created by following those rules:
   
-```
+```fsharp
 module Tree = 
 
     let rec cata ...
@@ -315,7 +315,7 @@ module Tree =
 If we look at the signature of `Tree.map`, we can see that all the leaf data is transformed to type `'a`, all the node data is transformed to type `'b`,
 and the final result is a `Tree<'a,'b>`.
 
-```
+```fsharp
 val map :
   fLeaf:('LeafData -> 'a) ->
   fNode:('INodeData -> 'b) ->
@@ -325,7 +325,7 @@ val map :
 
 We can define `Tree.iter` in a similar way:
 
-```
+```fsharp
 module Tree = 
 
     let rec map ...
@@ -349,7 +349,7 @@ module Tree =
 Let's say we want to use `map` to transform the file system into a directory listing - a tree of strings where each string has information
 about the corresponding file or directory. Here's how we could do it:
 
-```
+```fsharp
 let dirListing fileSystemItem =
     let printDate (d:DateTime) = d.ToString()
     let mapFile (fi:FileInfo) = 
@@ -361,7 +361,7 @@ let dirListing fileSystemItem =
 
 And then we can print the strings out like this:
 
-```
+```fsharp
 currentDir 
 |> dirListing 
 |> Tree.iter (printfn "%s") (printfn "\n%s")
@@ -369,7 +369,7 @@ currentDir
 
 The results will look something like this:
 
-```
+```text
   8315  10/08/2015 23:37:41  Fold.fsx
   3680  11/08/2015 23:59:01  FoldAndRecursiveTypes.fsproj
   1010  11/08/2015 01:19:07  FoldAndRecursiveTypes.sln
@@ -399,7 +399,7 @@ Before we start writing the main code, we'll need some helper functions.
 First, a generic function that folds over the lines in a file asynchronously.
 This will be the basis of the pattern matching.
 
-```
+```fsharp
 /// Fold over the lines in a file asynchronously
 /// passing in the current line and line number tothe folder function.
 ///
@@ -423,7 +423,7 @@ let foldLinesAsync folder acc (fi:FileInfo) =
 
 Next, a little helper that allows us to `map` over `Async` values:
 
-```
+```fsharp
 let asyncMap f asyncX = async { 
     let! x = asyncX
     return (f x)  }
@@ -431,7 +431,7 @@ let asyncMap f asyncX = async {
 
 Now for the central logic. We will create a function that, given a `textPattern` and a `FileInfo`, will return a list of lines that match the textPattern, but asynchronously:
 
-```
+```fsharp
 /// return the matching lines in a file, as an async<string list>
 let matchPattern textPattern (fi:FileInfo) = 
     // set up the regex
@@ -455,7 +455,7 @@ let matchPattern textPattern (fi:FileInfo) =
 
 And now for the `grep` function itself:
 
-```
+```fsharp
 let grep filePattern textPattern fileSystemItem =
     let regex = Text.RegularExpressions.Regex(pattern=filePattern)
 
@@ -485,7 +485,7 @@ let grep filePattern textPattern fileSystemItem =
 
 Let's test it!
 
-```
+```fsharp
 currentDir 
 |> grep "fsx" "LinkedList" 
 |> Async.RunSynchronously
@@ -493,7 +493,7 @@ currentDir
 
 The result will look something like this:
 
-```
+```text
 "                  SizeOfTypes.fsx:120     type LinkedList<'a> = ";
 "                  SizeOfTypes.fsx:122         | Cell of head:'a * tail:LinkedList<'a>";
 "                  SizeOfTypes.fsx:125     let S = size(LinkedList<'a>)";
@@ -529,7 +529,7 @@ To model the file system hierarchy in the database, say that we have four tables
 
 Here are the database table definitions:
 
-```
+```text
 CREATE TABLE DbDir (
 	DirId int IDENTITY NOT NULL,
 	Name nvarchar(50) NOT NULL
@@ -562,7 +562,7 @@ This implies that we should use `cata` instead of `fold`, so that we have access
 We're not wise enough to be using the [SQL Provider](https://fsprojects.github.io/SQLProvider/) and so we have written our
 own table insertion functions, like this dummy one:
 
-```
+```fsharp
 /// Insert a DbFile record 
 let insertDbFile name (fileSize:int64) =
     let id = nextIdentity()
@@ -571,7 +571,7 @@ let insertDbFile name (fileSize:int64) =
 
 In a real database, the identity column would be automatically generated for you, but for this example, I'll use a little helper function `nextIdentity`:
 
-```
+```fsharp
 let nextIdentity =
     let id = ref 0
     fun () -> 
@@ -587,7 +587,7 @@ nextIdentity() // 3
 Now in order to insert a directory, we need to first know all the ids of the files in the directory. This implies that the `insertDbFile` function should
 return the id that was generated.
 
-```
+```fsharp
 /// Insert a DbFile record and return the new file id
 let insertDbFile name (fileSize:int64) =
     let id = nextIdentity()
@@ -597,7 +597,7 @@ let insertDbFile name (fileSize:int64) =
 
 But that logic applies to the directories too:
 
-```
+```fsharp
 /// Insert a DbDir record and return the new directory id
 let insertDbDir name =
     let id = nextIdentity()
@@ -610,7 +610,7 @@ the relations are stored in different tables.
 
 No problem -- we'll just use a choice type to distinguish between them!
 
-```
+```fsharp
 type PrimaryKey =
     | FileId of int
     | DirId of int
@@ -618,7 +618,7 @@ type PrimaryKey =
 
 With this in place, we can complete the implementation of the database functions:
 
-```
+```fsharp
 /// Insert a DbFile record and return the new PrimaryKey
 let insertDbFile name (fileSize:int64) =
     let id = nextIdentity()
@@ -646,7 +646,7 @@ As noted above, we need to use `cata` instead of `fold`, because we need the inn
 
 The function to handle the `File` case is easy -- just insert it and return the `PrimaryKey`.
 
-```
+```fsharp
 let fFile (fi:FileInfo) = 
     insertDbFile fi.Name fi.Length
 ```
@@ -655,7 +655,7 @@ The function to handle the `Directory` case will be passed the `DirectoryInfo` a
 
 It should insert the main directory record, then insert the children, and then return the `PrimaryKey` for the next higher level:
 
-```
+```fsharp
 let fDir (di:DirectoryInfo) childIds  = 
     let dirId = insertDbDir di.Name
     // insert the children
@@ -666,7 +666,7 @@ let fDir (di:DirectoryInfo) childIds  =
 After inserting the directory record and getting its id, for each child id, we insert either into the `DbDir_File` table or the `DbDir_Dir`,
 depending on the type of the `childId`.
 
-```
+```fsharp
 let fDir (di:DirectoryInfo) childIds  = 
     let dirId = insertDbDir di.Name
     let parentPK = pkToInt dirId 
@@ -683,7 +683,7 @@ Note that I've also created a little helper function `pkToInt` that extracts the
 
 Here is all the code in one chunk:
 
-```
+```fsharp
 open System
 open System.IO
 
@@ -744,7 +744,7 @@ let insertFileSystemTree fileSystemItem =
 
 Now let's test it:
 
-```
+```fsharp
 // get the current directory as a Tree
 let currentDir = fromDir (DirectoryInfo("."))
 
@@ -755,7 +755,7 @@ currentDir
 
 The output should look something like this:
 
-```
+```text
      DbDir: inserting id:41 name:FoldAndRecursiveTypes
     DbFile: inserting id:42 name:Fold.fsx size:8315
 DbDir_File: inserting parentDir:41 childFile:42
@@ -788,7 +788,7 @@ Let's use the Gift domain again, but this time, we'll model the `Gift` type as a
 
 Here are the main types again, but notice that the final `Gift` type is defined as a tree:
 
-```
+```fsharp
 type Book = {title: string; price: decimal}
 type ChocolateType = Dark | Milk | SeventyPercent
 type Chocolate = {chocType: ChocolateType ; price: decimal}
@@ -814,7 +814,7 @@ type Gift = Tree<GiftContents,GiftDecoration>
 
 As usual, we can create some helper functions to assist with constructing a `Gift`:
 
-```
+```fsharp
 let fromBook book = 
     LeafNode (Book book)
 
@@ -840,7 +840,7 @@ let putTwoThingsInBox innerGift innerGift2 =
 
 And we can create some sample data:
 
-```
+```fsharp
 let wolfHall = {title="Wolf Hall"; price=20m}
 let yummyChoc = {chocType=SeventyPercent; price=5m}
 
@@ -870,7 +870,7 @@ let twoWrappedPresentsInBox =
 
 Functions like `description` now need to handle a *list* of inner texts, rather than one. We'll just concat the strings together with an `&` separator:
 
-```
+```fsharp
 let description gift =
 
     let fLeaf leafData = 
@@ -896,7 +896,7 @@ let description gift =
 
 Finally, we can check that the function still works as before, and that multiple items are handled correctly:
 
-```
+```fsharp
 birthdayPresent |> description
 // "'Wolf Hall' wrapped in HappyBirthday paper with a card saying 'Happy Birthday'"
 
@@ -938,7 +938,7 @@ do proper validation.
 So, let's define some DTO types for out domain. Each DTO type will correspond to a domain type, so let's start with `GiftContents`.
 We'll define a corresponding DTO type called `GiftContentsDto` as follows:
 
-```
+```fsharp
 [<CLIMutableAttribute>]
 type GiftContentsDto = {
     discriminator : string // "Book" or "Chocolate"
@@ -962,7 +962,7 @@ Obviously, this quite different from the original `GiftContents`, so let's look 
 
 The `GiftDecorationDto` type is created in the same way, with a discriminator and strings rather than unions.
 
-```
+```fsharp
 [<CLIMutableAttribute>]
 type GiftDecorationDto = {
     discriminator: string // "Wrapped" or "Boxed" or "WithACard"
@@ -975,7 +975,7 @@ type GiftDecorationDto = {
 
 Finally, we can define a `GiftDto` type as being a tree that is composed of the two DTO types:
 
-```
+```fsharp
 type GiftDto = Tree<GiftContentsDto,GiftDecorationDto>
 ```
 
@@ -987,7 +987,7 @@ that converts from `GiftDecoration` to `GiftDecorationDto`.
 
 Here's the complete code for `giftToDto`, which should be self-explanatory:
 
-```
+```fsharp
 let giftToDto (gift:Gift) :GiftDto =
     
     let fLeaf leafData :GiftContentsDto = 
@@ -1026,7 +1026,7 @@ If the leaf value is not null, then the record must represent the `LeafNode` cas
 
 Here's the definition of the data type:
 
-```
+```fsharp
 /// A DTO that represents a Tree
 /// The Leaf/Node choice is turned into a record
 [<CLIMutableAttribute>]
@@ -1041,7 +1041,7 @@ The `subtrees` are stored as an array rather than a seq -- this makes the serial
 
 To create a `TreeDto`, we use our old friend `cata` to assemble the record from a regular `Tree`.
 
-```
+```fsharp
 /// Transform a Tree into a TreeDto
 let treeToDto tree : TreeDto<'LeafData,'NodeData> =
     
@@ -1074,7 +1074,7 @@ Finally we can serialize the `TreeDto` using a JSON serializer.
 For this example, I am using the built-in `DataContractJsonSerializer` so that I don't need to take
 a dependency on a NuGet package. There are other JSON serializers that might be better for a serious project.
 
-```
+```fsharp
 #r "System.Runtime.Serialization.dll"
 
 open System.Runtime.Serialization
@@ -1101,13 +1101,13 @@ So, putting it all together, we have the following pipeline:
 
 Here's some example code:
 
-```
+```fsharp
 let goodJson = christmasPresent |> giftToDto |> treeToDto |> toJson  
 ```
 
 And here is what the JSON output looks like:
 
-```
+```text
 {
   "leafData@": null,
   "nodeData@": {
@@ -1165,7 +1165,7 @@ Simple! We just need to reverse the pipeline:
 
 We can deserialize the `TreeDto` using a JSON serializer.
 
-```
+```fsharp
 let fromJson<'a> str = 
     let serializer = new DataContractJsonSerializer(typeof<'a>)
     let encoding = System.Text.UTF8Encoding()
@@ -1181,7 +1181,7 @@ What if the deserialization fails? For now, we will ignore any error handling an
 To transform a `TreeDto` into a `Tree` we recursively loop through the record and its subtrees, turning each one into a `InternalNode`
 or a `LeafNode`, based on whether the appropriate field is null or not.
 
-```
+```fsharp
 let rec dtoToTree (treeDto:TreeDto<'Leaf,'Node>) :Tree<'Leaf,'Node> =
     let nullLeaf = Unchecked.defaultof<'Leaf>
     let nullNode = Unchecked.defaultof<'Node>
@@ -1225,7 +1225,7 @@ The code can be grouped as follows:
 * And finally, the `dtoToGift` function itself.  It looks at the `discriminator` field to see which case converter to call,
   and throws an exception if the discriminator value is not recognized.
 
-```
+```fsharp
 let strToBookTitle str =
     match str with
     | null -> failwith "BookTitle must not be null" 
@@ -1293,7 +1293,7 @@ let dtoToGift (giftDto:GiftDto) :Gift=
 
 We can now assemble the pipeline that takes a JSON string and creates a `Gift`.
 
-```
+```fsharp
 let goodGift = goodJson |> fromJson |> dtoToTree |> dtoToGift
 
 // check that the description is unchanged
@@ -1305,7 +1305,7 @@ This works fine, but the error handling is terrible!
 
 Look what happens if we corrupt the JSON a little:
 
-```
+```fsharp
 let badJson1 = goodJson.Replace("leafData","leafDataXX")
 
 let badJson1_result = badJson1 |> fromJson |> dtoToTree |> dtoToGift
@@ -1316,7 +1316,7 @@ We get an ugly exception.
 
 Or what if a discriminator is wrong?
 
-```
+```fsharp
 let badJson2 = goodJson.Replace("Wrapped","Wrapped2")
 
 let badJson2_result = badJson2 |> fromJson |> dtoToTree |> dtoToGift
@@ -1325,7 +1325,7 @@ let badJson2_result = badJson2 |> fromJson |> dtoToTree |> dtoToGift
 
 or one of the values for the WrappingPaperStyle DU?
 
-```
+```fsharp
 let badJson3 = goodJson.Replace("HappyHolidays","HappyHolidays2")
 let badJson3_result = badJson3 |> fromJson |> dtoToTree |> dtoToGift
 // Exception "WrappingPaperStyle HappyHolidays2 not recognized"
@@ -1344,14 +1344,14 @@ How we can do that will be discussed in the next section.
 
 To address the error handling issue, we're going use the `Result` type shown below:
 
-```
+```fsharp
 type Result<'a> = 
     | Success of 'a
     | Failure of string list
 ```
 
 I'm not going to explain how it works here.
-If you are not familar with this approach, please [read my post](../posts/recipe-part2.md) or [watch my talk](http://fsharpforfunandprofit.com/rop/index.md) on the topic of functional error handling.
+If you are not familar with this approach, please [read my post](../posts/recipe-part2.md) or [watch my talk](http://fsharpforfunandprofit.com/rop/) on the topic of functional error handling.
 
 Let's revisit all the steps from the previous section, and use `Result` rather than throwing exceptions.
 
@@ -1359,7 +1359,7 @@ Let's revisit all the steps from the previous section, and use `Result` rather t
 
 When we deserialize the `TreeDto` using a JSON serializer we will trap exceptions and turn them into a `Result`.
 
-```
+```fsharp
 let fromJson<'a> str = 
     try
         let serializer = new DataContractJsonSerializer(typeof<'a>)
@@ -1380,7 +1380,7 @@ The signature of `fromJson` is now `string -> Result<'a>`.
 As before, we transform a `TreeDto` into a `Tree` by recursively looping through the record and its subtrees, turning each one into a `InternalNode`
 or a `LeafNode`. This time, though, we use `Result` to handle any errors.
 
-```
+```fsharp
 let rec dtoToTreeOfResults (treeDto:TreeDto<'Leaf,'Node>) :Tree<Result<'Leaf>,Result<'Node>> =
     let nullLeaf = Unchecked.defaultof<'Leaf>
     let nullNode = Unchecked.defaultof<'Node>
@@ -1426,7 +1426,7 @@ is a mechanical process:
 Here is the actual code -- don't worry if you can't understand it immediately. Luckily, we only need to write it once for each combination
 of types, so for any kind of Tree/Result combination in the future, we're set!
 
-```
+```fsharp
 /// Convert a tree of Results into a Result of tree
 let sequenceTreeOfResult tree =
     // from the lower level
@@ -1452,7 +1452,7 @@ let sequenceTreeOfResult tree =
 Finally, the actual `dtoToTree` function is simple -- just send the `treeDto` through `dtoToTreeOfResults` and then use `sequenceTreeOfResult` to
 convert the final result into a `Result<Tree<..>>`, which is just what we need.
 
-```
+```fsharp
 let dtoToTree treeDto =
     treeDto |> dtoToTreeOfResults |> sequenceTreeOfResult 
     
@@ -1470,7 +1470,7 @@ use `sequenceTreeOfResult` again to get it back into the correct `Result<Tree<..
 Let's start with the helper methods (such as `strToChocolateType`) that convert a string into a proper domain type.
 This time, they return a `Result` rather than throwing an exception.
 
-```
+```fsharp
 let strToBookTitle str =
     match str with
     | null -> Result.failWithMsg "BookTitle must not be null"
@@ -1500,7 +1500,7 @@ The case converter methods have to build a `Book` or `Chocolate` from parameters
 where lifting functions like `Result.lift2` can help.
 For details on how this works, see [this post on lifting](../posts/elevated-world.md#lift) and [this one on validation with applicatives](../posts/elevated-world-3.md#validation).
   
-```
+```fsharp
 let bookFromDto (dto:GiftContentsDto) =
     let book bookTitle price = 
         Book {title=bookTitle; price=price}
@@ -1533,7 +1533,7 @@ And finally, the `dtoToGift` function itself is changed to return a `Result` if 
 
 As before, this mapping creates a Tree of Results, so we pipe the output of the `Tree.map` through `sequenceTreeOfResult` ...
 
-```
+```fsharp
 `Tree.map fLeaf fNode giftDto |> sequenceTreeOfResult`
 ```
 
@@ -1541,7 +1541,7 @@ As before, this mapping creates a Tree of Results, so we pipe the output of the 
 
 Here's the complete code for `dtoToGift`:
 
-```
+```fsharp
 open TreeDto_WithErrorHandling
 
 /// Transform a GiftDto to a Result<Gift>
@@ -1566,7 +1566,7 @@ let dtoToGift (giftDto:GiftDto) :Result<Gift>=
 
 The type signature of `dtoToGift` has changed -- it now returns a `Result<Gift>` rather than just a `Gift`.
 
-```
+```fsharp
 // val dtoToGift : GiftDto -> Result<GiftUsingTree.Gift>
 ```
 
@@ -1584,7 +1584,7 @@ In both case, `Result.bind` can be used to solve that problem of mis-matched out
 
 Ok, let's try deserializing the `goodJson` string we created earlier.
 
-```
+```fsharp
 let goodGift = goodJson |> fromJson |> Result.bind dtoToTree |> Result.bind dtoToGift
 
 // check that the description is unchanged
@@ -1597,7 +1597,7 @@ That's fine.
 Let's see if the error handling has improved now.
 We'll corrupt the JSON again:
 
-```
+```fsharp
 let badJson1 = goodJson.Replace("leafData","leafDataXX")
 
 let badJson1_result = badJson1 |> fromJson |> Result.bind dtoToTree |> Result.bind dtoToGift
@@ -1608,7 +1608,7 @@ Great! We get an nice `Failure` case.
 
 Or what if a discriminator is wrong?
 
-```
+```fsharp
 let badJson2 = goodJson.Replace("Wrapped","Wrapped2")
 let badJson2_result = badJson2 |> fromJson |> Result.bind dtoToTree |> Result.bind dtoToGift
 // Failure ["Unknown node discriminator 'Wrapped2'"]
@@ -1616,7 +1616,7 @@ let badJson2_result = badJson2 |> fromJson |> Result.bind dtoToTree |> Result.bi
 
 or one of the values for the WrappingPaperStyle DU?
 
-```
+```fsharp
 let badJson3 = goodJson.Replace("HappyHolidays","HappyHolidays2")
 let badJson3_result = badJson3 |> fromJson |> Result.bind dtoToTree |> Result.bind dtoToGift
 // Failure ["WrappingPaperStyle HappyHolidays2 not recognized"]
@@ -1629,7 +1629,7 @@ more than one error, the various errors can be aggregated so that we get a list 
 
 Let's see this in action by introducing two errors into the JSON string:
 
-```
+```fsharp
 // create two errors
 let badJson4 = goodJson.Replace("HappyHolidays","HappyHolidays2")
                        .Replace("SeventyPercent","SeventyPercent2")

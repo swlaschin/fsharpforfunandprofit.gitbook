@@ -25,19 +25,19 @@ On this site, I generally don't use any math, but in this case I'm going to brea
 
 Ready? Here's the first one:
 
-```
+```text
 1 + 2 = 3
 ```
 
 Could you handle that? How about another one?
 
-```
+```text
 1 + (2 + 3) = (1 + 2) + 3
 ```
 
 And finally one more...
 
-```
+```text
 1 + 0 = 1 and 0 + 1 = 1
 ```
 
@@ -164,14 +164,14 @@ What about booleans combined using OR? Is there a zero for that as well? I'll le
 
 Moving on, what about string concatenation? Is there a "zero" for this?  Yes, indeed -- it is just the empty string.
 
-```
+```text
 "" + "hello" = "hello"
 "hello" + "" = "hello"
 ```
 
 Finally, for list concatenation, the "zero" is just the empty list.  
 
-```
+```text
 [] @ [1;2;3] = [1;2;3]
 [1;2;3] @ [] = [1;2;3]
 ```
@@ -187,7 +187,7 @@ So now let's revisit the equations with our new generalizations in mind.
 
 Before, we had:
 
-```
+```text
 1 + 2 = 3
 1 + (2 + 3) = (1 + 2) + 3
 1 + 0 = 1 and 0 + 1 = 1
@@ -425,7 +425,7 @@ Replace 'float' with 'real number' to get associativity.
 [<i>can</i> divide by zero](http://stackoverflow.com/questions/14682005/why-does-division-by-zero-in-ieee754-standard-results-in-infinite-value) and get a valid value. So floats are indeed closed under
 division! Here's a demonstration:
 
-```
+```fsharp
 let x = 1.0/0.0 // infinity
 let y = x * 2.0 // two times infinity 
 let z = 2.0 / x // two divided by infinity 
@@ -492,7 +492,7 @@ Consider the task of summing the first 8 integers; how could we implement this?
 
 One way would be a crude step-by-step sum, as follows:
 
-```
+```fsharp
 let sumUpTo2 = 1 + 2
 let sumUpTo3 = sumUpTo2 + 3
 let sumUpTo4 = sumUpTo3 + 4
@@ -502,7 +502,7 @@ let result = sumUpTo7 + 8
 
 But because the sums can be done in any order, we could also implement the requirement by splitting the sum into two halves, like this
 
-```
+```fsharp
 let sum1To4 = 1 + 2 + 3 + 4
 let sum5To8 = 5 + 6 + 7 + 8
 let result = sum1To4 + sum5To8
@@ -510,7 +510,7 @@ let result = sum1To4 + sum5To8
 
 and then we can recursively split the sums into sub-sums in the same way until we get down to the basic pairwise operation:
 
-```
+```fsharp
 let sum1To2 = 1 + 2 
 let sum3To4 = 3 + 4
 let sum1To4 = sum1To2 + sum3To4
@@ -606,7 +606,7 @@ Regarding the first point above, if we are concerned that the list might be empt
 
 Here are `reduce` and `fold` in action:
 
-```
+```fsharp
 // ok
 [1..10] |> List.reduce (+)
 
@@ -624,7 +624,7 @@ Using a "zero" can result in counter-intuitive results sometimes. For example, w
 
 The answer is `1`, not `0` as you might expect!  Here's the code to prove it:
 
-```
+```fsharp
 [1..4] |> List.fold (*) 1  // result is 24
 [] |> List.fold (*) 1      // result is 1
 ```
@@ -635,7 +635,7 @@ To sum up, a monoid is basically a way to describe an aggregation pattern -- we 
 
 Or in F# terms:
 
-```
+```text
 Monoid Aggregation : 'T list -> 'T
 ```
 

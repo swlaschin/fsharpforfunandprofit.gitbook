@@ -26,7 +26,7 @@ Well, there are two possible cases: either the data is valid (the happy path), o
 
 But as before, this would not be a valid function. A function can only have one output, so we must use the `Result` type we defined last time:
 
-```
+```fsharp
 type Result<'TSuccess,'TFailure> = 
     | Success of 'TSuccess
     | Failure of 'TFailure
@@ -38,7 +38,7 @@ And the diagram now looks like this:
 
 To show you how this works in practice, here is an example of what an actual validation function might look like:
 
-```
+```fsharp
 type Request = {name:string; email:string}
 
 let validateInput input =
@@ -49,7 +49,7 @@ let validateInput input =
 
 If you look at the type of the function, the compiler has deduced that it takes a `Request` and spits out a `Result` as output, with a `Request` for the success case and a `string` for the failure case:
 
-```
+```fsharp
 validateInput : Request -> Result<Request,string>
 ```
 
@@ -130,7 +130,7 @@ The answer is simple. We can create an "adapter" function that has a "hole" or "
 
 And here's what the actual code looks like. I'm going to name the adapter function `bind`, which is the standard name for it.
 
-```
+```fsharp
 let bind switchFunction = 
     fun twoTrackInput -> 
         match twoTrackInput with
@@ -142,7 +142,7 @@ The bind function takes a switch function as a parameter and returns a new funct
 
 Compile it and then look at the function signature:
 
-```
+```fsharp
 val bind : ('a -> Result<'b,'c>) -> Result<'a,'c> -> Result<'b,'c>
 ```
 
@@ -164,7 +164,7 @@ Just as an aside, there are some other ways of writing functions like this.
 
 One way is to use an explicit second parameter for the `twoTrackInput` rather than defining an internal function, like this:
 
-```
+```fsharp
 let bind switchFunction twoTrackInput = 
     match twoTrackInput with
     | Success s -> switchFunction s
@@ -175,7 +175,7 @@ This is exactly the same as the first definition. And if you are wondering how a
 
 Yet another way of writing it is to replace the `match..with` syntax with the more concise `function` keyword, like this:
 
-```
+```fsharp
 let bind switchFunction = 
     function
     | Success s -> switchFunction s
@@ -190,7 +190,7 @@ Let's write a little bit of code now, to test the concepts.
 
 Let's start with what we already have defined. `Request`, `Result` and `bind`:
 
-```
+```fsharp
 type Result<'TSuccess,'TFailure> = 
     | Success of 'TSuccess
     | Failure of 'TFailure
@@ -206,7 +206,7 @@ let bind switchFunction twoTrackInput =
 
 Next we'll create three validation functions, each of which is a "switch" function, with the goal of combining them into one bigger function:
 
-```
+```fsharp
 let validate1 input =
    if input.name = "" then Failure "Name must not be blank"
    else Success input
@@ -224,7 +224,7 @@ Now to combine them, we apply `bind` to each validation function to create a new
 
 Then we can connect the two-tracked functions using standard function composition, like this:
 
-```
+```fsharp
 /// glue the three validation functions together
 let combinedValidation = 
     // convert from switch to two-track input
@@ -243,7 +243,7 @@ Here's a diagram showing the `Validate1` switch (unbound) and the `Validate2` an
 
 We could have also "inlined" the `bind`, like this:
 
-```
+```fsharp
 let combinedValidation = 
     // connect the two-tracks together
     validate1 
@@ -254,7 +254,7 @@ let combinedValidation =
 
 Let's test it with two bad inputs and a good input:
 
-```
+```fsharp
 // test 1
 let input1 = {name=""; email=""}
 combinedValidation input1 
@@ -288,7 +288,7 @@ While we are discussing the `bind` function, there is a common symbol for it, `>
 
 Here's the definition, which switches around the two parameters to make them easier to chain together:
 
-```
+```fsharp
 /// create an infix operator
 let (>>=) twoTrackInput switchFunction = 
     bind switchFunction twoTrackInput 
@@ -303,7 +303,7 @@ But in a "bind pipe" operation, the left hand side is a *two-track* value, and t
 
 Here it is in use to create another implementation of the `combinedValidation` function.
 
-```
+```fsharp
 let combinedValidation x = 
     x 
     |> validate1   // normal pipe because validate1 has a one-track input
@@ -316,7 +316,7 @@ The difference between this implementation and the previous one is that this def
 
 In the previous implementation (repeated below), there was no data parameter at all! The focus was on the functions themselves, not the data that flows through them.
 
-```
+```fsharp
 let combinedValidation = 
     validate1 
     >> bind validate2 
@@ -347,7 +347,7 @@ Because each composition results in just another switch, we can always add anoth
 
 Here's the code for switch composition.  The standard symbol used is `>=>`, a bit like the normal composition symbol, but with a railway track between the angles.
 
-```
+```fsharp
 let (>=>) switch1 switch2 x = 
     match switch1 x with
     | Success s -> switch2 s
@@ -358,7 +358,7 @@ Again, the actual implementation is very straightforward. Pass the single track 
 
 Now we can rewrite the `combinedValidation` function to use switch composition rather than bind:
 
-```
+```fsharp
 let combinedValidation = 
     validate1 
     >=> validate2 
@@ -404,7 +404,7 @@ And here's the same thing done by using `bind` on the second switch:
 
 Here's the switch composition operator rewritten using this way of thinking:
 
-```
+```fsharp
 let (>=>) switch1 switch2 = 
     switch1 >> (bind switch2)
 ```
@@ -419,7 +419,7 @@ For example, let's say we have a function that is *not* a switch, just a regular
 
 Here's a real example - say that we want to trim and lowercase the email address after the validation is complete. Here's some code to do this:
 
-```
+```fsharp
 let canonicalizeEmail input =
    { input with email = input.email.Trim().ToLower() }
 ```
@@ -436,7 +436,7 @@ In other words, we need an adapter block. It the same concept that we used for `
 
 The code to do this is trivial. All we need to do is take the output of the one track function and turn it into a two-track result. In this case, the result will *always* be Success.
 
-```
+```fsharp
 // convert a normal function into a switch
 let switch f x = 
     f x |> Success
@@ -449,7 +449,7 @@ but of course, the failure track is just a dummy and the switch never actually g
 
 Once `switch` is available, we can easily append the `canonicalizeEmail` function to the end of the chain. Since we are beginning to extend it, let's rename the function to `usecase`. 
 
-```
+```fsharp
 let usecase = 
     validate1 
     >=> validate2 
@@ -459,7 +459,7 @@ let usecase =
 
 Try testing it to see what happens:
 
-```
+```fsharp
 let goodInput = {name="Alice"; email="UPPERCASE   "}
 usecase goodInput
 |> printfn "Canonicalize Good Result = %A"
@@ -489,7 +489,7 @@ And again, the actual implementation is very straightforward. If the two-track i
 
 Here's the code:
 
-```
+```fsharp
 // convert a normal function into a two-track function
 let map oneTrackFunction twoTrackInput = 
     match twoTrackInput with
@@ -499,7 +499,7 @@ let map oneTrackFunction twoTrackInput =
 
 And here it is in use with `canonicalizeEmail`:
 
-```
+```fsharp
 let usecase = 
     validate1 
     >=> validate2 
@@ -535,7 +535,7 @@ To make this work, we need another adapter function, like `switch`, except that 
 
 Here's the code, which I will call `tee`, after the UNIX tee command:
 
-```
+```fsharp
 let tee f x = 
     f x |> ignore
     x
@@ -546,7 +546,7 @@ Once we have converted the dead-end function to a simple one-track pass through 
 
 Here's the code in use with the "switch composition" style:
 
-```
+```fsharp
 // a dead-end function    
 let updateDatabase input =
    ()   // dummy dead-end function for now
@@ -563,7 +563,7 @@ Or alternatively, rather than using `switch` and then connecting with `>=>`, we 
 
 Here's a variant implementation which is exactly the same but uses the "two-track" style with normal composition
 
-```
+```fsharp
 let usecase = 
     validate1 
     >> bind validate2 
@@ -578,7 +578,7 @@ Our dead end database update might not return anything, but that doesn't mean th
 
 The code is similar to the `switch` function, except that it catches exceptions. I'll call it `tryCatch`:
 
-```
+```fsharp
 let tryCatch f x =
     try
         f x |> Success
@@ -588,7 +588,7 @@ let tryCatch f x =
 
 And here is a modified version of the data flow, using `tryCatch` rather than `switch` for the update database code.
 
-```
+```fsharp
 let usecase = 
     validate1 
     >=> validate2 
@@ -609,7 +609,7 @@ As we have done previously, we will create an adapter block, but this time it wi
 
 Here's the code:
 
-```
+```fsharp
 let doubleMap successFunc failureFunc twoTrackInput =
     match twoTrackInput with
     | Success s -> Success (successFunc s)
@@ -618,14 +618,14 @@ let doubleMap successFunc failureFunc twoTrackInput =
 
 As an aside, we can use this function to create a simpler version of `map`, using `id` for the failure function:
 
-```
+```fsharp
 let map successFunc =
     doubleMap successFunc id
 ```
 
 Let's use `doubleMap` to insert some logging into the data flow:
 
-```
+```fsharp
 let log twoTrackInput = 
     let success x = printfn "DEBUG. Success so far: %A" x; x
     let failure x = printfn "ERROR. %A" x; x
@@ -642,7 +642,7 @@ let usecase =
 
 Here's some test code, with the results:
 
-```
+```fsharp
 let goodInput = {name="Alice"; email="good"}
 usecase goodInput
 |> printfn "Good Result = %A"
@@ -663,7 +663,7 @@ usecase badInput
 
 For completeness, we should also create simple functions that turn a single simple value into a two-track value, either success or failure.
 
-```
+```fsharp
 let succeed x = 
     Success x
 
@@ -691,7 +691,7 @@ So, what is the logic for adding two switches in parallel?
 
 Here's the function, which I will call `plus`:
 
-```
+```fsharp
 let plus switch1 switch2 x = 
     match (switch1 x),(switch2 x) with
     | Success s1,Success s2 -> Success (s1 + s2)
@@ -708,7 +708,7 @@ The method of combining values might change in different contexts, so rather tha
 
 Here's a rewritten version:
 
-```
+```fsharp
 let plus addSuccess addFailure switch1 switch2 x = 
     match (switch1 x),(switch2 x) with
     | Success s1,Success s2 -> Success (addSuccess s1 s2)
@@ -730,7 +730,7 @@ For validation then, the "plus" operation that we want is like an "AND" function
 
 That naturally leads to wanting to use `&&` as the operator symbol. Unfortunately, `&&` is reserved, but we can use `&&&`, like this: 
 
-```
+```fsharp
 // create a "plus" function for validation functions
 let (&&&) v1 v2 = 
     let addSuccess r1 r2 = r1 // return first
@@ -740,7 +740,7 @@ let (&&&) v1 v2 =
 
 And now using `&&&`, we can create a single validation function that combines the three smaller validations:
 
-```
+```fsharp
 let combinedValidation = 
     validate1 
     &&& validate2 
@@ -749,7 +749,7 @@ let combinedValidation =
 
 Now let's try it with the same tests we had earlier:
 
-```
+```fsharp
 // test 1
 let input1 = {name=""; email=""}
 combinedValidation input1 
@@ -773,7 +773,7 @@ The first test now has *two* validation errors combined into a single string, ju
 
 Next, we can tidy up the main dataflow function by using the `usecase` function now instead of the three separate validation functions we had before:
 
-```
+```fsharp
 let usecase = 
     combinedValidation
     >=> switch canonicalizeEmail
@@ -782,7 +782,7 @@ let usecase =
 
 And if we test that now, we can see that a success flows all the way to the end and that the email is lowercased and trimmed:
 
-```
+```fsharp
 // test 4
 let input4 = {name="Alice"; email="UPPERCASE   "}
 usecase input4
@@ -800,14 +800,14 @@ The simplest way to do this is to create a two-track function to be injected int
 
 Here's the idea:
 
-```
+```fsharp
 let injectableFunction = 
     if config.debug then debugLogger else id
 ```
 
 Let's try it with some real code:
 
-```
+```fsharp
 type Config = {debug:bool}
 
 let debugLogger twoTrackInput = 
@@ -826,7 +826,7 @@ let usecase config =
 
 And here is it in use:
 
-```
+```fsharp
 let input = {name="Alice"; email="good"}
 
 let releaseConfig = {debug=false}
@@ -948,7 +948,7 @@ I have made some minor tweaks from the original code presented above:
 * Most functions are now defined in terms of a core function called `either`.
 * `tryCatch` has been given an extra parameter for the exception handler.
 
-```
+```fsharp
 // the two-track type
 type Result<'TSuccess,'TFailure> = 
     | Success of 'TSuccess
@@ -1048,7 +1048,7 @@ But there is another, more subtle aspect of generic functions that is worth poin
 
 To see what I mean, let's look at the signature for `map`:
 
-```
+```fsharp
 val map : ('a -> 'b) -> (Result<'a,'c> -> Result<'b,'c>)
 ```
 
@@ -1072,7 +1072,7 @@ In other words, there is basically *only one way to implement the `map` function
 
 On the other hand, imagine that the `map` function had been very specific about the types it needed, like this:
 
-```
+```fsharp
 val map : (int -> int) -> (Result<int,int> -> Result<int,int>)
 ```
 
@@ -1111,7 +1111,7 @@ These guidelines may result in code that is not particularly concise or elegant,
 
 So with these guidelines, here are the main bits of the implementation so far. Note especially the use of `>>` everywhere in the final `usecase` function.
 
-```
+```fsharp
 open RailwayCombinatorModule 
 
 let (&&&) v1 v2 = 

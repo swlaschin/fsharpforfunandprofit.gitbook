@@ -9,7 +9,7 @@ seriesOrder: 3
 
 Let's look at the simple function again
 
-```
+```fsharp
 let add1 x = x + 1
 ```
 
@@ -22,7 +22,7 @@ This process of using a name to represent a value is called "binding". The name 
 
 So if we evaluate the function with the input 5 say, what is happening is that everywhere we see "x" in the original definition, we replace it with "5", sort of like search and replace in a word processor. 
 
-```
+```fsharp
 let add1 x = x + 1
 add1 5
 // replace "x" with "5"
@@ -42,7 +42,7 @@ When you type `let add1 x = x + 1` you are telling the F# compiler "every time y
 
 To see that the function is independent of its name, try:
 
-```
+```fsharp
 let add1 x = x + 1
 let plus1 = add1
 add1 5
@@ -53,7 +53,7 @@ You can see that "`add1`" and "`plus1`" are two names that refer ("bound to") to
 
 You can always identify a function value because its signature has the standard form `domain -> range`. Here is a generic function value signature:
 
-```
+```fsharp
 val functionName : domain -> range
 ```
 
@@ -67,13 +67,13 @@ This would be a "constant" operation.
 
 How would we write this in F#?  We want to tell the F# compiler "every time you see the name `c`, replace it with 5". Here's how:
 
-```
+```fsharp
 let c = 5
 ```
 
 which when evaluated, returns:
 
-```
+```fsharp
 val c : int = 5
 ```
 
@@ -83,7 +83,7 @@ In other words, we've just defined a constant, or in F# terms, a simple value.
 
 You can always tell a simple value from a function value because all simple values have a signature that looks like:
 
-```
+```fsharp
 val aName: type = constant     // Note that there is no arrow
 ```
 
@@ -93,7 +93,7 @@ It is important to understand that in F#, unlike languages such as C#, there is 
 
 Note that there is a subtle difference between a simple value and a function value. A function always has a domain and range and must be "applied" to an argument to get a result. A simple value does not need to be evaluated after being bound. Using the example above, if we wanted to define a "constant function" that returns five we would have to use 
 
-```
+```fsharp
 let c = fun()->5    
 // or
 let c() = 5
@@ -101,13 +101,13 @@ let c() = 5
 
 The signature for these functions is:
 
-```
+```fsharp
 val c : unit -> int
 ```
 
 instead of:
 
-```
+```fsharp
 val c : int = 5
 ```
 
@@ -123,7 +123,7 @@ An object, in a standard definition, is an encapsulation of a data structure wit
 
 In F#, even the primitive values have some object-like behavior. For example, you can dot into a string to get its length:
 
-```
+```fsharp
 "abc".Length
 ```
 
@@ -135,13 +135,13 @@ Standard naming rules are used for value and function names, basically, any alph
 
 You can put an apostrophe anywhere in a name, except the first character. So: 
 
-```
+```fsharp
 A'b'c     begin'  // valid names
 ```
 
 The final tick is often used to signal some sort of "variant" version of a value:
 
-```
+```fsharp
 let f = x
 let f' = derivative f
 let f'' = derivative f'
@@ -149,13 +149,13 @@ let f'' = derivative f'
 
 or define variants of existing keywords
 
-```
+```fsharp
 let if' b t f = if b then t else f
 ```
 
 You can also put double backticks around any string to make a valid identifier.
 
-```
+```fsharp
 ``this is a name``  ``123``    //valid names
 ```
 
@@ -163,13 +163,13 @@ You might want to use the double backtick trick sometimes:
 
 * When you want to  use an identifier that is the same as a keyword 
 
-```
+```fsharp
 let ``begin`` = "begin"
 ```
 
 * When trying to use natural language for business rules, unit tests, or BDD style executable specifications a la Cucumber. 
 
-```
+```fsharp
 let ``is first time customer?`` = true
 let ``add gift to order`` = ()
 if ``is first time customer?`` then ``add gift to order``

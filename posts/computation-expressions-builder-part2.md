@@ -13,7 +13,7 @@ In this post we're going to look at returning multiple values from a computation
 
 So far, our expression builder class looks like this:
 
-```
+```fsharp
 type TraceBuilder() =
     member this.Bind(m, f) = 
         match m with 
@@ -55,7 +55,7 @@ Previously, we saw how `yield` could be used to return values just like `return`
 
 Normally, `yield` is not used just once, of course, but multiple times in order to return values at different stages of a process such as an enumeration. So let's try that:
 
-```
+```fsharp
 trace { 
     yield 1
     yield 2
@@ -64,13 +64,13 @@ trace {
 
 But uh-oh, we get an error message:
 
-```
+```text
 This control construct may only be used if the computation expression builder defines a 'Combine' method.
 ```
 
 And if you use `return` instead of `yield`, you get the same error.
 
-```
+```fsharp
 trace { 
     return 1
     return 2
@@ -79,7 +79,7 @@ trace {
 
 And this problem occurs in other contexts too.  For example, if we want to do something and then return, like this:
 
-```
+```fsharp
 trace { 
     if true then printfn "hello" 
     return 1
@@ -94,7 +94,7 @@ So what's going on here?
 
 To understand, let's go back to the behind-the-scenes view of the computation expression. We have seen that `return` and `yield` are really just the last step in a series of continuations, like this:
 
-```
+```fsharp
 Bind(1,fun x -> 
    Bind(2,fun y -> 
      Bind(x + y,fun z -> 
@@ -103,7 +103,7 @@ Bind(1,fun x ->
 
 You can think of `return` (or `yield`) as "resetting" the indentation, if you like. So when we `return/yield` and then `return/yield` again, we are generating code like this: 
 
-```
+```fsharp
 Bind(1,fun x -> 
    Bind(2,fun y -> 
      Bind(x + y,fun z -> 
@@ -117,7 +117,7 @@ Bind(3,fun w ->
 
 But really this can be simplified to:
 
-```
+```fsharp
 let value1 = some expression 
 let value2 = some other expression 
 ```
@@ -134,7 +134,7 @@ The answer is by using the `Combine` method, which takes two *wrapped* values an
 
 In our case, we are dealing specifically with `int options`, so one simple implementation that leaps to mind it just to add the numbers together. Each parameter is an `option` of course (the wrapped type), so we need to pick them apart and handle the four possible cases:
 
-```
+```fsharp
 type TraceBuilder() =
     // other members as before
 
@@ -159,7 +159,7 @@ let trace = new TraceBuilder()
 
 Running the test code again:
 
-```
+```fsharp
 trace { 
     yield 1
     yield 2
@@ -168,13 +168,13 @@ trace {
 
 But now we get a different error message:
 
-```
+```text
 This control construct may only be used if the computation expression builder defines a 'Delay' method
 ```
 
 The `Delay` method is a hook that allows you to delay evaluation of a computation expression until needed -- we'll discuss this in detail very soon; but for now, let's create a default implementation:
 
-```
+```fsharp
 type TraceBuilder() =
     // other members as before
 
@@ -188,7 +188,7 @@ let trace = new TraceBuilder()
 
 Running the test code again:
 
-```
+```fsharp
 trace { 
     yield 1
     yield 2
@@ -197,7 +197,7 @@ trace {
 
 And finally we get the code to complete. 
 
-```
+```text
 Delay
 Yield an unwrapped 1 as an option
 Delay
@@ -210,7 +210,7 @@ The result of the entire workflow is the sum of all the yields, namely `Some 3`.
 
 If we have a "failure" in the workflow (e.g. a `None`), the second yield doesn't occur and the overall result is `Some 1` instead.
 
-```
+```fsharp
 trace { 
     yield 1
     let! x = None
@@ -220,7 +220,7 @@ trace {
 
 We can have three `yields` rather than two:
 
-```
+```fsharp
 trace { 
     yield 1
     yield 2
@@ -232,7 +232,7 @@ The result is what you would expect, `Some 6`.
         
 We can even try mixing up `yield` and `return` together. Other than the syntax difference, the overall effect is the same.
 
-```
+```fsharp
 trace { 
     yield 1
     return 2
@@ -255,7 +255,7 @@ No, `yield` is naturally used as part of sequence generation, and now that we un
 
 Here's the full class:
 
-```
+```fsharp
 type ListBuilder() =
     member this.Bind(m, f) = 
         m |> List.collect f
@@ -290,7 +290,7 @@ let listbuilder = new ListBuilder()
 
 And here it is in use:
 
-```
+```fsharp
 listbuilder { 
     yield 1
     yield 2
@@ -304,7 +304,7 @@ listbuilder {
 
 And here's a more complicated example with a `for` loop and some `yield`s.
 
-```
+```fsharp
 listbuilder { 
     for i in ["red";"blue"] do
         yield i
@@ -315,7 +315,7 @@ listbuilder {
 
 And the result is:
 
-```
+```text
 ["red"; "red hat"; "-"; "red tie"; "-"; "blue"; "blue hat"; "-"; "blue tie"; "-"]    
 ```
 
@@ -330,7 +330,7 @@ As you can see from the example above, you can use `yield` in creative ways to g
 
 The `Combine` method only has two parameters.  So what happens when you combine more than two values? For example, here are four values to combine:
 
-```
+```fsharp
 listbuilder { 
     yield 1
     yield 2
@@ -341,7 +341,7 @@ listbuilder {
 
 If you look at the output you can see that the values are combined pair-wise, as you might expect.  
 
-```
+```text
 combining [3] and [4]
 combining [2] and [3; 4]
 combining [1] and [2; 3; 4]
@@ -356,7 +356,7 @@ A subtle but important point is that they are combined "backwards", starting fro
 
 In the second of our earlier problematic examples, we didn't have a sequence; we just had two separate expressions in a row.
 
-```
+```fsharp
 trace { 
     if true then printfn "hello"  //expression 1
     return 1                      //expression 2
@@ -378,7 +378,7 @@ In this case, we also generally use the "failure" value for `Zero`.
 
 This approach is useful for chaining together a series of "or else" expressions where the first success "wins" and becomes the overall result.  
 
-```
+```text
 if (do first expression)
 or else (do second expression)
 or else (do third expression)
@@ -386,7 +386,7 @@ or else (do third expression)
 
 For example, for the `maybe` workflow, it is common to return the first expression if it is `Some`, but otherwise the second expression, like this:
 
-```
+```fsharp
 type TraceBuilder() =
     // other members as before
     
@@ -408,7 +408,7 @@ let trace = new TraceBuilder()
 
 Let's try a parsing example with this implementation:
 
-```
+```fsharp
 type IntOrBool = I of int | B of bool
 
 let parseInt s = 
@@ -429,7 +429,7 @@ trace {
 
 We get the following result:
 
-```
+```text
 Some (I 42)
 ```
 
@@ -439,7 +439,7 @@ You can see that the first `return!` expression is `None`, and ignored. So the o
 
 In this example, we'll try looking up the same key in a number of dictionaries, and return when we find a value:
 
-```
+```fsharp
 let map1 = [ ("1","One"); ("2","Two") ] |> Map.ofList
 let map2 = [ ("A","Alice"); ("B","Bob") ] |> Map.ofList
 
@@ -451,7 +451,7 @@ trace {
 
 We get the following result:
 
-```
+```text
 Result for map lookup: Some "Alice"
 ```
 
@@ -465,7 +465,7 @@ If the workflow has the concept of sequential steps, then the overall result is 
 
 In normal F#, this would be written:
 
-```
+```text
 do some expression
 do some other expression 
 final expression
@@ -473,7 +473,7 @@ final expression
 
 Or using the semicolon syntax, just:
 
-```
+```text
 some expression; some other expression; final expression
 ```
 
@@ -483,7 +483,7 @@ The equivalent approach for a computation expression is to treat each expression
 
 This is exactly what bind does, of course, and so the easiest implementation is just to reuse the `Bind` method itself. Also, for this approach to work it is important that `Zero` is the wrapped unit value.
 
-```
+```fsharp
 type TraceBuilder() =
     // other members as before
 
@@ -503,7 +503,7 @@ The difference from a normal bind is that the continuation has a unit parameter,
 
 Here's an example of sequential processing that works with this implementation of `Combine`:
 
-```
+```fsharp
 trace { 
     if true then printfn "hello......."
     if false then printfn ".......world"
@@ -513,7 +513,7 @@ trace {
 
 Here's the following trace. Note that the result of the whole expression was the result of the last expression in the sequence, just like normal F# code.
 
-```
+```text
 hello.......
 Zero
 Returning a unwrapped <null> as an option
@@ -563,7 +563,7 @@ As with all the builder methods, if you don't need them, you don't need to imple
 
 Here's an example of a minimal implementation that works:
 
-```
+```fsharp
 type TraceBuilder() =
 
     member this.ReturnFrom(x) = x
@@ -581,7 +581,7 @@ let trace = new TraceBuilder()
 
 And here it is in use:
 
-```
+```fsharp
 trace { 
     if true then printfn "hello......."
     if false then printfn ".......world"
@@ -591,7 +591,7 @@ trace {
 
 Similarly, if you have a data-structure oriented workflow, you could just implement `Combine` and some other helpers. For example, here is a minimal implementation of our list builder class:
 
-```
+```fsharp
 type ListBuilder() =
 
     member this.Yield(x) = [x]
@@ -610,7 +610,7 @@ let listbuilder = new ListBuilder()
 
 And even with the minimal implementation, we can write code like this:
 
-```
+```fsharp
 listbuilder { 
     yield 1
     yield 2
@@ -634,7 +634,7 @@ one fails) that we used earlier for options is sometimes written as `<++`.
 
 So here is an example of a standalone left-biased combination of options, as used in a dictionary lookup example.
 
-```
+```fsharp
 module StandaloneCombine = 
 
     let combine a b = 

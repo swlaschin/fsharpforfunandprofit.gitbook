@@ -19,7 +19,7 @@ To do this, you use the syntax `new MyInterface with ...`, and the wrap the whol
 
 Here is some example code that creates a number of objects, each of which implements `IDisposable`.
 
-```
+```fsharp
 // create a new object that implements IDisposable
 let makeResource name = 
    { new System.IDisposable 
@@ -55,7 +55,7 @@ first resource disposed
 
 We can take the same approach with the `IAddingService` and create one on the fly as well.
 
-```
+```fsharp
 let makeAdder id = 
    { new IAddingService with 
      member this.Add x y =

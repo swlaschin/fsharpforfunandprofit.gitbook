@@ -87,7 +87,7 @@ Let's start off by looking at the following code.
 
 The question I would ask you is simple: What is the value of `y`?
 
-```
+```csharp
 var x = 2;
 DoSomething(x);
 
@@ -112,7 +112,7 @@ Trick question!  This code is actually JavaScript!
 
 Here's the whole thing:
 
-```
+```csharp
 function DoSomething (foo) { x = false}
 
 var x = 2;
@@ -155,7 +155,7 @@ In this next example, we're going to create two instances of the same `Customer`
 
 The question is: Are they equal?
 
-```
+```csharp
 // create two customers
 var cust1 = new Customer(99, "J Smith");
 var cust2 = new Customer(99, "J Smith");
@@ -171,7 +171,7 @@ cust1.Equals(cust2);
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 
-```
+```csharp
 // true or false?
 cust1.Equals(cust2);
 ```
@@ -207,7 +207,7 @@ In this next example, I've got two objects containing exactly the same data, but
 
 The question again is: Are they equal?
 
-```
+```csharp
 // create a customer and an order
 var cust = new Customer(99, "J Smith");
 var order = new Order(99, "J Smith");
@@ -223,7 +223,7 @@ cust.Equals(order);
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 
-```
+```csharp
 // true or false?
 cust.Equals(order);
 ```
@@ -255,7 +255,7 @@ But what is the cost of this feature? You get the ability to compare subclasses,
 
 In this snippet, we're just going to create a `Customer` instance. That's all. Can't get much more basic than that.
 
-```
+```csharp
 // create a customer
 var cust = new Customer();
 
@@ -273,7 +273,7 @@ Now the question is: what is the expected output of `WriteLine`?
 
 
 
-```
+```csharp
 // what is the expected output?
 Console.WriteLine(cust.Address.Country);
 ```
@@ -310,7 +310,7 @@ In this next example, we're going to:
 
 What could possibly go wrong?
 
-```
+```csharp
 // create a customer
 var cust = new Customer(99, "J Smith");
 
@@ -334,7 +334,7 @@ So, does the set still contain the customer at the end of this code?
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 
-```
+```csharp
 // Does the set contain the customer?
 processedCustomers.Contains(cust);
 ```
@@ -358,7 +358,7 @@ Better to just make the entire `Customer` class immutable instead!
 
 Now if the `Customer` class was immutable, and `ProcessCustomer` wanted to make changes, it would have to return a *new version* of the customer, and the code would look like this:
 
-```
+```csharp
 // create a customer
 var cust = new ImmutableCustomer(99, "J Smith");
 
@@ -375,7 +375,7 @@ processedCustomers.Contains(cust);
 
 Notice that the `ProcessCustomer` line has changed to:
 
-```
+```csharp
 var changedCustomer = ProcessCustomer(cust);
 ```
 
@@ -413,7 +413,7 @@ Almost done now -- just one more!
 
 In this final example, we'll try to fetch a customer from a `CustomerRepository`.
 
-```
+```csharp
 // create a repository
 var repo = new CustomerRepository();
 
@@ -433,7 +433,7 @@ The question is: after we do `customer = repo.GetById(42)`, what is the value of
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 
-```
+```csharp
 var customer = repo.GetById(42);
 
 // what is the expected output?
@@ -456,7 +456,7 @@ But now imagine that your language did not allow `null` and did not allow except
 
 The answer is, you would be forced to return a special class that might contain *either* a customer *or* an error, like this:
 
-```
+```csharp
 // create a repository
 var repo = new CustomerRepository();
 
@@ -467,7 +467,7 @@ var customerOrError = repo.GetById(42);
 
 The code that processed this "customerOrError" result would then have to test what kind of result it was, and handle each case separately, like this:
 
-```
+```csharp
 // handle both cases
 if (customerOrError.IsCustomer)
     Console.WriteLine(customerOrError.Customer.Id);

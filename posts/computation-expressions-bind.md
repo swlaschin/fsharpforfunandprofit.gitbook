@@ -18,7 +18,7 @@ The [MSDN page on computation expressions](http://msdn.microsoft.com/en-us/libra
 
 Here's the `let!` expression documentation, along with a real example:
 
-```
+```fsharp
 // documentation
 {| let! pattern = expr in cexpr |}
 
@@ -28,7 +28,7 @@ let! x = 43 in some expression
 
 And here's the `Bind` method documentation, along with a real example:
 
-```
+```fsharp
 // documentation
 builder.Bind(expr, (fun pattern -> {| cexpr |}))
 
@@ -44,7 +44,7 @@ Notice a few interesting things about this:
 
 So in other words, if we chain a number of `let!` expressions together like this:
 
-```
+```fsharp
 let! x = 1
 let! y = 2
 let! z = x + y
@@ -52,7 +52,7 @@ let! z = x + y
 
 the compiler converts it to calls to `Bind`, like this:
 
-```
+```fsharp
 Bind(1, fun x ->
 Bind(2, fun y ->
 Bind(x + y, fun z ->
@@ -75,7 +75,7 @@ So when you think of `bind` this this way, you can see that it is similar to pip
 
 In fact, you can turn it into an infix operation like this:
 
-```
+```fsharp
 let (>>=) m f = pipeInto(m,f)
 ```
 
@@ -83,7 +83,7 @@ let (>>=) m f = pipeInto(m,f)
 
 Going back to the safe divide example, we can now write the workflow on one line, like this:
 
-```
+```fsharp
 let divideByWorkflow x y w z = 
     x |> divideBy y >>= divideBy w >>= divideBy z 
 ```
@@ -102,7 +102,7 @@ In the particular case of the `bind` for safe divide, the wrapper type is `Optio
 
 To see bind used in a different context, here is an example of the logging workflow expressed using a infix bind function:
 
-```
+```fsharp
 let (>>=) m f = 
     printfn "expression is %A" m
     f m
@@ -124,7 +124,7 @@ A particularly useful one is `Option.bind`, which does exactly what we wrote by 
 
 Here was our hand-crafted function:
 
-```
+```fsharp
 let pipeInto (m,f) =
    match m with
    | None -> 
@@ -135,7 +135,7 @@ let pipeInto (m,f) =
 
 And here is the implementation of `Option.bind`:
 
-```
+```fsharp
 module Option = 
     let bind f m =
        match m with
@@ -149,7 +149,7 @@ There is a moral in this -- don't be too hasty to write your own functions. Ther
 
 Here is the "maybe" workflow, rewritten to use `Option.bind`:
 
-```
+```fsharp
 type MaybeBuilder() =
     member this.Bind(m, f) = Option.bind f m
     member this.Return(x) = Some x
@@ -164,7 +164,7 @@ We've used four different approaches for the "safe divide" example so far. Let's
 
 First the original version, using an explicit workflow:
 
-```
+```fsharp
 module DivideByExplicit = 
 
     let divideBy bottom top =
@@ -194,7 +194,7 @@ module DivideByExplicit =
 
 Next, using our own version of "bind"  (a.k.a. "pipeInto")      
 
-```
+```fsharp
 module DivideByWithBindFunction = 
 
     let divideBy bottom top =
@@ -221,7 +221,7 @@ module DivideByWithBindFunction =
 
 Next, using a computation expression:
 
-```
+```fsharp
 module DivideByWithCompExpr = 
 
     let divideBy bottom top =
@@ -251,7 +251,7 @@ module DivideByWithCompExpr =
 
 And finally, using bind as an infix operation:
 
-```
+```fsharp
 module DivideByWithBindOperator = 
 
     let divideBy bottom top =
@@ -283,13 +283,13 @@ Here is a little exercise for you.
 
 First, create a function that parses a string into a int:
 
-```
+```fsharp
 let strToInt str = ???
 ```
 
 and then create your own computation expression builder class so that you can use it in a workflow, as shown below.
 
-```
+```fsharp
 let stringAddWorkflow x y z = 
     yourWorkflow 
         {
@@ -308,14 +308,14 @@ let bad = stringAddWorkflow "12" "xyz" "2"
 
 Once you have the first part working, extend the idea by adding two more functions:
 
-```
+```fsharp
 let strAdd str i = ???
 let (>>=) m f = ???
 ```
 
 And then with these functions, you should be able to write code like this:
 
-```
+```fsharp
 let good = strToInt "1" >>= strAdd "2" >>= strAdd "3"
 let bad = strToInt "1" >>= strAdd "xyz" >>= strAdd "3"
 ```

@@ -47,7 +47,7 @@ So for example, if the param is the wildcard `_`, it will always match, and if f
     
 Looking at the following example:
 
-```
+```fsharp
 let x = 
     match 1 with 
     | 1 -> "a"
@@ -65,7 +65,7 @@ So, the `1` pattern gets tried first, then then the `2` pattern, and finally, th
     
 On the other hand, if we changed the order to put the wildcard first, it would be tried first and always win immediately:
 
-```
+```fsharp
 let x = 
     match 1 with 
     | _ -> "z" 
@@ -87,7 +87,7 @@ The [post on F# syntax](../posts/fsharp-syntax) gives an overview of how alignme
 
 This guideline is straightforward.
 
-```
+```fsharp
 let f x =   match x with 
             // aligned
             | 1 -> "pattern 1" 
@@ -102,7 +102,7 @@ let f x =   match x with
 
 The `match..with` can be on the same line or a new line, but using a new line keeps the indenting consistent, independent of the lengths of the names:
 
-```
+```fsharp
                                               // ugly alignment!  
 let myVeryLongNameForAFunction myParameter =  match myParameter with 
                                               | 1 -> "something" 
@@ -120,7 +120,7 @@ let myVeryLongNameForAFunction myParameter =
 Again, the result expression can be on the same line as the arrow, but using a new line again keeps the indenting consistent and helps to
 separate the match pattern from the result expression.
 
-```
+```fsharp
 let f x =  
     match x with 
     | "a very long pattern that breaks up the flow" -> "something" 
@@ -136,7 +136,7 @@ let f x =
 
 Of course, when all the patterns are very compact, a common sense exception can be made:
 
-```
+```fsharp
 let f list =  
     match list with 
     | [] -> "something" 
@@ -150,7 +150,7 @@ It is important to realize that `match..with` is not really a "control flow" con
 
 One consequence of it being an expression is that all branches *must* evaluate to the *same* type -- we have already seen this same behavior with if-then-else expressions and for loops.
 
-```
+```fsharp
 let x = 
     match 1 with 
     | 1 -> 42
@@ -166,7 +166,7 @@ Since they are normal expressions, match expressions can appear anywhere an expr
 
 For example, here's a nested match expression:
 
-```
+```fsharp
 // nested match..withs are ok
 let f aValue = 
     match aValue with 
@@ -177,7 +177,7 @@ let f aValue =
 
 And here's a match expression embedded in a lambda:
 
-```
+```fsharp
 [2..10]
 |> List.map (fun i ->
         match i with 
@@ -196,7 +196,7 @@ That is, the valuable concept of "exhaustive matching" comes from the "everythin
 
 Here's an example of an incomplete match:
 
-```
+```fsharp
 let x = 
     match 42 with 
     | 1 -> "a"
@@ -215,7 +215,7 @@ In this case, you may need to add an extra case just to keep the compiler happy.
 
 One way to guarantee that you always match all cases is to put the wildcard parameter as the last match:
 
-```
+```fsharp
 let x = 
     match 42 with 
     | 1 -> "a"
@@ -229,7 +229,7 @@ But if you want to get the full benefits of exhaustive pattern matching, I would
 and try to match all the cases explicitly if you can.  This is particularly true if you are matching on
 the cases of a union type:
 
-```
+```fsharp
 type Choices = A | B | C
 let x = 
     match A with 
@@ -243,7 +243,7 @@ By being always explicit in this way, you can trap any error caused by adding a 
 
 If you can't have *every* case be explicit, you might try to document your boundary conditions as much as possible, and assert an runtime error for the wildcard case.
 
-```
+```fsharp
 let x = 
     match -1 with 
     | 1 -> "a"
@@ -264,7 +264,7 @@ For more details on the various patterns, see the [MSDN documentation](http://ms
 
 The most basic pattern is to bind to a value as part of the match:
 
-```
+```fsharp
 let y = 
     match (1,0) with 
     // binding to a named value
@@ -275,7 +275,7 @@ let y =
 
 It is important to note that the values that are bound *must* be distinct for each pattern. So you can't do something like this:
 
-```
+```fsharp
 let elementsAreEqual aTuple = 
     match aTuple with 
     | (x,x) -> 
@@ -286,7 +286,7 @@ let elementsAreEqual aTuple =
 
 Instead, you have to do something like this:
 
-```
+```fsharp
 let elementsAreEqual aTuple = 
     match aTuple with 
     | (x,y) -> 
@@ -300,7 +300,7 @@ This second option can also be rewritten using "guards" (`when` clauses) instead
 
 You can combine multiple patterns on one line, with OR logic and AND logic:
 
-```
+```fsharp
 let y = 
     match (1,0) with 
     // OR  -- same as multiple cases on one line
@@ -313,7 +313,7 @@ let y =
 
 The OR logic is particularly common when matching a large number of union cases:
 
-```
+```fsharp
 type Choices = A | B | C | D
 let x = 
     match A with 
@@ -326,7 +326,7 @@ let x =
 
 Lists can be matched explicitly in the form `[x;y;z]` or in the "cons" form `head::tail`:
 
-```
+```fsharp
 let y = 
     match [1;2;3] with 
     // binding to explicit positions
@@ -350,7 +350,7 @@ Of these patterns, the most common one is the "cons" pattern, often used in conj
 
 Here are some examples of looping through lists using recursion:
 
-```
+```fsharp
 // loop through a list and print the values
 let rec loopAndPrint aList = 
     match aList with 
@@ -393,7 +393,7 @@ The second example shows how we can carry state from one iteration of the loop t
 
 Pattern matching is available for all the built-in F# types.  More details in the [series on types](../posts/overview-of-types-in-fsharp).
 
-```
+```fsharp
 // -----------------------
 // Tuple pattern matching
 let aTuple = (1,2)
@@ -424,7 +424,7 @@ match intOrBool with
 
 Sometimes you want to match the individual components of the value *and* also the whole thing. You can use the `as` keyword for this.
 
-```
+```fsharp
 let y = 
     match (1,0) with 
     // binding to three values
@@ -438,7 +438,7 @@ let y =
 
 You can match on subtypes, using the `:?` operator, which gives you a crude polymorphism:
 
-```
+```fsharp
 let x = new Object()
 let y = 
     match x with 
@@ -454,7 +454,7 @@ This only works to find subclasses of a parent class (in this case, Object). The
 
 Note that in some cases, you may need to "box" the value.
 
-```
+```fsharp
 let detectType v =
     match v with
         | :? int -> printfn "this is an int"
@@ -467,7 +467,7 @@ let detectType v =
 The message tells you the problem: "runtime type tests are not allowed on some types". 
 The answer is to "box" the value which forces it into a reference type, and then you can type check it:
 
-```
+```fsharp
 let detectTypeBoxed v =
     match box v with      // used "box v" 
         | :? int -> printfn "this is an int"
@@ -491,7 +491,7 @@ The short answer is: you can't. Matches are only allowed on single values.
 
 But wait a minute -- could we combine two values into a *single* tuple on the fly and match on that? Yes, we can!
 
-```
+```fsharp
 let matchOnTwoParameters x y = 
     match (x,y) with 
     | (1,y) -> 
@@ -502,7 +502,7 @@ let matchOnTwoParameters x y =
 
 And indeed, this trick will work whenever you want to match on a set of values -- just group them all into a single tuple.
 
-```
+```fsharp
 let matchOnTwoTuples x y = 
     match (x,y) with 
     | (1,_),(1,_) -> "both start with 1"
@@ -518,7 +518,7 @@ matchOnTwoTuples (3,2) (1,2)
 
 Sometimes pattern matching is just not enough, as we saw in this example:
 
-```
+```fsharp
 let elementsAreEqual aTuple = 
     match aTuple with 
     | (x,y) -> 
@@ -533,7 +533,7 @@ These clauses are known as "guards".
 
 Here's the same logic written using a guard instead:
 
-```
+```fsharp
 let elementsAreEqual aTuple = 
     match aTuple with 
     | (x,y) when x=y -> 
@@ -553,7 +553,7 @@ Guards can be used for all sorts of things that pure patterns can't be used for,
 
 Let's look at some examples of these:
 
-```
+```fsharp
 // --------------------------------
 // comparing values in a when clause
 let makeOrdered aTuple = 
@@ -623,7 +623,7 @@ Guards are great for one-off matches. But if there are certain guards that you u
 
 For example, the email example above could be rewritten as follows:
 
-```
+```fsharp
 open System.Text.RegularExpressions
 
 // create an active pattern to match an email address
@@ -652,7 +652,7 @@ You can see other examples of active patterns in a [previous post](../posts/conv
 
 In the examples so far, we've seen a lot of this:
 
-```
+```fsharp
 let f aValue = 
     match aValue with 
     | _ -> "something" 
@@ -660,7 +660,7 @@ let f aValue =
 
 In the special case of function definitions we can simplify this dramatically by using the `function` keyword.
 
-```
+```fsharp
 let f = 
     function 
     | _ -> "something" 
@@ -672,7 +672,7 @@ This keyword is *not* the same as the `fun` keyword for standard lambdas, rather
 
 The `function` keyword works anywhere a function definition or lambda can be used, such as nested matches:
 
-```
+```fsharp
 // using match..with
 let f aValue = 
     match aValue with 
@@ -690,7 +690,7 @@ let f =
 
 or lambdas passed to a higher order function:
 
-```
+```fsharp
 // using match..with
 [2..10] |> List.map (fun i ->
         match i with 
@@ -711,7 +711,7 @@ A minor drawback of `function` compared with `match..with` is that you can't see
 
 In the [previous post](../posts/exceptions), we looked at catching exceptions with the `try..with` expression.
 
-```
+```fsharp
 try
     failwith "fail"
 with
@@ -728,7 +728,7 @@ So in the above example we see the use of matching on a custom pattern
 
 Because the `try..with` expression implements full pattern matching, we can also use guards as well, if needed to add extra conditional logic:
 
-```
+```fsharp
 let debugMode = false
 try
     failwith "fail"
@@ -750,7 +750,7 @@ The best way of avoiding this is to wrap `match..with` expressions into function
 
 Here's a simple example. The `match x with 42` is wrapped in a `isAnswerToEverything` function.
 
-```
+```fsharp
 let times6 x = x * 6
 
 let isAnswerToEverything x = 
@@ -770,7 +770,7 @@ For example, instead of using recursion to loop through lists, you should try to
 
 In particular, the function we wrote earlier:
 
-```
+```fsharp
 let rec loopAndSum aList sumSoFar = 
     match aList with 
     | [] -> 
@@ -782,7 +782,7 @@ let rec loopAndSum aList sumSoFar =
 
 can be rewritten using the `List` module in at least three different ways!
 
-```
+```fsharp
 // simplest
 let loopAndSum1 aList = List.sum aList 
 [1..10] |> loopAndSum1 
@@ -800,7 +800,7 @@ Similarly, the Option type (discussed at length in [this post](../posts/the-opti
 
 For example, a function that does a match on `Some` vs `None` can be replaced with `Option.map`:
 
-```
+```fsharp
 // unnecessary to implement this explicitly
 let addOneIfValid optionalInt = 
     match optionalInt with 
@@ -825,13 +825,13 @@ nicely.
 
 For example, here is a type for defining temperature. 
 
-```
+```fsharp
 type TemperatureType  = F of float | C of float
 ```
 
 Chances are, we will matching these cases a lot, so let's create a generic function that will do the matching for us.
 
-```
+```fsharp
 module Temperature =
     let fold fahrenheitFunction celsiusFunction aTemp =
         match aTemp with
@@ -850,7 +850,7 @@ Let's start by testing for a fever. We need a function for testing degrees F for
 
 And then we combine them both using the fold function.
 
-```
+```fsharp
 let fFever tempF =
     if tempF > 100.0 then "Fever!" else "OK"
 
@@ -863,7 +863,7 @@ let isFever aTemp = Temperature.fold fFever cFever aTemp
 
 And now we can test.
 
-```
+```fsharp
 let normalTemp = C 37.0
 let result1 = isFever normalTemp 
 
@@ -875,7 +875,7 @@ For a completely different use, let's write a temperature conversion utility.
 
 Again we start by writing the functions for each case, and then combine them.
 
-```
+```fsharp
 let fConversion tempF =
     let convertedValue = (tempF - 32.0) / 1.8
     TemperatureType.C convertedValue    //wrapped in type
@@ -890,13 +890,13 @@ let convert aTemp = Temperature.fold fConversion cConversion aTemp
 
 Note that the conversion functions wrap the converted values in a new `TemperatureType`, so the `convert` function has the signature: 
 
-```
+```fsharp
 val convert : TemperatureType -> TemperatureType
 ```
 
 And now we can test.
 
-```
+```fsharp
 let c20 = C 20.0
 let resultInF = convert c20
 
@@ -906,7 +906,7 @@ let resultInC = convert f75
 
 We can even call convert twice in a row, and we should get back the same temperature that we started with!
 
-```
+```fsharp
 let resultInC = C 20.0 |> convert |> convert
 ```
 

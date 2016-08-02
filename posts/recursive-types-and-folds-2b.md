@@ -76,7 +76,7 @@ Well, for in `fold`, the accumulator was initialized at the top level, and was p
 
 In code terms, each level did this:
 
-```
+```text
 accumulatorFromHigherLevel, combined with 
   stuffFromThisLevel 
     => stuffToSendDownToNextLowerLevel
@@ -84,7 +84,7 @@ accumulatorFromHigherLevel, combined with
 
 In an imperative language, this is exactly a "for loop" with a mutable variable storing the accumulator.
 
-```
+```fsharp
 var accumulator = initialValue
 foreach level in levels do
 {
@@ -100,7 +100,7 @@ On the other hand, in `cata`, the accumulator started at the bottom level, and w
 
 In code terms, each level did this:
 
-```
+```text
 accumulatorFromLowerLevel, combined with 
   stuffFromThisLevel 
     => stuffToSendUpToNextHigherLevel
@@ -108,7 +108,7 @@ accumulatorFromLowerLevel, combined with
 
 This is exactly a recursive loop:
   
-```
+```fsharp
 let recurse (head::tail) =
     if atBottomLevel then
        return something
@@ -138,7 +138,7 @@ the "File System" domain from the [second post in the series](../posts/recursive
 
 As a reminder, here is the crude "file system" domain from that post:
 
-```
+```fsharp
 type FileSystemItem =
     | File of File
     | Directory of Directory
@@ -151,7 +151,7 @@ Out implementation of fold will have to take this into account.
 
 Here are some sample values:
 
-```
+```fsharp
 let readme = File {name="readme.txt"; fileSize=1}
 let config = File {name="config.xml"; fileSize=2}
 let build  = File {name="build.bat"; fileSize=3}
@@ -163,7 +163,7 @@ let root = Directory {name="root"; dirSize=5; subitems=[src; bin]}
 We want to create a fold, `foldFS`, say.
 So, following the rules, let's add an extra accumulator parameter `acc` and pass it to the `File` case:
 
-```
+```fsharp
 let rec foldFS fFile fDir acc item :'r = 
     let recurse = foldFS fFile fDir 
     match item with
@@ -176,7 +176,7 @@ let rec foldFS fFile fDir acc item :'r =
 The `Directory` case is trickier. We are not supposed to know about the subitems, so that means that the only data we can use
 is the `name`, `dirSize`, and the accumulator passed in from a higher level. These are combined to make a new accumulator.
 
-```
+```fsharp
 | Directory dir -> 
     let newAcc = fDir acc (dir.name,dir.dirSize) 
     // to do
@@ -194,7 +194,7 @@ so we need to use the following approach:
 
 That approach is already available to us though. It's exactly what `List.fold` does!  So here's the code for the Directory case:
 
-```
+```fsharp
 | Directory dir -> 
     let newAcc = fDir acc (dir.name,dir.dirSize) 
     dir.subitems |> List.fold recurse newAcc 
@@ -202,7 +202,7 @@ That approach is already available to us though. It's exactly what `List.fold` d
 
 And here's the entire `foldFS` function:
 
-```
+```fsharp
 let rec foldFS fFile fDir acc item :'r = 
     let recurse = foldFS fFile fDir 
     match item with
@@ -217,7 +217,7 @@ With this in place, we can rewrite the same two functions we implemented in the 
 
 First, the `totalSize` function, which just sums up all the sizes:
 
-```
+```fsharp
 let totalSize fileSystemItem =
     let fFile acc (file:File) = 
         acc + file.fileSize
@@ -228,7 +228,7 @@ let totalSize fileSystemItem =
 
 And if we test it we get the same results as before:
 
-```
+```fsharp
 readme |> totalSize  // 1
 src |> totalSize     // 16 = 10 + (1 + 2 + 3)
 root |> totalSize    // 31 = 5 + 16 + 10
@@ -247,7 +247,7 @@ This time it is the `File` case handler which is tricky:
 
 Here's the code:
 
-```
+```fsharp
 let fFile (largestSoFarOpt:File option) (file:File) = 
     match largestSoFarOpt with
     | None -> 
@@ -261,14 +261,14 @@ let fFile (largestSoFarOpt:File option) (file:File) =
 
 On the other hand, the `Directory` handler is trivial -- just pass the "largest so far" accumulator down to the next level
 
-```
+```fsharp
 let fDir largestSoFarOpt (name,size) = 
     largestSoFarOpt
 ```
 
 Here's the complete implementation:
 
-```
+```fsharp
 let largestFile fileSystemItem =
     let fFile (largestSoFarOpt:File option) (file:File) = 
         match largestSoFarOpt with
@@ -289,7 +289,7 @@ let largestFile fileSystemItem =
 
 And if we test it we get the same results as before:
 
-```
+```fsharp
 readme |> largestFile  
 // Some {name = "readme.txt"; fileSize = 1}
 
@@ -364,19 +364,19 @@ Here are some guidelines:
   
 Another way to think about it is to look at your "combiner" function. At each step, you are combining data from the different levels:
 
-```
+```text
 level1 data [combined with] level2 data [combined with] level3 data [combined with] level4 data
 ```
 
 If your combiner function is "left associative" like this:
 
-```
+```text
 (((level1 combineWith level2) combineWith level3) combineWith level4)
 ```
 
 then use the iterative approach, but if your combiner function is "right associative" like this:
 
-```
+```text
 (level1 combineWith (level2 combineWith (level3 combineWith level4)))
 ```
 
@@ -394,7 +394,7 @@ See for yourself with the three implementations that we have discussed.
 
 First, here's the code for the `WithACard` case in the original `cataGift` implementation:
 
-```
+```fsharp
 | WithACard (gift,message) -> 
     fCard (recurse gift,message) 
 //         ~~~~~~~  <= Call to recurse is not last expression.
@@ -405,7 +405,7 @@ The `cataGift` implementation is *not* tail-recursive.
 
 Here's the code from the `foldGift` implementation:
 
-```
+```fsharp
 | WithACard (innerGift,message) -> 
     let newAcc = fCard acc message 
     recurse newAcc innerGift
@@ -417,7 +417,7 @@ The `foldGift` implementation *is* tail-recursive.
 
 And here's the code from the `foldbackGift` implementation:
 
-```
+```fsharp
 | WithACard (innerGift,message) -> 
     let newGenerator innerVal =
         let newInnerVal = fCard innerVal message 
@@ -433,7 +433,7 @@ The `foldbackGift` implementation is also tail-recursive.
 
 In a language like C#, you can exit a iterative loop early using `break` like this:
 
-```
+```csharp
 foreach (var elem in collection)
 {
     // do something
@@ -455,7 +455,7 @@ The first one is to not use `fold` at all and create your own recursive function
 
 In this example, the loop exits when the sum is larger than 100:
 
-```
+```fsharp
 let rec firstSumBiggerThan100 sumSoFar listOfInts =
     match listOfInts with
     | [] -> 
@@ -477,7 +477,7 @@ Once this flag is set, the remaining iterations do nothing.
 
 Here's an example of calculating the sum, but the accumulator is actually a tuple with an `ignoreFlag` in addition to the `sumSoFar`:
 
-```
+```fsharp
 let firstSumBiggerThan100 listOfInts =
 
     let folder accumulator i =
@@ -506,7 +506,7 @@ a computation expression so that it looks more natural.
 
 This approach is documented on [Tomas Petricek's blog](http://tomasp.net/blog/imperative-ii-break.aspx/) and the code looks like this:
 
-```
+```fsharp
 let firstSumBiggerThan100 listOfInts =
     let mutable sumSoFar = 0
     imperative { 

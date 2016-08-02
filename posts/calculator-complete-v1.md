@@ -23,7 +23,7 @@ such there is really only one way of writing the code.
 
 I'm going to show all the code at once (below), and I'll add some comments afterwards.
 
-```
+```fsharp
 // ================================================
 // Implementation of CalculatorConfiguration
 // ================================================          
@@ -144,7 +144,7 @@ I'm going to spare you all the painful iterations and just go directly to the fi
 
 I won't show all the code, as it is about 200 lines (and you can see it in the [gist](https://gist.github.com/swlaschin/0e954cbdc383d1f5d9d3#file-calculator_v1-fsx)), but here are some highlights:
 
-```
+```fsharp
 module CalculatorUI =
 
     open CalculatorDomain
@@ -174,7 +174,7 @@ Well, after the state has changed, we need to refresh the control (a Label) that
 
 The standard way to do it is to make the label control a field in the form, like this:
 
-```
+```fsharp
 type CalculatorForm(initState:InitState, calculate:Calculate) as this = 
     inherit Form()
 
@@ -183,7 +183,7 @@ type CalculatorForm(initState:InitState, calculate:Calculate) as this =
 
 and then set it to an actual control value when the form has been initialized:
 
-```
+```fsharp
 member this.CreateDisplayLabel() = 
     let display = new Label(Text="",Size=displaySize,Location=getPos(0,0))
     display.TextAlign <- ContentAlignment.MiddleRight
@@ -202,7 +202,7 @@ By using a function, we (a) encapsulate the access to the real control and (b) a
 The mutable function starts off with a safe default implementation (`fun text -> ()`),
 and is then changed to a *new* implementation when the label control is created:
 
-```
+```fsharp
 member this.CreateDisplayLabel() = 
     let display = new Label(Text="",Size=displaySize,Location=getPos(0,0))
     this.Controls.Add(display)
@@ -219,7 +219,7 @@ The buttons are laid out in a grid, and so I create a helper function `getPos(ro
 
 Here's an example of creating the buttons:
 
-```
+```fsharp
 member this.CreateButtons() = 
     let sevenButton = new Button(Text="7",Size=buttonSize,Location=getPos(1,0),BackColor=DigitButtonColor)
     sevenButton |> addDigitButton Seven
@@ -239,7 +239,7 @@ member this.CreateButtons() =
 
 And since all the digit buttons have the same behavior, as do all the math op buttons, I just created some helpers that set the event handler in a generic way:
 
-```
+```fsharp
 let addDigitButton digit (button:Button) =
     button.Click.AddHandler(EventHandler(fun _ _ -> handleDigit digit))
     this.Controls.Add(button)
@@ -251,7 +251,7 @@ let addOpButton op (button:Button) =
 
 I also added some keyboard support:
 
-```
+```fsharp
 member this.KeyPressHandler(e:KeyPressEventArgs) =
     match e.KeyChar with
     | '0' -> handleDigit Zero
@@ -264,7 +264,7 @@ member this.KeyPressHandler(e:KeyPressEventArgs) =
 
 Button clicks and keyboard presses are eventually routed into the key function `handleInput`, which does the calculation.
 
-```
+```fsharp
 let handleInput input =
      let newState = calculate(input,state)
      state <- newState 
@@ -319,7 +319,7 @@ What changes do we need to make to the code?
 
 First, we need to store the flag somewhere. We'll store it in the `CalculatorState` of course!
 
-```
+```fsharp
 type CalculatorState = {
     display: CalculatorDisplay
     pendingOp: (CalculatorMathOp * Number) option
@@ -346,7 +346,7 @@ We'll make the following tweaks to the code:
 
 Most of the services are fine. The only service that is broken now is `initState`, which just needs to be tweaked to have `allowAppend` be true when starting.
 
-```
+```fsharp
 let initState :InitState = fun () -> 
     {
     display=""
@@ -417,7 +417,7 @@ Now I'm not saying that I am against automated testing. In fact, I do use it all
 
 So, for example, here is how I might test this code:
 
-```
+```fsharp
 module CalculatorTests =
     open CalculatorDomain
     open System

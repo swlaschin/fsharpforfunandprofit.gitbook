@@ -143,7 +143,7 @@ without having TeamCity installed.
 
 Here's an example of a very simple FAKE script, taken from [a more detailed example on the FAKE site](http://fsharp.github.io/FAKE/gettingstarted.html).
 
-```
+```fsharp
 // Include Fake lib
 // Assumes NuGet has been used to fetch the FAKE libraries
 #r "packages/FAKE/tools/FakeLib.dll"
@@ -186,7 +186,7 @@ Some further reading on FAKE:
 This script checks that a website is responding with a 200.
 This might be useful as the basis for a post-deployment smoke test, for example.
 
-```
+```fsharp
 // Requires FSharp.Data under script directory 
 //    nuget install FSharp.Data -o Packages -ExcludeVersion  
 #r @"Packages\FSharp.Data\lib\net40\FSharp.Data.dll"
@@ -222,7 +222,7 @@ let bad = "http://example.bad", []
 
 The result is:
 
-```
+```text
 Response for http://google.com is 200
 Error for http://example.bad. Message=No response
 ```
@@ -242,7 +242,7 @@ and convert it to a CSV file for later analysis.
 Note that the RSS parsing code is just one line of code! Most of the code is concerned with writing the CSV.
 Yes, I could have used a CSV library (there are lots on NuGet) but I thought I'd leave it as is to show you how simple it is.
  
-```
+```fsharp
 // sets the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 
@@ -289,7 +289,7 @@ Note that the type provider generates intellisense (shown below) to show you the
 
 The result is something like this:
 
-```
+```text
 "Optimising F# answer for Euler #4","DropTheTable","18/04/2014"
 "How to execute a function, that creates a lot of objects, in parallel?","Lawrence Woodman","01/04/2014"
 "How to invoke a user defined function using R Type Provider","Dave","19/04/2014"
@@ -311,7 +311,7 @@ Luckily there is an F# type provider for WMI that makes using it easy.
 In this example, we'll get the system time and also check some stats for a process.
 This could be useful during and after a load test, for example. 
 
-```
+```fsharp
 // sets the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 
@@ -348,7 +348,7 @@ printfn "PageFileBytesPeak=%O" explorerProc.PageFileBytesPeak
 
 The output is something like this:
 
-```
+```text
 Time=2014-4-20 14:2:35
 Timezone=GMT Standard Time
 ElapsedTime=2761906
@@ -376,13 +376,13 @@ For simple scripting, [Fog](http://dmohl.github.io/Fog/) is a nice wrapper for A
 
 So for example, to upload a blob, the code is as simple as this:
 
-```
+```fsharp
 UploadBlob "testcontainer" "testblob" "This is a test" |> ignore
 ```
 
 or to add and receive messages:
 
-```
+```fsharp
 AddMessage "testqueue" "This is a test message" |> ignore
 
 let result = GetMessages "testqueue" 20 5

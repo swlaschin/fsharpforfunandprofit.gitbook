@@ -15,7 +15,7 @@ But that approach was designed for expressions *inside* a workflow. What happens
 
 Here is the code from our "maybe" builder class. This code is based on the `trace` builder from the earlier post, but with all the tracing taken out, so that it is nice and clean.
 
-```
+```fsharp
 type MaybeBuilder() =
 
     member this.Bind(m, f) = 
@@ -53,7 +53,7 @@ Before moving on, make sure that you understand how this works. If we analyze th
 
 Now let's check this code and make sure everything works as expected. 
 
-```
+```fsharp
 maybe { 
     printfn "Part 1: about to return 1"
     return 1
@@ -73,7 +73,7 @@ maybe {
 
 But what happens if we refactor the code into a child workflow, like this:
 
-```
+```fsharp
 let childWorkflow = 
     maybe {printfn "Child workflow"} 
 
@@ -94,7 +94,7 @@ The obvious approach is to wrap the *entire result of the builder* in a delay fu
 
 So, here's our new wrapper type:
 
-```
+```fsharp
 type Maybe<'a> = Maybe of (unit -> 'a option)
 ```
 
@@ -102,7 +102,7 @@ We've replaced a simple `option` with a function that evaluates to an option, an
 
 And now we need to change the `Run` method as well. Previously, it evaluated the delay function that was passed in to it, but now it should leave it unevaluated and wrap it in our new wrapper type:
 
-```
+```fsharp
 // before
 member this.Run(f) = 
     f()
@@ -116,13 +116,13 @@ member this.Run(f) =
 
 One more thing -- we'll need a way to "run" the result now.
 
-```
+```fsharp
 let run (Maybe f) = f()
 ```
 
 Let's try out our new type on our previous examples:
 
-```
+```fsharp
 let m1 = maybe { 
     printfn "Part 1: about to return 1"
     return 1
@@ -132,7 +132,7 @@ let m1 = maybe {
 
 Running this, we get something like this:
 
-```
+```fsharp
 val m1 : Maybe<int> = Maybe <fun:m1@123-7>
 ```
 
@@ -140,13 +140,13 @@ That looks good; nothing else was printed.
 
 And now run it:
 
-```
+```fsharp
 run m1 |> printfn "Result for Part1 but not Part2: %A" 
 ```
 
 and we get the output:
 
-```
+```text
 Part 1: about to return 1
 Result for Part1 but not Part2: Some 1
 ```
@@ -155,7 +155,7 @@ Perfect. Part 2 did not run.
 
 But we run into a problem with the next example:
 
-```
+```fsharp
 let m2 = maybe { 
     printfn "Part 1: about to return None"
     return! None
@@ -167,7 +167,7 @@ Oops! We forgot to fix up `ReturnFrom`!  As we know, that method takes a *wrappe
 
 Here's the fix:
 
-```
+```fsharp
 member this.ReturnFrom(Maybe f) = 
     f()
 ```
@@ -179,7 +179,7 @@ But now we have another problem -- we can't return an explicit `None` anymore in
 Well, we could create a helper function that constructs one for us.  But there is a much simpler answer:
 you can create a new `Maybe` type by using a `maybe` expression!  
 
-```
+```fsharp
 let m2 = maybe { 
     return! maybe {printfn "Part 1: about to return None"}
     printfn "Part 2: after None, keep going"
@@ -190,7 +190,7 @@ This is why the `Zero` method is useful. With `Zero` and the builder instance, y
 
 But now we have one more error -- the dreaded "value restriction":
 
-```
+```text
 Value restriction. The value 'm2' has been inferred to have generic type
 ```
 
@@ -198,7 +198,7 @@ The reason why this has happened is that *both* expressions are returning `None`
 
 There are two fixes. One is to make the type explicit:
 
-```
+```fsharp
 let m2_int: Maybe<int> = maybe { 
     return! maybe {printfn "Part 1: about to return None"}
     printfn "Part 2: after None, keep going;"
@@ -207,7 +207,7 @@ let m2_int: Maybe<int> = maybe {
 
 Or we can just return some non-None value instead:
 
-```
+```fsharp
 let m2 = maybe { 
     return! maybe {printfn "Part 1: about to return None"}
     printfn "Part 2: after None, keep going;"
@@ -219,13 +219,13 @@ Both of these solutions will fix the problem.
 
 Now if we run the example, we see that the result is as expected. The second part *is* run this time.
 
-```
+```fsharp
 run m2 |> printfn "Result for Part1 and then Part2: %A" 
 ```
 
 The trace output:
 
-```
+```text
 Part 1: about to return None
 Part 2: after None, keep going;
 Result for Part1 and then Part2: Some 1
@@ -233,7 +233,7 @@ Result for Part1 and then Part2: Some 1
 
 Finally, we'll try the child workflow examples again:
 
-```
+```fsharp
 let childWorkflow = 
     maybe {printfn "Child workflow"} 
 
@@ -250,7 +250,7 @@ And now the child workflow is not evaluated, just as we wanted.
 
 And if we *do* need the child workflow to be evaluated, this works too:
 
-```
+```fsharp
 let m4 = maybe { 
     return! maybe {printfn "Part 1: about to return None"}
     return! childWorkflow 
@@ -263,7 +263,7 @@ run m4 |> printfn "Result for Part1 and then childWorkflow: %A"
 
 Let's look at all the code in the new builder class again:
 
-```
+```fsharp
 type Maybe<'a> = Maybe of (unit -> 'a option)
 
 type MaybeBuilder() =
@@ -311,7 +311,7 @@ An alternative design might use `Maybe<'a>` as the internal type as well, which 
 
 Let's look at a variant of the last example:
 
-```
+```fsharp
 let child_twice: Maybe<unit> = maybe { 
     let workflow = maybe {printfn "Child workflow"} 
 
@@ -337,7 +337,7 @@ The changes we need to make are:
 
 Here is the new class with the changes:
 
-```
+```fsharp
 type Maybe<'a> = Maybe of Lazy<'a option>
 
 type MaybeBuilder() =
@@ -373,7 +373,7 @@ let run (Maybe f) = f.Force()
 
 And if we run the "child twice` code from above, we get:
 
-```
+```text
 Part 1: about to return None
 Child workflow
 Result for childWorkflow twice: <null>

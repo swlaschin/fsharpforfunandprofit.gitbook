@@ -41,7 +41,7 @@ We could then think of `M<BodyPart>` as a *recipe* or *instructions* for creatin
 
 The definition of `M` was:
 
-```
+```fsharp
 type M<'a> = M of (VitalForce -> 'a * VitalForce)
 ```
 
@@ -52,7 +52,7 @@ a unbroken arm recipe (`M<LeftArm>`). The solution was to implement a function `
 
 The signature of `mapM` was:
 
-```
+```fsharp
 val mapM : f:('a -> 'b) -> M<'a> -> M<'b>
 ```
 
@@ -63,7 +63,7 @@ a whole arm (`M<RightArm>`). The solution was `map2M`.
 
 The signature of `map2M` was:
 
-```
+```fsharp
 val map2M : f:('a -> 'b -> 'c) -> M<'a> -> M<'b> -> M<'c>
 ```
 
@@ -74,7 +74,7 @@ an `M<Skull>` so it could be used with `map2M` to make a whole head.
 
 The signature of `returnM` was:
 
-```
+```fsharp
 val returnM : 'a -> M<'a>
 ```
 
@@ -83,13 +83,13 @@ val returnM : 'a -> M<'a>
 We created many functions that had a similar shape. They all take something as input and return a M-recipe as output.
 In other words, they have this signature:
 
-```
+```fsharp
 val monadicFunction : 'a -> M<'b>
 ```
 
 Here are some examples of actual monadic functions that we used:
 
-```
+```fsharp
 val makeLiveLeftLeg : DeadLeftLeg -> M<LiveLeftLeg>
 val makeLiveRightLowerArm : DeadRightLowerArm -> M<LiveRightLowerArm>
 val makeLiveHeart : DeadHeart -> M<LiveHeart>
@@ -106,7 +106,7 @@ The solution was `bindM`, which transforms monadic functions of the form `'a -> 
 
 The signature of `bindM` was:
 
-```
+```fsharp
 val bindM : f:('a -> M<'b>) -> M<'a> -> M<'b>
 ```
 
@@ -118,7 +118,7 @@ From that, we could work with a function of any size, step by step, using partia
 
 The signature of `applyM` was:
 
-```
+```fsharp
 val applyM : M<('a -> 'b)> -> M<'a> -> M<'b>
 ```
 
@@ -133,7 +133,7 @@ In fact, as we'll see below, the functions `mapM`, `map2M`, and `applyM` can act
 
 A lot of the functions we have created have a very similar shape, resulting in a lot of duplication. Here's one example:
 
-```
+```fsharp
 let makeLiveLeftLegM deadLeftLeg  = 
     let becomeAlive vitalForce = 
         let (DeadLeftLeg label) = deadLeftLeg
@@ -153,7 +153,7 @@ To create a computation expression in F#, you just need two things to start with
 
 Next, you define a class with specially named methods `Bind` and `Return`:
 
-```
+```fsharp
 type MonsterBuilder()=
     member this.Return(x) = returnM x
     member this.Bind(xM,f) = bindM f xM
@@ -161,7 +161,7 @@ type MonsterBuilder()=
 
 And finally, you create an instance of this class:
 
-```
+```fsharp
 let monster = new MonsterBuilder()
 ```
 
@@ -174,7 +174,7 @@ When this is done, we have access to the special syntax `monster {...}`, just li
 
 So some example code would look like this:
 
-```
+```fsharp
 monster {
     let! x = xM  // unwrap an M<X> into an X and bind to "x"
     return y     // wrap a Y and return an M<Y>
@@ -193,7 +193,7 @@ With `monster` expressions available, let's rewrite `mapM` and the other functio
 
 Here is an implementation using `monster`:
 
-```
+```fsharp
 let mapM f xM = 
     monster {
         let! x = xM  // unwrap the M<X>
@@ -203,7 +203,7 @@ let mapM f xM =
 
 If we compile this implementation, we get the same signature as the previous implementation:
 
-```
+```fsharp
 val mapM : f:('a -> 'b) -> M<'a> -> M<'b>
 ```
 
@@ -213,7 +213,7 @@ val mapM : f:('a -> 'b) -> M<'a> -> M<'b>
 
 It's also easy to write using `monster` expressions:
 
-```
+```fsharp
 let map2M f xM yM = 
     monster {
         let! x = xM  // unwrap M<X>
@@ -224,7 +224,7 @@ let map2M f xM yM =
 
 If we compile this implementation, we again get the same signature as the previous implementation:
 
-```
+```fsharp
 val map2M : f:('a -> 'b -> 'c) -> M<'a> -> M<'b> -> M<'c>
 ```
 
@@ -234,7 +234,7 @@ val map2M : f:('a -> 'b -> 'c) -> M<'a> -> M<'b> -> M<'c>
 
 Again, it's trivial  to write using `monster` expressions:
 
-```
+```fsharp
 let applyM fM xM = 
     monster {
         let! f = fM  // unwrap M<F>
@@ -245,7 +245,7 @@ let applyM fM xM =
 
 And the signature is as expected
 
-```
+```fsharp
 val applyM : M<('a -> 'b)> -> M<'a> -> M<'b>
 ```
 
@@ -255,7 +255,7 @@ We'd like to use the monster expression to rewrite all our other functions too, 
 
 Many of our functions have a body that looks like this:
 
-```
+```fsharp
 // extract a unit of vital force from the context 
 let oneUnit, remainingVitalForce = getVitalForce vitalForce 
 
@@ -275,7 +275,7 @@ Let's start with the getter. How should we implement it?
 
 Well, the vital force is only available in the context of becoming alive, so the function must follow the familiar template:
 
-```
+```fsharp
 let getM = 
     let doSomethingWhileLive vitalForce = 
         // what here ??
@@ -289,7 +289,7 @@ But what should happen in the middle? And what should be returned as the first e
 
 The answer is simple: just return the vital force itself!
     
-```
+```fsharp
 let getM = 
     let doSomethingWhileLive vitalForce = 
         // return the current vital force in the first element of the tuple
@@ -299,7 +299,7 @@ let getM =
 
 `getM` is a `M<VitalForce>` value, which means that we can unwrap it inside a monster expression like this:
 
-```
+```fsharp
 monster {
     let! vitalForce = getM
     // do something with vital force
@@ -310,7 +310,7 @@ monster {
 
 For the putter, the implementation is a function with a parameter for the new vital force.
 
-```
+```fsharp
 let putM newVitalForce  = 
     let doSomethingWhileLive vitalForce = 
         what here ??
@@ -327,7 +327,7 @@ And what should be in the first part of the tuple that is returned? There is no 
 
 Here's the final implementation:
 
-```
+```fsharp
 let putM newVitalForce  = 
     let doSomethingWhileLive vitalForce = 
         // return nothing in the first element of the tuple
@@ -345,7 +345,7 @@ With `getM` and `putM` in place, we can now create a function that
 
 And here's the code:
 
-```
+```fsharp
 let useUpOneUnitM = 
     monster {
         let! vitalForce = getM
@@ -362,7 +362,7 @@ With `useUpOneUnitM`, we can start to rewrite all the other functions.
 
 For example, the original function `makeLiveLeftLegM` looked like this, with lots of explicit handling of the vital force.
 
-```
+```fsharp
 let makeLiveLeftLegM deadLeftLeg  = 
     let becomeAlive vitalForce = 
         let (DeadLeftLeg label) = deadLeftLeg
@@ -374,7 +374,7 @@ let makeLiveLeftLegM deadLeftLeg  =
 
 The new version, using a monster expression, has implicit handling of the vital force, and consequently looks much cleaner.
 
-```
+```fsharp
 let makeLiveLeftLegM deadLeftLeg = 
     monster {
         let (DeadLeftLeg label) = deadLeftLeg
@@ -385,7 +385,7 @@ let makeLiveLeftLegM deadLeftLeg =
 
 Similarly, we can rewrite all the arm surgery code like this:
 
-```
+```fsharp
 let makeLiveRightLowerArm (DeadRightLowerArm label) = 
     monster {
         let! oneUnit = useUpOneUnitM
@@ -414,7 +414,7 @@ And so on. This new code is much cleaner.
 In fact, we can make it cleaner yet by eliminating the intermediate values such as `armSurgery` and `armSurgeryM`
 and putting everything in the one monster expression.
 
-```
+```fsharp
 let rightArmM = monster {
     let! lowerArm = DeadRightLowerArm "Tom" |> makeLiveRightLowerArm 
     let! upperArm = DeadRightUpperArm "Jerry" |> makeLiveRightUpperArm 
@@ -424,7 +424,7 @@ let rightArmM = monster {
 
 We can use this approach for the head as well. We don't need `headSurgery` or `returnM` any more.
 
-```
+```fsharp
 let headM = monster {
     let! brain = makeLiveBrain deadBrain
     return {brain=brain; skull=skull}
@@ -433,7 +433,7 @@ let headM = monster {
 
 Finally, we can use a `monster` expression to create the whole body too:
 
-```
+```fsharp
 // a function to create a M-body given all the M-parts
 let createBodyM leftLegM rightLegM leftArmM rightArmM headM beatingHeartM = 
     monster {
@@ -467,7 +467,7 @@ We previously used an alternative way to create the body, using `applyM`.
 
 For reference, here's that way using `applyM`:
 
-```
+```fsharp
 let createBody leftLeg rightLeg leftArm rightArm head beatingHeart =
     {
     leftLeg = leftLeg
@@ -517,14 +517,14 @@ Instead, I'll just focus on how the state monad might be defined and used in pra
 First off, to be truly reusable, we need to replace the `VitalForce` type with other types.  So our function-wrapping type (call it `S`) must have *two* type parameters,
 one for the type of the state, and one for the type of the value.
 
-```
+```fsharp
 type S<'State,'Value> = 
     S of ('State -> 'Value * 'State)
 ```
  
 With this defined, we can create the usual suspects: `runS`, `returnS` and `bindS`.
 
-```
+```fsharp
 // encapsulate the function call that "runs" the state
 let runS (S f) state = f state
 
@@ -544,7 +544,7 @@ let bindS f xS =
 
 Personlly, I'm glad that we got to understood how these worked in the `M` context before making them completely generic. I don't know about you, but signatures like these
 
-```
+```fsharp
 val runS : S<'a,'b> -> 'a -> 'b * 'a
 val bindS : f:('a -> S<'b,'c>) -> S<'b,'a> -> S<'b,'c>
 ```
@@ -553,7 +553,7 @@ would be really hard to understand on their own, without any preparation.
 
 Anyway, with those basics in place we can create a `state` expression.
  
-```
+```fsharp
 type StateBuilder()=
     member this.Return(x) = returnS x
     member this.Bind(xS,f) = bindS f xS
@@ -563,7 +563,7 @@ let state = new StateBuilder()
 
 `getS` and `putS` are defined in a similar way as `getM` and `putM` for `monster`.
 
-```
+```fsharp
 let getS = 
     let run state = 
         // return the current state in the first element of the tuple
@@ -600,7 +600,7 @@ I won't go into this any more right now. I suggest watching [the talk](http://fs
 
 We can now use `state` expressions exactly as we did `monster` expressions. Here's an example:
 
-```
+```fsharp
 // combine get and put to extract one unit
 let useUpOneUnitS = state {
     let! vitalForce = getS
@@ -621,7 +621,7 @@ let makeLiveLeftLeg (DeadLeftLeg label) = state {
 
 Another example is how to build a `BeatingHeart`:
 
-```
+```fsharp
 type DeadHeart = DeadHeart of Label 
 type LiveHeart = LiveHeart of Label * VitalForce
 type BeatingHeart = BeatingHeart of LiveHeart * VitalForce
@@ -658,7 +658,7 @@ The state computation expression, once defined, can be used for all sorts of thi
 
 Let's start by defining a `Stack` type and associated functions:
 
-```
+```fsharp
 // define the type to use as the state
 type Stack<'a> = Stack of 'a list
 
@@ -686,7 +686,7 @@ Note that none of that code knows about or uses the `state` computation expressi
 
 To make it work with `state`, we need to define a customized getter and putter for use in a `state` context:
 
-```
+```fsharp
 let pop() = state {
     let! stack = getS
     let top, remainingStack = popStack stack
@@ -708,7 +708,7 @@ With these in place we can start coding our domain!
 
 Here's a simple one. We push "world", then "hello", then pop the stack and combine the results.
 
-```
+```fsharp
 let helloWorldS = state {
     do! push "world"
     do! push "hello" 
@@ -725,7 +725,7 @@ let helloWorld = getValue helloWorldS // "hello world"
 
 Here's a simple stack-based calculator:
 
-```
+```fsharp
 let one = state {do! push 1}
 let two = state {do! push 2}
 
@@ -738,7 +738,7 @@ let add = state {
 
 And now we can combine these basic states to build more complex ones:
 
-```
+```fsharp
 let three = state {
     do! one
     do! two
@@ -756,7 +756,7 @@ Remember that, just as with the vital force, all we have now is a *recipe* for b
 
 Let's add a helper to run all the operations and return the top of the stack:
 
-```
+```fsharp
 let calculate stackOperations = state {
     do! stackOperations
     let! top = pop()
@@ -766,7 +766,7 @@ let calculate stackOperations = state {
 
 Now we can evaluate the operations, like this:
 
-```
+```fsharp
 let threeN = calculate three |> getValue // 3
 
 let fiveN = calculate five |> getValue   // 5

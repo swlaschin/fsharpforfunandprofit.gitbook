@@ -140,7 +140,7 @@ How about this?
 
 Here's some code that implements that property:
 
-```
+```fsharp
 let ``+1 then sort should be same as sort then +1`` sortFn aList = 
 	let add1 x = x + 1
 	
@@ -157,7 +157,7 @@ Check.Quick (``+1 then sort should be same as sort then +1`` goodSort)
 Well, that works, but it also would work for a lot of other transformations too.
 For example, if we implemented `List.sort` as just the identity, then this property would be satisfied equally well! You can test this for yourself:
 
-```
+```fsharp
 let badSort aList = aList
 Check.Quick (``+1 then sort should be same as sort then +1`` badSort)
 // Ok, passed 100 tests.
@@ -175,7 +175,7 @@ How about adding an item that we *know* will come at the front of the list after
 
 Here's the code:
 
-```
+```fsharp
 let ``append minValue then sort should be same as sort then prepend minValue`` sortFn aList = 
 	let minValue = Int32.MinValue
    
@@ -190,7 +190,7 @@ Check.Quick (``append minValue then sort should be same as sort then prepend min
 
 The bad implementation fails now!
 
-```
+```fsharp
 Check.Quick (``append minValue then sort should be same as sort then prepend minValue`` badSort)
 // Falsifiable, after 1 test (2 shrinks) 
 // [0]
@@ -205,7 +205,7 @@ could take advantage of! The EDFH will exploit the fact that we always use `Int3
 
 In other words, the EDFH can identify which path we are on and have special cases for each one:
 
-```
+```fsharp
 // The Enterprise Developer From Hell strikes again
 let badSort2 aList = 
 	match aList with
@@ -222,7 +222,7 @@ let badSort2 aList =
 
 And when we check it...
 
-```
+```fsharp
 // Oh dear, the bad implementation passes!
 Check.Quick (``append minValue then sort should be same as sort then prepend minValue`` badSort2)
 // Ok, passed 100 tests.
@@ -236,7 +236,7 @@ then on the path that negates *after* the sort, add an extra reverse as well.
 
 ![List sort with negate](../assets/img/property_list_sort3.png)
 
-```
+```fsharp
 let ``negate then sort should be same as sort then negate then reverse`` sortFn aList = 
 	let negate x = x * -1
 
@@ -247,7 +247,7 @@ let ``negate then sort should be same as sort then negate then reverse`` sortFn 
 
 This property is harder for the EDFH to beat because there are no magic numbers to help identify which path you are on:
 
-```
+```fsharp
 // test
 Check.Quick ( ``negate then sort should be same as sort then negate then reverse`` goodSort)
 // Ok, passed 100 tests.
@@ -277,7 +277,7 @@ We can do the same append/prepend trick:
 
 Here's the code for the property:
 
-```
+```fsharp
 let ``append any value then reverse should be same as reverse then prepend same value`` revFn anyValue aList = 
   
 	let appendThenReverse = (aList @ [anyValue]) |> revFn 
@@ -287,7 +287,7 @@ let ``append any value then reverse should be same as reverse then prepend same 
 
 Here are the test results for the correct function and for two incorrect functions:
 
-```
+```fsharp
 // test
 let goodReverse = List.rev
 Check.Quick (``append any value then reverse should be same as reverse then prepend same value`` goodReverse)
@@ -328,7 +328,7 @@ What about list reversal?  Well, as it happens, reversal is its own inverse!
 
 Let's turn that into a property:
 
-```
+```fsharp
 let ``reverse then reverse should be same as original`` revFn aList = 
 	let reverseThenReverse = aList |> revFn |> revFn
 	reverseThenReverse = aList
@@ -336,7 +336,7 @@ let ``reverse then reverse should be same as original`` revFn aList =
 
 And it passes:
 
-```
+```fsharp
 let goodReverse = List.rev
 Check.Quick (``reverse then reverse should be same as original`` goodReverse)
 // Ok, passed 100 tests.
@@ -344,7 +344,7 @@ Check.Quick (``reverse then reverse should be same as original`` goodReverse)
 
 Unfortunately, a bad implementation satisfies the property too!
 
-```
+```fsharp
 let badReverse aList = aList 
 Check.Quick (``reverse then reverse should be same as original`` badReverse)
 // Ok, passed 100 tests.
@@ -375,7 +375,7 @@ when concatenated, give us back the original string!
 
 Here's the core code from that property:
 
-```
+```fsharp
 let concatWithComma s t = s + "," + t
 
 let tokens = originalString.Split [| ',' |] 
@@ -395,7 +395,7 @@ For now though, we'll use a trick. The trick is to let FsCheck generate a list o
 
 So here's the complete code for the property:
 
-```
+```fsharp
 let ``concatting the elements of a string split by commas recreates the original string`` aListOfStrings = 
 	// helper to make a string
 	let addWithComma s t = s + "," + t
@@ -413,7 +413,7 @@ let ``concatting the elements of a string split by commas recreates the original
 
 When we test this we are happy:
 
-```
+```fsharp
 Check.Quick ``concatting the elements of a string split by commas recreates the original string`` 
 // Ok, passed 100 tests.
 ```
@@ -429,7 +429,7 @@ The first thing that pops into my mind is that for each pair of elements in the 
 
 So let's make that into a property:
 
-```
+```fsharp
 let ``adjacent pairs from a list should be ordered`` sortFn aList = 
 	let pairs = aList |> sortFn |> Seq.pairwise
 	pairs |> Seq.forall (fun (x,y) -> x <= y )
@@ -437,12 +437,12 @@ let ``adjacent pairs from a list should be ordered`` sortFn aList =
 
 But something funny happens when we try to check it. We get an error! 
 
-```
+```fsharp
 let goodSort = List.sort
 Check.Quick (``adjacent pairs from a list should be ordered`` goodSort)
 ```
 
-```
+```text
 System.Exception: Geneflect: type not handled System.IComparable
    at FsCheck.ReflectArbitrary.reflectObj@102-4.Invoke(String message)
    at Microsoft.FSharp.Core.PrintfImpl.go@523-3[b,c,d](String fmt, Int32 len, FSharpFunc`2 outputChar, FSharpFunc`2 outa, b os, FSharpFunc`2 finalize, FSharpList`1 args, Int32 i)
@@ -454,7 +454,7 @@ But `IComparable` is not a type than can be instantiated, so FsCheck throws an e
 
 How can we prevent this from happening? The solution is to specify a particular type for the property, such as `int list`, like this:
 
-```
+```fsharp
 let ``adjacent pairs from a list should be ordered`` sortFn (aList:int list) = 
 	let pairs = aList |> sortFn |> Seq.pairwise
 	pairs |> Seq.forall (fun (x,y) -> x <= y )
@@ -462,7 +462,7 @@ let ``adjacent pairs from a list should be ordered`` sortFn (aList:int list) =
 
 This code works now.
 
-```
+```fsharp
 let goodSort = List.sort
 Check.Quick (``adjacent pairs from a list should be ordered`` goodSort)
 // Ok, passed 100 tests.
@@ -470,7 +470,7 @@ Check.Quick (``adjacent pairs from a list should be ordered`` goodSort)
 
 Note that even though the property has been constrained, the property is still a very general one. We could have used `string list` instead, for example, and it would work just the same.
 
-```
+```fsharp
 let ``adjacent pairs from a string list should be ordered`` sortFn (aList:string list) = 
 	let pairs = aList |> sortFn |> Seq.pairwise
 	pairs |> Seq.forall (fun (x,y) -> x <= y )
@@ -483,7 +483,7 @@ Check.Quick (``adjacent pairs from a string list should be ordered`` goodSort)
 
 Are we done now?  No! One problem with this property is that it doesn't catch malicious implementations by the EDFH.
 
-```
+```fsharp
 // bad implementation passes
 let badSort aList = []
 Check.Quick (``adjacent pairs from a list should be ordered`` badSort)
@@ -511,7 +511,7 @@ And in the "list sort" example above, we could satisfy the "pairwise ordered" pr
 
 Our first attempt might be to check the length of the sorted list. If the lengths are different, then the sort function obviously cheated!
 
-```
+```fsharp
 let ``sort should have same length as original`` sortFn (aList:int list) = 
 	let sorted = aList |> sortFn 
 	List.length sorted = List.length aList
@@ -519,7 +519,7 @@ let ``sort should have same length as original`` sortFn (aList:int list) =
 
 We check it and it works:
 
-```
+```fsharp
 let goodSort = List.sort
 Check.Quick (``sort should have same length as original`` goodSort )
 // Ok, passed 100 tests.
@@ -527,7 +527,7 @@ Check.Quick (``sort should have same length as original`` goodSort )
 
 And yes, the bad implementation fails:
 
-```
+```fsharp
 let badSort aList = []
 Check.Quick (``sort should have same length as original`` badSort )
 // Falsifiable, after 1 test (1 shrink) 
@@ -536,7 +536,7 @@ Check.Quick (``sort should have same length as original`` badSort )
 
 Unfortunately, the BDFH is not defeated and can come up with another compliant implementation! Just repeat the first element N times!
 
-```
+```fsharp
 // bad implementation has same length
 let badSort2 aList = 
 	match aList with 
@@ -549,14 +549,14 @@ let badSort2 aList =
 
 Now when we test this, it passes:
 
-```
+```fsharp
 Check.Quick (``sort should have same length as original`` badSort2)
 // Ok, passed 100 tests.
 ```
 
 What's more, it also satisfies the pairwise property too!
 
-```
+```fsharp
 Check.Quick (``adjacent pairs from a list should be ordered`` badSort2)
 // Ok, passed 100 tests.
 ```
@@ -571,7 +571,7 @@ Answer: the fake result is throwing away data. The real result always contains t
 
 That leads us to a new property: a sorted list is always a permutation of the original list. Aha! Let's write the property in terms of permutations now:
 
-```
+```fsharp
 let ``a sorted list is always a permutation of the original list`` sortFn (aList:int list) = 
 	let sorted = aList |> sortFn 
 	let permutationsOfOriginalList = permutations aList 
@@ -585,7 +585,7 @@ Great, now all we need is a permutation function.
 
 Let's head over to StackOverflow and ~~steal~~ [borrow an implementation](http://stackoverflow.com/a/4610704/1136133). Here it is:
 
-```
+```fsharp
 /// given aList and anElement to insert,
 /// generate all possible lists with anElement 
 /// inserted into aList 
@@ -619,7 +619,7 @@ let rec permutations aList =
 
 Some quick interactive tests confirm that it works as expected:
 
-```
+```fsharp
 permutations ['a';'b';'c'] |> Seq.toList
 //  [['a'; 'b'; 'c']; ['b'; 'a'; 'c']; ['b'; 'c'; 'a']; ['a'; 'c'; 'b'];
 //  ['c'; 'a'; 'b']; ['c'; 'b'; 'a']]
@@ -640,7 +640,7 @@ permutations [3;3] |> Seq.toList
 
 Excellent! Now let's run FsCheck:
 
-```
+```fsharp
 Check.Quick (``a sorted list is always a permutation of the original list`` goodSort)
 ```
 
@@ -671,7 +671,7 @@ As a result, the code was *later refactored* to make this kind of testing easier
 
 Ok, so we can't use permutations by just looping through them. So let's use the same idea but write a function that is specific for this case, a `isPermutationOf` function. 
 
-```
+```fsharp
 let ``a sorted list has same contents as the original list`` sortFn (aList:int list) = 
 	let sorted = aList |> sortFn 
 	isPermutationOf aList sorted
@@ -679,7 +679,7 @@ let ``a sorted list has same contents as the original list`` sortFn (aList:int l
 	
 Here's the code for `isPermutationOf` and its associated helper functions:
 
-```
+```fsharp
 /// Given an element and a list, and other elements previously skipped,
 /// return a new list without the specified element.
 /// If not found, return None
@@ -716,14 +716,14 @@ let rec isPermutationOf list1 list2 =
 
 Let's try the test again. And yes, this time it completes before the heat death of the universe.
 
-```
+```fsharp
 Check.Quick (``a sorted list has same contents as the original list``  goodSort)
 // Ok, passed 100 tests.
 ```
 
 What's also great is that the malicious implementation now fails to satisfy this property!
 
-```
+```fsharp
 Check.Quick (``a sorted list has same contents as the original list``  badSort2)
 // Falsifiable, after 2 tests (5 shrinks) 
 // [1; 0]
@@ -746,7 +746,7 @@ FsCheck to the rescue! There are built in operators to combine properties: `.&.`
 
 Here is an example of them in use:
 
-```
+```fsharp
 let ``list is sorted``sortFn (aList:int list) = 
 	let prop1 = ``adjacent pairs from a list should be ordered`` sortFn aList 
 	let prop2 = ``a sorted list has same contents as the original list`` sortFn aList 
@@ -755,7 +755,7 @@ let ``list is sorted``sortFn (aList:int list) =
 
 When we test the combined property with a good implementation of `sort`, everything works as expected.
 
-```
+```fsharp
 let goodSort = List.sort
 Check.Quick (``list is sorted`` goodSort )
 // Ok, passed 100 tests.
@@ -763,7 +763,7 @@ Check.Quick (``list is sorted`` goodSort )
 
 And if we test a bad implementation, the combined property fails as well.
 
-```
+```fsharp
 let badSort aList = []
 Check.Quick (``list is sorted`` badSort )
 // Falsifiable, after 1 test (0 shrinks) 
@@ -774,7 +774,7 @@ But there's a problem now. Which of the two properties failed?
 
 What we would like to do is add a "label" to each property so that we can tell them apart. In FsCheck, this is done with the `|@` operator:
 
-```
+```fsharp
 let ``list is sorted (labelled)``sortFn (aList:int list) = 
 	let prop1 = ``adjacent pairs from a list should be ordered`` sortFn aList 
 				|@ "adjacent pairs from a list should be ordered"
@@ -785,7 +785,7 @@ let ``list is sorted (labelled)``sortFn (aList:int list) =
 
 And now, when we test with the bad sort, we get a message `Label of failing property: a sorted list has same contents as the original list`:
 
-```
+```fsharp
 Check.Quick (``list is sorted (labelled)`` badSort )
 //  Falsifiable, after 1 test (2 shrinks)
 //  Label of failing property: a sorted list has same contents as the original list
@@ -802,7 +802,7 @@ Sometimes you have a recursive data structure or a recursive problem.  In these 
 
 For example, for a sort, we could say something like:
 
-```
+```text
 A list is sorted if:
 * The first element is smaller (or equal to) the second.
 * The rest of the elements after the first element are also sorted.
@@ -810,7 +810,7 @@ A list is sorted if:
 
 Here is that logic expressed in code:
 
-```
+```fsharp
 let rec ``First element is <= than second, and tail is also sorted`` sortFn (aList:int list) = 
 	let sortedList = aList |> sortFn 
 	match sortedList with
@@ -826,7 +826,7 @@ let rec ``First element is <= than second, and tail is also sorted`` sortFn (aLi
 
 This property is satisfied by the real sort function:
 
-```
+```fsharp
 let goodSort = List.sort
 Check.Quick (``First element is <= than second, and tail is also sorted`` goodSort )
 // Ok, passed 100 tests.
@@ -834,7 +834,7 @@ Check.Quick (``First element is <= than second, and tail is also sorted`` goodSo
 
 But unfortunately, just like previous examples, the malicious implementations also pass.
 
-```
+```fsharp
 let badSort aList = []
 Check.Quick (``First element is <= than second, and tail is also sorted`` badSort )
 // Ok, passed 100 tests.
@@ -876,7 +876,7 @@ I won't go too much into this right now, but let's look at two simple examples.
 
 First, our old friend `sort` is idempotent (ignoring stability) while `reverse` is not, obviously.
 
-```
+```fsharp
 let ``sorting twice gives the same result as sorting once`` sortFn (aList:int list) =
 	let sortedOnce = aList |> sortFn 
 	let sortedTwice = aList |> sortFn |> sortFn 
@@ -896,7 +896,7 @@ Here's a quick demonstration.
 
 First we'll create a `NonIdempotentService` that gives different results on each query.
 
-```
+```fsharp
 type NonIdempotentService() =
 	let mutable data = 0
 	member this.Get() = 
@@ -921,7 +921,7 @@ let ``querying NonIdempotentService after update gives the same result`` value1 
 
 But if we test it now, we find that it does not satisfy the required idempotence property:
 
-```
+```fsharp
 Check.Quick ``querying NonIdempotentService after update gives the same result``
 // Falsifiable, after 2 tests 
 ```
@@ -929,7 +929,7 @@ Check.Quick ``querying NonIdempotentService after update gives the same result``
 As an alternative, we can create a (crude) `IdempotentService` that requires a timestamp for each transaction.
 In this design, multiple GETs using the same timestamp will always retrieve the same data.
 
-```
+```fsharp
 type IdempotentService() =
 	let mutable data = Map.empty
 	member this.GetAsOf (dt:DateTime) = 
@@ -956,7 +956,7 @@ let ``querying IdempotentService after update gives the same result`` value1 val
 
 And this one works:
 
-```
+```fsharp
 Check.Quick ``querying IdempotentService after update gives the same result``
 // Ok, passed 100 tests.
 ```
@@ -974,7 +974,7 @@ but that doesn't stop it being very useful for testing.
 
 So for "list sort", there are many simple but slow implementations around. For example, here's a quick implementation of insertion sort:
 
-```
+```fsharp
 module InsertionSort = 
 	
 	// Insert a new element into a list by looping over the list.
@@ -1000,7 +1000,7 @@ module InsertionSort =
 
 With this in place, we can write a property that tests the result against insertion sort.
 
-```
+```fsharp
 let ``sort should give same result as insertion sort`` sortFn (aList:int list) = 
 	let sorted1 = aList |> sortFn 
 	let sorted2 = aList |> InsertionSort.sort
@@ -1009,7 +1009,7 @@ let ``sort should give same result as insertion sort`` sortFn (aList:int list) =
 
 When we test the good sort, it works. Good!
 
-```
+```fsharp
 let goodSort = List.sort
 Check.Quick (``sort should give same result as insertion sort`` goodSort)
 // Ok, passed 100 tests.
@@ -1017,7 +1017,7 @@ Check.Quick (``sort should give same result as insertion sort`` goodSort)
 
 And when we test a bad sort, it doesn't. Even better!
 
-```
+```fsharp
 let badSort aList = aList 
 Check.Quick (``sort should give same result as insertion sort`` badSort)
 // Falsifiable, after 4 tests (6 shrinks) 
@@ -1033,7 +1033,7 @@ Can we compare them to each other and test them both in one fell swoop?
 
 The first algorithm was based on understanding that Roman numerals were based on tallying, leading to this simple code:
 
-```
+```fsharp
 let arabicToRomanUsingTallying arabic = 
    (String.replicate arabic "I")
 	.Replace("IIIII","V")
@@ -1055,7 +1055,7 @@ Another way to think about Roman numerals is to imagine an abacus. Each wire has
 
 This leads to the so-called "bi-quinary" approach:
 
-```
+```fsharp
 let biQuinaryDigits place (unit,five,ten) arabic =
   let digit =  arabic % (10*place) / place
   match digit with
@@ -1081,7 +1081,7 @@ let arabicToRomanUsingBiQuinary arabic =
 
 We now have two completely different algorithms, and we can cross-check them with each other to see if they give the same result.
 
-```
+```fsharp
 let ``biquinary should give same result as tallying`` arabic = 
 	let tallyResult = arabicToRomanUsingTallying arabic 
 	let biquinaryResult = arabicToRomanUsingBiQuinary arabic 
@@ -1090,7 +1090,7 @@ let ``biquinary should give same result as tallying`` arabic =
 
 But if we try running this code, we get a `ArgumentException: The input must be non-negative` due to the `String.replicate` call.
 
-```
+```fsharp
 Check.Quick ``biquinary should give same result as tallying``
 // ArgumentException: The input must be non-negative.
 ```
@@ -1104,7 +1104,7 @@ We saw in the previous post that we could use preconditions.  But for this examp
 First we'll define a *new* arbitrary integer called `arabicNumber` which is filtered as we want
 (an "arbitrary" is a combination of a generator algorithm and a shrinker algorithm, as described in the previous post).
 
-```
+```fsharp
 let arabicNumber = Arb.Default.Int32() |> Arb.filter (fun i -> i > 0 && i <= 4000) 
 ```
 
@@ -1112,14 +1112,14 @@ Next, we create a new property *which is constrained to only use "arabicNumber"*
 
 We'll give the property the rather clever name of "for all values of arabicNumber, biquinary should give same result as tallying".
 
-```
+```fsharp
 let ``for all values of arabicNumber biquinary should give same result as tallying`` = 
 	Prop.forAll arabicNumber ``biquinary should give same result as tallying`` 
 ```
 
 Now finally, we can do the cross-check test:
 
-```
+```fsharp
 Check.Quick ``for all values of arabicNumber biquinary should give same result as tallying``
 // Ok, passed 100 tests.
 ```
@@ -1185,7 +1185,7 @@ So what do we have?
 * A `Dollar` class that stores an `Amount`.
 * Methods `Add` and `Times` that transform the amount in the obvious way.
 
-```
+```fsharp
 // OO style class with members
 type Dollar(amount:int) =
 	member val Amount  = amount with get, set
@@ -1199,7 +1199,7 @@ type Dollar(amount:int) =
 
 So, first let's try it out interactively to make sure it works as expected:
 
-```
+```fsharp
 let d = Dollar.Create 2
 d.Amount  // 2
 d.Times 3 
@@ -1224,7 +1224,7 @@ Let's skip the "different paths" one for now. What about inverses? Are there any
 
 Yes, the setter and getter form an inverse that we can create a property from:
 
-```
+```fsharp
 let ``set then get should give same result`` value = 
 	let obj = Dollar.Create 0
 	obj.Amount <- value
@@ -1238,7 +1238,7 @@ Check.Quick ``set then get should give same result``
 Idempotence is relevant too. For example, doing two sets in a row should be the same as doing just one.
 Here's a property for that:
 
-```
+```fsharp
 let ``set amount is idempotent`` value = 
 	let obj = Dollar.Create 0
 	obj.Amount <- value
@@ -1266,7 +1266,7 @@ But in "TDD by Example" , Kent quickly realizes the problems with that and chang
 
 Here's the immutable version:
 
-```
+```fsharp
 type Dollar(amount:int) =
 	member val Amount  = amount 
 	member this.Add add = 
@@ -1299,7 +1299,7 @@ I think the "different paths to same result" is very applicable. We can do the s
 
 Here's that property expressed in code:
 
-```
+```fsharp
 let ``create then times should be same as times then create`` start multiplier = 
 	let d0 = Dollar.Create start
 	let d1 = d0.Times(multiplier)
@@ -1309,7 +1309,7 @@ let ``create then times should be same as times then create`` start multiplier =
 
 Great! Let's see if it works!
 
-```
+```fsharp
 Check.Quick ``create then times should be same as times then create``
 // Falsifiable, after 1 test 
 ```
@@ -1321,7 +1321,7 @@ Why not? Because we forgot that `Dollar` is a reference type and doesn't compare
 As a result of this mistake, we have discovered a property that we might have overlooked!
 Let's encode that before we forget.
 
-```
+```fsharp
 let ``dollars with same amount must be equal`` amount = 
 	let d1 = Dollar.Create amount 
 	let d2 = Dollar.Create amount 
@@ -1339,7 +1339,7 @@ You can do that if you like -- I'm going to switch to F# record types and get eq
 
 Here's the `Dollar` rewritten again:
 
-```
+```fsharp
 type Dollar = {amount:int } 
 	with 
 	member this.Add add = 
@@ -1352,7 +1352,7 @@ type Dollar = {amount:int }
 
 And now our two properties are satisfied:
 
-```
+```fsharp
 Check.Quick ``dollars with same amount must be equal`` 
 // Ok, passed 100 tests.
 
@@ -1366,7 +1366,7 @@ We can extend this approach for different paths. For example, we can extract the
 
 The code looks like this:
 
-```
+```fsharp
 let ``create then times then get should be same as times`` start multiplier = 
 	let d0 = Dollar.Create start
 	let d1 = d0.Times(multiplier)
@@ -1386,7 +1386,7 @@ For example, we can do a `Times` followed by an `Add` via two different paths, l
 
 And here's the code:
 
-```
+```fsharp
 let ``create then times then add should be same as times then add then create`` start multiplier adder = 
 	let d0 = Dollar.Create start
 	let d1 = d0.Times(multiplier)
@@ -1423,7 +1423,7 @@ Now all our tests can be reduced to this one property:
 
 Let's add a `Map` method to `Dollar`. And we can also rewrite `Times` and `Add` in terms of `Map`:
 
-```
+```fsharp
 type Dollar = {amount:int } 
 	with 
 	member this.Map f = 
@@ -1438,7 +1438,7 @@ type Dollar = {amount:int }
 
 Now the code for our property looks like this:
 
-```
+```fsharp
 let ``create then map should be same as map then create`` start f = 
 	let d0 = Dollar.Create start
 	let d1 = d0.Map f  
@@ -1452,7 +1452,7 @@ Don't worry! FsCheck has you covered! In cases like this, FsCheck will actually 
 
 Try it -- it just works!
 
-```
+```fsharp
 Check.Quick ``create then map should be same as map then create`` 
 // Ok, passed 100 tests.
 ```
@@ -1463,13 +1463,13 @@ Our new "map" property is much more general than the original property using "ti
 
 There's a little problem with the property as it stands. If you want to see what the function is that FsCheck is generating, then Verbose mode is not helpful.
 
-```
+```fsharp
 Check.Verbose ``create then map should be same as map then create`` 
 ```
 
 Gives the output:
 
-```
+```text
 0:
 18
 <fun:Invoke@3000>
@@ -1490,7 +1490,7 @@ We can't tell what the function values actually were.
 
 However, you can tell FsCheck to show more useful information by wrapping your function in a special `F` case, like this:
 
-```
+```fsharp
 let ``create then map should be same as map then create2`` start (F (_,f)) = 
 	let d0 = Dollar.Create start
 	let d1 = d0.Map f  
@@ -1500,13 +1500,13 @@ let ``create then map should be same as map then create2`` start (F (_,f)) =
 
 And now when you use Verbose mode...
 
-```
+```fsharp
 Check.Verbose ``create then map should be same as map then create2`` 
 ```
 
 ... you get a detailed log of each function that was used:
 
-```
+```text
 0:
 0
 { 0->1 }

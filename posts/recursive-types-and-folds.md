@@ -64,7 +64,7 @@ and sometimes, if I'm feeling particularly extravagant, I put them in a gift box
 
 Let's see how I might model this in types:
 
-```
+```fsharp
 type Book = {title: string; price: decimal}
 
 type ChocolateType = Dark | Milk | SeventyPercent
@@ -91,7 +91,7 @@ Note that, unlike functions, the `rec` keyword is *not* needed for defining recu
 
 Let's create some example values:
 
-```
+```fsharp
 // a Book
 let wolfHall = {title="Wolf Hall"; price=20m}
 
@@ -123,7 +123,7 @@ If there were no non-recursive elements, such as `Book`, all values of the type 
 
 For example, in the `ImpossibleGift` type below, all the cases are recursive. To construct any one of the cases you need an inner gift, and that needs to be constructed too, and so on.
 
-```
+```fsharp
 type ImpossibleGift =
     | Boxed of ImpossibleGift 
     | WithACard of ImpossibleGift * message:string
@@ -144,7 +144,7 @@ First, say that we want a description of the gift. The logic will be:
 
 Here's an example implementation:  
 
-```
+```fsharp
 let rec description gift =
     match gift with 
     | Book book -> 
@@ -161,7 +161,7 @@ let rec description gift =
 
 Note the recursive calls like this one in the `Boxed` case:
 
-```
+```fsharp
     | Boxed innerGift -> 
         sprintf "%s in a box" (description innerGift) 
                                ~~~~~~~~~~~ <= recursive call
@@ -169,7 +169,7 @@ Note the recursive calls like this one in the `Boxed` case:
 
 If we try this with our example values, let's see what we get:
 
-```
+```fsharp
 birthdayPresent |> description  
 // "'Wolf Hall' wrapped in HappyBirthday paper with a card saying 'Happy Birthday'"
 
@@ -188,7 +188,7 @@ For `totalCost`, the logic will be:
 * A box adds `1.0` to the cost.
 * A card adds `2.0` to the cost.
 
-```
+```fsharp
 let rec totalCost gift =
     match gift with 
     | Book book -> 
@@ -205,7 +205,7 @@ let rec totalCost gift =
 
 And here are the costs for the two examples:
 
-```
+```fsharp
 birthdayPresent |> totalCost 
 // 22.5m
 
@@ -216,7 +216,7 @@ christmasPresent |> totalCost
 Sometimes, people ask what is inside the box or wrapping paper.  A `whatsInside` function is easy to implement -- just ignore the container cases
 and return something for the non-recursive cases.
 
-```
+```fsharp
 let rec whatsInside gift =
     match gift with 
     | Book book -> 
@@ -233,7 +233,7 @@ let rec whatsInside gift =
 
 And the results:
 
-```
+```fsharp
 birthdayPresent |> whatsInside 
 // "A book"
 
@@ -258,7 +258,7 @@ As always, we can parameterize the application logic by passing in functions.  I
 
 Here is the new, parameterized version -- I'll explain why I have called it `cataGift` shortly.
 
-```
+```fsharp
 let rec cataGift fBook fChocolate fWrapped fBox fCard gift =
     match gift with 
     | Book book -> 
@@ -286,7 +286,7 @@ You can see this function is created using a purely mechanical process:
 
 Let's rewrite total cost using the generic `cataGift` function.
 
-```
+```fsharp
 let totalCostUsingCata gift =
     let fBook (book:Book) = 
         book.price
@@ -309,14 +309,14 @@ Notes:
 
 And this function gives the same result as before:
 
-```
+```fsharp
 birthdayPresent |> totalCostUsingCata 
 // 22.5m
 ```
 
 We can rewrite the `description` function using `cataGift` in the same way, changing `innerGiftResult` to `innerText`.
 
-```
+```fsharp
 let descriptionUsingCata gift =
     let fBook (book:Book) = 
         sprintf "'%s'" book.title 
@@ -334,7 +334,7 @@ let descriptionUsingCata gift =
 
 And the results are the same as before:
 
-```
+```fsharp
 birthdayPresent |> descriptionUsingCata  
 // "'Wolf Hall' wrapped in HappyBirthday paper with a card saying 'Happy Birthday'"
 
@@ -374,7 +374,7 @@ you can simplify it somewhat.
 
 First, the `cataGift fBook fChocolate fWrapped fBox fCard` crops up three times, once for each recursive case. Let's assign it a name like `recurse`:
 
-```
+```fsharp
 let rec cataGift fBook fChocolate fWrapped fBox fCard gift =
     let recurse = cataGift fBook fChocolate fWrapped fBox fCard
     match gift with 
@@ -403,7 +403,7 @@ Generally I avoid shadowing, but this is one case where it actually is a good pr
 
 Here's the version after the clean up:
 
-```
+```fsharp
 let rec cataGift fBook fChocolate fWrapped fBox fCard gift =
     let recurse = cataGift fBook fChocolate fWrapped fBox fCard
     match gift with 
@@ -422,14 +422,14 @@ let rec cataGift fBook fChocolate fWrapped fBox fCard gift =
 One more thing. I'm going to explicitly annotate the return type and call it `'r`. Later on in this series we'll be dealing with other
 generic types such as `'a` and `'b`, so it will be helpful to be consistent and always have a standard name for the return type.
 
-```
+```fsharp
 let rec cataGift fBook fChocolate fWrapped fBox fCard gift :'r =
 //                                name the return type =>  ~~~~ 
 ```
 
 Here's the final version:
 
-```
+```fsharp
 let rec cataGift fBook fChocolate fWrapped fBox fCard gift :'r =
     let recurse = cataGift fBook fChocolate fWrapped fBox fCard
     match gift with 
@@ -454,7 +454,7 @@ and the corresponding handler `fWrapped (recurse gift,style)`. Which leads us ni
 Here is the signature for the `cataGift` function. You can see that each case handler function (`fBook`, `fBox`, etc.) has the same pattern:
 an input which contains all the data for that case, and a common output type `'r`.  
 
-```
+```fsharp
 val cataGift :
   fBook:(Book -> 'r) ->
   fChocolate:(Chocolate -> 'r) ->
@@ -476,7 +476,7 @@ For example:
 
 Here is that relationship expressed through type signatures:
 
-```
+```fsharp
 // The Gift.Book constructor 
 Book -> Gift
 
@@ -527,7 +527,7 @@ For example, if all the clients used the catamorphism function rather than patte
 
 Here's an example. Let's say that I had a earlier design for `Gift` that didn't have the `WithACard` case. I'll call it version 1:
 
-```
+```fsharp
 type Gift =
     | Book of Book
     | Chocolate of Chocolate 
@@ -537,7 +537,7 @@ type Gift =
 
 And say that we built and published a catamorphism function for that structure:
 
-```
+```fsharp
 let rec cataGift fBook fChocolate fWrapped fBox gift :'r =
     let recurse = cataGift fBook fChocolate fWrapped fBox 
     match gift with 
@@ -555,7 +555,7 @@ Note that this has only *four* function parameters.
 
 Now suppose that version 2 of `Gift` comes along, which adds the `WithACard` case:
 
-```
+```fsharp
 type Gift =
     | Book of Book
     | Chocolate of Chocolate 
@@ -570,7 +570,7 @@ Often, when we add a new case, we *want* to break all the clients and force them
 
 But sometimes, we don't. And so we can stay compatible with the original `cataGift` by handling the extra case silently, like this:
 
-```
+```fsharp
 /// Uses Gift_V2 but is still backwards compatible with the earlier "cataGift".
 let rec cataGift fBook fChocolate fWrapped fBox gift :'r =
     let recurse = cataGift fBook fChocolate fWrapped fBox 
@@ -599,7 +599,7 @@ While we're on the topic of hiding the structure of a type, I should mention tha
 
 For example, we could create a active pattern for the first four cases, and ignore the `WithACard` case.
 
-```
+```fsharp
 let rec (|Book|Chocolate|Wrapped|Boxed|) gift =
     match gift with 
     | Gift.Book book -> 
@@ -617,7 +617,7 @@ let rec (|Book|Chocolate|Wrapped|Boxed|) gift =
 
 The clients can pattern match on the four cases without knowing that the new case even exists:
 
-```
+```fsharp
 let rec whatsInside gift =
     match gift with 
     | Book book -> 
@@ -636,7 +636,7 @@ Catamorphisms use function parameters, and as noted above, functions are more fl
 
 Here's an example where all the "container" cases are ignored, and only the "content" cases are handled. 
 
-```
+```fsharp
 let handleContents fBook fChocolate gift =
     let fWrapped (innerGiftResult,style) =   
         innerGiftResult
@@ -651,7 +651,7 @@ let handleContents fBook fChocolate gift =
 
 And here it is in use, with the two remaining cases handled "inline" using piping:
 
-```
+```fsharp
 birthdayPresent 
 |> handleContents 
     (fun book -> "The book you wanted for your birthday") 
@@ -681,7 +681,7 @@ but discarding the box and gift card.
 
 What's left at the end is a "gift minus chocolate" that we can model as follows:
 
-```
+```fsharp
 type GiftMinusChocolate =
     | Book of Book
     | Apology of string
@@ -697,7 +697,7 @@ We can easily map from a `Gift` to a `GiftMinusChocolate`, because the cases are
 
 Here's the code:
 
-```
+```fsharp
 let removeChocolate gift =
     let fBook (book:Book) = 
         Book book
@@ -715,7 +715,7 @@ let removeChocolate gift =
 
 And if we test...
 
-```
+```fsharp
 birthdayPresent |> removeChocolate
 // GiftMinusChocolate = 
 //     Wrapped (Book {title = "Wolf Hall"; price = 20M}, HappyBirthday)
@@ -733,7 +733,7 @@ That means that we can just use *the original case constructors* as the function
 To see what I mean, let's define a function called `deepCopy` that clones the original value.
 Each case handler is just the corresponding case constructor:
 
-```
+```fsharp
 let deepCopy gift =
     let fBook book = 
         Book book 
@@ -751,7 +751,7 @@ let deepCopy gift =
 
 We can simplify this further by removing the redundant parameters for each handler:
 
-```
+```fsharp
 let deepCopy gift =
     let fBook = Book 
     let fChocolate = Chocolate 
@@ -764,7 +764,7 @@ let deepCopy gift =
 
 You can test that this works yourself:
 
-```
+```fsharp
 christmasPresent |> deepCopy
 // Result => 
 //   Wrapped ( 
@@ -783,7 +783,7 @@ A slight variant on `deepCopy` allows us to recurse through an object and change
 
 For example, let's say I don't like milk chocolate. Well, I can write a function that upgrades the gift to better quality chocolate and leaves all the other cases alone.
 
-```
+```fsharp
 let upgradeChocolate gift =
     let fBook = Book 
     let fChocolate (choc:Chocolate) = 
@@ -796,7 +796,7 @@ let upgradeChocolate gift =
 ```
 
 And here it is in use:
-```
+```fsharp
 // create some chocolate I don't like
 let cheapChoc = Boxed (Chocolate {chocType=Milk; price=5m})
 

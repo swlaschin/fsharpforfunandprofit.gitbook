@@ -30,7 +30,7 @@ The F# type checker is not that much stricter than the C# type checker.  But bec
 
 Here is a simple example:
 
-```
+```fsharp
 //define a "safe" email address type
 type EmailAddress = EmailAddress of string
 
@@ -60,7 +60,7 @@ Here is a minor feature that demonstrates one of the ways that F# is more type-s
 
 Try evaluating the following and look at the errors generated:
 
-```
+```fsharp
 let printingExample = 
    printf "an int %i" 2                        // ok
    printf "an int %i" 2.0                      // wrong type
@@ -81,7 +81,7 @@ Unlike C#, the compiler analyses the format string and determines what the numbe
 
 This can be used to constrain the types of parameters without explicitly having to specify them. So for example, in the code below, the compiler can deduce the types of the arguments automatically.
 
-```
+```fsharp
 let printAString x = printf "%s" x
 let printAnInt x = printf "%i" x
 
@@ -95,7 +95,7 @@ let printAnInt x = printf "%i" x
 
 F# has the ability to define units of measure and associate them with floats. The unit of measure is then "attached" to the float as a type and prevents mixing different types. This is another feature that can be very handy if you need it.
 
-```
+```fsharp
 // define some measures
 [<Measure>] 
 type cm
@@ -140,7 +140,7 @@ One final example. In C# any class can be equated with any other class (using re
 
 Here is some C# code which is perfectly valid and compiles fine:
 
-```
+```csharp
 using System;
 var obj = new Object();
 var ex = new Exception();
@@ -149,7 +149,7 @@ var b = (obj == ex);
 
 If we write the identical code in F#, we get a compile-time error:
 
-```
+```fsharp
 open System
 let obj = new Object()
 let ex = new Exception()
@@ -162,7 +162,7 @@ In F#, you can even stop a type being compared at all!  This is not as silly as 
 
 Here is an example of this:
 
-```
+```fsharp
 // deny comparison
 [<NoEquality; NoComparison>]
 type CustomerAccount = {CustomerAccountId: int}

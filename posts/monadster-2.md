@@ -30,7 +30,7 @@ Just like the right arm, the head is composed of two parts, a brain and a skull.
 
 Dr Frankenfunctor started by defining the dead brain and skull:
 
-```
+```fsharp
 type DeadBrain = DeadBrain of Label 
 type Skull = Skull of Label 
 ```
@@ -38,7 +38,7 @@ type Skull = Skull of Label
 Unlike the two-part right arm, only the brain needs to become alive.
 The skull can be used as is and does not need to be transformed before being used in a live head.
 
-```
+```fsharp
 type LiveBrain = LiveBrain of Label * VitalForce
 
 type LiveHead = {
@@ -49,7 +49,7 @@ type LiveHead = {
 
 The live brain is combined with the skull to make a live head using a `headSurgery` function, analogous to the `armSurgery` we had earlier.
 
-```
+```fsharp
 let headSurgery brain skull =
     {brain=brain; skull=skull}
 ```
@@ -71,7 +71,7 @@ We can use the same approach as we did before:
 
 Here's the code:
 
-```
+```fsharp
 let wrapSkullInM skull = 
     let becomeAlive vitalForce = 
         skull, vitalForce 
@@ -80,7 +80,7 @@ let wrapSkullInM skull =
 
 But the signature of `wrapSkullInM` is quite interesting. 
 
-```
+```fsharp
 val wrapSkullInM : 'a -> M<'a>
 ```
 
@@ -91,7 +91,7 @@ No mention of skulls anywhere!
 We've created a completely generic function that will turn anything into an `M`.  So let's rename it.
 I'm going to call it `returnM`, but in other contexts it might be called `pure` or `unit`.
 
-```
+```fsharp
 let returnM x = 
     let becomeAlive vitalForce = 
         x, vitalForce 
@@ -104,7 +104,7 @@ Let's put this into action.
 
 First, we need to define how to create a live brain.
 
-```
+```fsharp
 let makeLiveBrain (DeadBrain label) = 
     let becomeAlive vitalForce = 
         let oneUnit, remainingVitalForce = getVitalForce vitalForce 
@@ -115,7 +115,7 @@ let makeLiveBrain (DeadBrain label) =
 
 Next we obtain a dead brain and skull:
 
-```
+```fsharp
 let deadBrain = DeadBrain "Abby Normal"
 let skull = Skull "Yorick"
 ```
@@ -126,14 +126,14 @@ let skull = Skull "Yorick"
 
 Next we build the "M" versions from the dead parts:
 
-```
+```fsharp
 let liveBrainM = makeLiveBrain deadBrain
 let skullM = returnM skull
 ```
 
 And combine the parts using `map2M`:
 
-```
+```fsharp
 let headSurgeryM = map2M headSurgery
 let headM = headSurgeryM liveBrainM skullM
 ```
@@ -142,7 +142,7 @@ Once again, we can do all these things up front, before the lightning strikes.
 
 When the vital force is available, we can run `headM` with the vital force...
 
-```
+```fsharp
 let vf = {units = 10}
 
 let liveHead, remainingFromHead = runM headM vf
@@ -150,7 +150,7 @@ let liveHead, remainingFromHead = runM headM vf
 
 ...and we get this result:
 
-```
+```text
 val liveHead : LiveHead = 
     {brain = LiveBrain ("Abby normal",{units = 1;});
     skull = Skull "Yorick";}
@@ -169,7 +169,7 @@ There is one more component we need, and that is a heart.
 
 First, we have a dead heart and a live heart defined in the usual way:
 
-```
+```fsharp
 type DeadHeart = DeadHeart of Label 
 type LiveHeart = LiveHeart of Label * VitalForce
 ```
@@ -177,13 +177,13 @@ type LiveHeart = LiveHeart of Label * VitalForce
 But the creature needs more than a live heart -- it needs a *beating heart*.
 A beating heart is constructed from a live heart and some more vital force, like this:
 
-```
+```fsharp
 type BeatingHeart = BeatingHeart of LiveHeart * VitalForce
 ```
 
 The code that creates a live heart is very similar to the previous examples:
 
-```
+```fsharp
 let makeLiveHeart (DeadHeart label) = 
     let becomeAlive vitalForce = 
         let oneUnit, remainingVitalForce = getVitalForce vitalForce 
@@ -195,7 +195,7 @@ let makeLiveHeart (DeadHeart label) =
 The code that creates a beating heart is also very similar. It takes a live heart as a parameter, uses up another unit of vital force,
 and returns the beating heart and the remaining vital force.
 
-```
+```fsharp
 let makeBeatingHeart liveHeart = 
 
     let becomeAlive vitalForce = 
@@ -207,7 +207,7 @@ let makeBeatingHeart liveHeart =
 
 If we look at the signatures for these functions, we see that they are very similar; both of the form `Something -> M<SomethingElse>`.
 
-```
+```fsharp
 val makeLiveHeart : DeadHeart -> M<LiveHeart>
 val makeBeatingHeart : LiveHeart -> M<BeatingHeart>
 ```
@@ -234,7 +234,7 @@ And furthermore, we want to build it from the `makeBeatingHeart` function we alr
 
 Here's a first attempt, using the same pattern we've used many times before:
 
-```
+```fsharp
 let makeBeatingHeartFromLiveHeartM liveHeartM = 
 
     let becomeAlive vitalForce = 
@@ -259,7 +259,7 @@ What vital force though? It should be the remaining vital force after getting th
 
 So the final version looks like this:
 
-```
+```fsharp
 let makeBeatingHeartFromLiveHeartM liveHeartM = 
 
     let becomeAlive vitalForce = 
@@ -283,7 +283,7 @@ Notice that we return `remainingVitalForce2` at the end, the remainder after bot
 
 If we look at the signature for this function, it is:
 
-```
+```fsharp
 M<LiveHeart> -> M<BeatingHeart>
 ```
 
@@ -295,7 +295,7 @@ Once again, we can make this function generic by passing in a function parameter
 
 I'll call it `bindM`. Here's the code:
 
-```
+```fsharp
 let bindM f bodyPartM = 
     let becomeAlive vitalForce = 
         let bodyPart, remainingVitalForce = runM bodyPartM vitalForce 
@@ -307,7 +307,7 @@ let bindM f bodyPartM =
 
 and the signature is:
 
-```
+```fsharp
 f:('a -> M<'b>) -> M<'a> -> M<'b>
 ```
 
@@ -317,7 +317,7 @@ By the way, functions with a signature like `Something -> M<SomethingElse>` are 
 
 Anyway, once you understand what is going on in `bindM`, a slightly shorter version can be implemented like this:
 
-```
+```fsharp
 let bindM f bodyPartM = 
     let becomeAlive vitalForce = 
         let bodyPart, remainingVitalForce = runM bodyPartM vitalForce 
@@ -331,7 +331,7 @@ So finally, we have a way of creating a function, that given a `DeadHeart`, crea
 
 Here's the code:
 
-```
+```fsharp
 // create a dead heart
 let deadHeart = DeadHeart "Anne"
 
@@ -345,7 +345,7 @@ let beatingHeartM = bindM makeBeatingHeart liveHeartM
 
 There are a lot of intermediate values in there, and it can be made simpler by using piping, like this:
 
-```
+```fsharp
 let beatingHeartM = 
    DeadHeart "Anne"
    |> makeLiveHeart 
@@ -377,7 +377,7 @@ By using `bindM`, we can convert each step into a function where the input and o
 
 As always, we construct the recipe ahead of time, in this case, to make a `BeatingHeart`.
 
-```
+```fsharp
 let beatingHeartM =
     DeadHeart "Anne" 
     |> makeLiveHeart 
@@ -386,7 +386,7 @@ let beatingHeartM =
 
 When the vital force is available, we can run `beatingHeartM` with the vital force...
 
-```
+```fsharp
 let vf = {units = 10}
 
 let beatingHeart, remainingFromHeart = runM beatingHeartM vf
@@ -394,7 +394,7 @@ let beatingHeart, remainingFromHeart = runM beatingHeartM vf
 
 ...and we get this result:
 
-```
+```text
 val beatingHeart : BeatingHeart = 
     BeatingHeart (LiveHeart ("Anne",{units = 1;}),{units = 1;})
 
@@ -410,7 +410,7 @@ Finally, we have all the parts we need to assemble a complete body.
 
 Here is Dr Frankenfunctor's definition of a live body:
 
-```
+```fsharp
 type LiveBody = {
     leftLeg: LiveLeftLeg
     rightLeg : LiveLeftLeg
@@ -440,7 +440,7 @@ One way would be to repeat the technique that we used with `mapM` and `map2M`.  
 
 For example, `map3M` could be defined like this:
 
-```
+```fsharp
 let map3M f m1 m2 m3 =
     let becomeAlive vitalForce = 
         let v1,remainingVitalForce = runM m1 vitalForce 
@@ -460,7 +460,7 @@ but *functions* can be assembled step by step, thanks to the magic of currying a
 
 So if we have a six parameter function that creates a `LiveBody`, like this:
 
-```
+```fsharp
 val createBody : 
     leftLeg:LiveLeftLeg ->
     rightLeg:LiveLeftLeg ->
@@ -473,20 +473,20 @@ val createBody :
 
 we can actually think of it as a *one* parameter function that returns a five parameter function, like this:
 
-```
+```fsharp
 val createBody : 
     leftLeg:LiveLeftLeg -> (five param function) 
 ```
 
 and then when we apply the function to the first parameter ("leftLeg") we get back that five parameter function:
 
-```
+```fsharp
 (six param function) apply (first parameter) returns (five param function)
 ```
 
 where the five parameter function has the signature:
 
-```
+```fsharp
     rightLeg:LiveLeftLeg ->
     leftArm:LiveLeftArm ->
     rightArm:LiveRightArm ->
@@ -497,19 +497,19 @@ where the five parameter function has the signature:
 
 This five parameter function can in turn be thought of as a one parameter function that returns a four parameter function:
 
-```
+```fsharp
     rightLeg:LiveLeftLeg -> (four parameter function)
 ```
 
 Again, we can apply a first parameter ("rightLeg") and get back that four parameter function:
 
-```
+```fsharp
 (five param function) apply (first parameter) returns (four param function)
 ```
 
 where the four parameter function has the signature:
 
-```
+```fsharp
     leftArm:LiveLeftArm ->
     rightArm:LiveRightArm ->
     head:LiveHead -> 
@@ -527,7 +527,7 @@ We start with the six parameter function wrapped in an M, and an M<LiveLeftLeg> 
 
 Let's assume there is some way to "apply" the M-function to the M-parameter. We should get back a five parameter function wrapped in an `M`.
 
-```
+```fsharp
 // normal version
 (six param function) apply (first parameter) returns (five param function)
 
@@ -537,7 +537,7 @@ M<six param function> applyM M<first parameter> returns M<five param function>
 
 And then doing that again, we can apply the next M-parameter
 
-```
+```fsharp
 // normal version
 (five param function) apply (first parameter) returns (four param function)
 
@@ -554,7 +554,7 @@ The output will be the result of the function wrapped in an M.
 
 Here's the implementation:
 
-```
+```fsharp
 let applyM mf mx =
     let becomeAlive vitalForce = 
         let f,remainingVitalForce = runM mf vitalForce 
@@ -570,7 +570,7 @@ Let's try it out!
 
 First we need our six parameter function:
 
-```
+```fsharp
 let createBody leftLeg rightLeg leftArm rightArm head beatingHeart =
     {
     leftLeg = leftLeg
@@ -584,7 +584,7 @@ let createBody leftLeg rightLeg leftArm rightArm head beatingHeart =
 
 And we're going to need to clone the left leg to use it for the right leg:
 
-```
+```fsharp
 let rightLegM = leftLegM
 ```
 
@@ -594,7 +594,7 @@ With the `returnM` function we defined earlier for skull, of course!
 
 So putting it together, we have this code:
 
-```
+```fsharp
 // move createBody to M-world -- a six parameter function wrapped in an M
 let fSixParamM = returnM createBody           
 
@@ -619,13 +619,13 @@ But that code sure is ugly!  What can we do to make it look nicer?
 
 One trick is to turn `applyM` into an infix operation, just like normal function application. The operator used for this is commonly written `<*>`.
 
-```
+```fsharp
 let (<*>) = applyM
 ```
 
 With this in place, we can rewite the above code as:
 
-```
+```fsharp
 let bodyM = 
     returnM createBody 
     <*> leftLegM
@@ -640,13 +640,13 @@ which is much nicer!
 
 Another trick is to notice that the `returnM` followed by `applyM` is the same as `mapM`. So if we create an infix operator for `mapM` too...
 
-```
+```fsharp
 let (<!>) = mapM
 ```
 
 ...we can get rid of the `returnM` as well and write the code like this:
 
-```
+```fsharp
 let bodyM = 
     createBody 
     <!> leftLegM
@@ -669,7 +669,7 @@ Now all we have to do is wait for lightning to strike and charge the machinery t
 
 Here it comes --  the vital force is available! Quickly we run `bodyM ` in the usual way...
 
-```
+```fsharp
 let vf = {units = 10}
 
 let liveBody, remainingFromBody = runM bodyM vf
@@ -677,7 +677,7 @@ let liveBody, remainingFromBody = runM bodyM vf
 
 ...and we get this result:
 
-```
+```text
 val liveBody : LiveBody =
   {leftLeg = LiveLeftLeg ("Boris",{units = 1;});
    rightLeg = LiveLeftLeg ("Boris",{units = 1;});

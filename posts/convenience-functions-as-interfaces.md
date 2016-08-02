@@ -17,7 +17,7 @@ To see how this works, let's compare the same design pattern in C# and F#. For e
 
 Let's say that we have a calculator interface:
 
-```
+```csharp
 interface ICalculator 
 {
    int Calculate(int input);
@@ -26,7 +26,7 @@ interface ICalculator
 
 And then a specific implementation:
 
-```
+```csharp
 class AddingCalculator: ICalculator
 {
    public int Calculate(int input) { return input + 1; }
@@ -35,7 +35,7 @@ class AddingCalculator: ICalculator
 
 And then if we want to add logging, we can wrap the core calculator implementation inside a logging wrapper.
 
-```
+```csharp
 class LoggingCalculator: ICalculator
 {
    ICalculator _innerCalculator;
@@ -61,7 +61,7 @@ And here is where F# shines. In F#, you can do the same thing without having to 
 
 Here is the equivalent F# code.
 
-```
+```fsharp
 let addingCalculator input = input + 1
 
 let loggingCalculator innerCalculator input = 
@@ -77,7 +77,7 @@ In other words, the signature of the function *is* the interface.
 
 Even nicer is that by default, the F# logging code can be made completely generic so that it will work for *any* function at all. Here are some examples:
 
-```
+```fsharp
 let add1 input = input + 1
 let times2 input = input * 2
 
@@ -93,7 +93,7 @@ let times2WithLogging = genericLogger times2
 
 The new "wrapped" functions can be used anywhere the original functions could be used ? no one can tell the difference!
 
-```
+```fsharp
 // test
 add1WithLogging 3
 times2WithLogging 3
@@ -103,7 +103,7 @@ times2WithLogging 3
 
 Exactly the same generic wrapper approach can be used for other things. For example, here is a generic wrapper for timing a function.
 
-```
+```fsharp
 let genericTimer anyFunc input = 
    let stopwatch = System.Diagnostics.Stopwatch()
    stopwatch.Start() 
@@ -130,7 +130,7 @@ Let's use the familiar example of inheritance: an `Animal` superclass with `Cat`
 
 In a true functional design, there are no subclasses, but instead the `Animal` class would have a `NoiseMaking` function that would be passed in with the constructor.   This approach is exactly the same as the "strategy" pattern in OO design.
 
-```
+```fsharp
 type Animal(noiseMakingStrategy) = 
    member this.MakeNoise = 
       noiseMakingStrategy() |> printfn "Making noise %s" 

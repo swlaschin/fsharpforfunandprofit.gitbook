@@ -174,7 +174,7 @@ To demonstrate what I mean, let's compare the test suite developed in the video 
 
 The test suite developed in the video checks only the obvious inputs, plus the case 3497 "for good measure". Here's the Ruby code ported to F#:
 
-```
+```fsharp
 [<Test>]
 let ``For certain inputs, expect certain outputs``() = 
     let testpairs = [ 
@@ -207,7 +207,7 @@ True, the test with 3497 implicitly checks the ordering requirement ("M" before 
 
 Now compare that test with this one:
 
-```
+```fsharp
 [<Test>]
 let ``For all valid inputs, there must be a max of four "I"s in a row``() = 
     for i in [1..4000] do
@@ -245,7 +245,7 @@ To switch to property-based testing for the requirement above, I would refactor 
 
 Here's the refactored code:
 
-```
+```fsharp
 // Define a property that should be true for all inputs
 let ``has max rep of four Is`` arabic = 
    let roman = arabicToRoman arabic
@@ -270,7 +270,7 @@ Check.Quick prop
 
 Or for example, let's say that I want to test the substitution rule for 40 => "XL".
 
-```
+```fsharp
 // Define a property that should be true for all inputs
 let ``if arabic has 4 tens then roman has one XL otherwise none`` arabic = 
    let roman = arabicToRoman arabic
@@ -319,14 +319,14 @@ So, what is the simplest implementation I can think of that would work?
 
 How about just converting our arabic number to tally marks?  1 becomes "I", 2 becomes "II", and so on.
 
-```
+```fsharp
 let arabicToRoman arabic = 
    String.replicate arabic "I"
 ```
 
 Here it is in action:
 
-```
+```fsharp
 arabicToRoman 1    // "I"
 arabicToRoman 5    // "IIIII"
 arabicToRoman 10   // "IIIIIIIIII" 
@@ -340,7 +340,7 @@ This is where insight into the domain comes in. If we understand that the tally 
 
 So let's convert all runs of five tally marks into a "V".
  
-```
+```fsharp
 let arabicToRoman arabic = 
    (String.replicate arabic "I")
     .Replace("IIIII","V")
@@ -354,7 +354,7 @@ arabicToRoman 10   // "VV"
 
 But now we can have runs of "V"s. Two "V"s need to be collapsed into an "X".
 
-```
+```fsharp
 let arabicToRoman arabic = 
    (String.replicate arabic "I")
     .Replace("IIIII","V")
@@ -371,7 +371,7 @@ arabicToRoman 16   // "XVI"
 
 I think you get the idea. We can go on adding abbreviations... 
 
-```
+```fsharp
 let arabicToRoman arabic = 
    (String.replicate arabic "I")
     .Replace("IIIII","V")
@@ -395,7 +395,7 @@ And now we're done. We've met the first three requirements.
 
 If we want to add the optional abbreviations for the fours and nines, we can do that at the end, after all the tally marks have been accumulated.
 
-```
+```fsharp
 let arabicToRoman arabic = 
    (String.replicate arabic "I")
     .Replace("IIIII","V")
@@ -467,7 +467,7 @@ This leads directly to an algorithm based on converting the beads on the abacus 
 
 Here's an implementation that is a direct translation of that algorithm:
 
-```
+```fsharp
 let biQuinaryDigits place (unit,five) arabic =
     let digit =  arabic % (10*place) / place
     match digit with
@@ -495,7 +495,7 @@ let arabicToRoman arabic =
 Note that the above code does not produce the abbreviations for the four and nine cases.
 We can easily modify it to do this though. We just need to pass in the symbol for ten, and tweak the mapping for the 4 and 9 case, as follows:
 
-```
+```fsharp
 let biQuinaryDigits place (unit,five,ten) arabic =
   let digit =  arabic % (10*place) / place
   match digit with

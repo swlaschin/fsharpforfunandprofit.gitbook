@@ -38,7 +38,7 @@ But when I [compare code](../posts/fvsc-sum-of-squares.md) written in a function
 
 I mean, just look at this code written in a familiar language:
 
-```
+```csharp
 public static class SumOfSquaresHelper
 {
    public static int Square(int i)
@@ -60,7 +60,7 @@ public static class SumOfSquaresHelper
 
 and compare it with this:
 
-```
+```fsharp
 let square x = x * x
 let sumOfSquares n = [1..n] |> List.map square |> List.sum
 ```
@@ -75,7 +75,7 @@ And that's another thing. What's up with all these languages that get rid of cur
 
 I'll show you what I mean. Here's a code sample with familiar curly braces.
 
-```
+```csharp
 public class Squarer
 {
     public int Square(int input)
@@ -94,7 +94,7 @@ public class Squarer
     
 And here's some similar code, but without curly braces. 
 
-```
+```fsharp
 type Squarer() =  
 
     let Square input = 
@@ -118,14 +118,14 @@ Well, as it happens, I *like* to see type declarations. I feel uncomfortable if 
 
 Here's a function signature for some ML-ish code. There are no type declarations needed and all types are inferred automatically.
 
-```
+```fsharp
 let GroupBy source keySelector = 
     ... 
 ```
 
 And here's the function signature for similar code in C#, with explicit type declarations.
 
-```
+```csharp
 public IEnumerable<IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(
     IEnumerable<TSource> source,
     Func<TSource, TKey> keySelector
@@ -172,7 +172,7 @@ I'd much rather get everything (mostly) working for the happy path, and then fix
 
 I'm very conscientious about [checking for nulls](http://stackoverflow.com/questions/7585493/null-parameter-checking-in-c-sharp) on every method. It gives me great satisfaction to know that my code is completely bulletproof as a result.
 
-```
+```csharp
 void someMethod(SomeClass x)
 {
     if (x == null) { throw new NullArgumentException(); }
@@ -197,7 +197,7 @@ Perhaps the functional programmers are not aware of them?
 
 Here's some more code for calculating the sum of squares. This is *way* too hard to understand because of all the weird symbols in it.
 
-```
+```text
 ss=: +/ @: *:
 ```
 

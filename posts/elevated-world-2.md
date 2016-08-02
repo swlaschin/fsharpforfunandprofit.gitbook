@@ -105,7 +105,7 @@ Of course, the "unwrapping" metaphor does not work for every elevated world, but
 
 Here are some examples of defining `bind` for two different types in F#:
 
-```
+```fsharp
 module Option = 
 
     // The bind function for Options
@@ -138,7 +138,7 @@ Let's see how this works in practice with a simple example.
 
 First let's say we have a function that parses certain `string`s into `int`s. Here's a very simple implementation:
 
-```
+```fsharp
 let parseInt str = 
     match str with
     | "-1" -> Some -1
@@ -155,7 +155,7 @@ Sometimes it returns a int, sometimes not. So the signature is `string -> int op
   
 And let's say we have another function that takes an `int` as input and returns a `OrderQty` type:
 
-```
+```fsharp
 type OrderQty = OrderQty of int
 
 let toOrderQty qty = 
@@ -176,7 +176,7 @@ The output of `parseInt` cannot be fed directly into `toOrderQty`, so this is wh
 
 Doing `Option.bind toOrderQty` lifts it to a `int option -> OrderQty option` function and so the output of `parseInt` can be used as input, just as we need.
 
-```
+```fsharp
 let parseOrderQty str =
     parseInt str
     |> Option.bind toOrderQty
@@ -193,7 +193,7 @@ typically called `>>=` (for left to right data flow) or `=<<` (for right to left
 
 With this in place you can write an alternative version of `parseOrderQty` like this:
 
-```
+```fsharp
 let parseOrderQty_alt str =
     str |> parseInt >>= toOrderQty
 ```
@@ -204,7 +204,7 @@ You can see that `>>=` performs the same kind of role as pipe (`|>`) does, excep
 
 Bind can be used to chain any number of functions or expressions together, so you often see code looking something like this:
 
-```
+```fsharp
 expression1 >>= 
 expression2 >>= 
 expression3 >>= 
@@ -213,7 +213,7 @@ expression4
 
 This is not too different from how an imperative program might look if you replace the `>>=` with a `;`:
 
-```
+```fsharp
 statement1; 
 statement2;
 statement3;
@@ -228,7 +228,7 @@ Most functional programming languages have some kind of syntax support for `bind
 
 In F# it is (one component) of computation expressions, so the following explicit chaining of `bind`:
 
-```
+```fsharp
 initialExpression >>= (fun x ->
 expressionUsingX  >>= (fun y ->
 expressionUsingY  >>= (fun z ->
@@ -237,7 +237,7 @@ x+y+z )))             // return
 
 becomes implicit, using `let!` syntax:
 
-```
+```fsharp
 elevated {
     let! x = initialExpression 
     let! y = expressionUsingX x
@@ -247,7 +247,7 @@ elevated {
 
 In Haskell, the equivalent is the "do notation":
 
-```
+```fsharp
 do
     x <- initialExpression 
     y <- expressionUsingX x
@@ -257,7 +257,7 @@ do
 
 And in Scala, the equivalent is the "for comprehension":
 
-```
+```fsharp
 for {
     x <- initialExpression 
     y <- expressionUsingX(x)
@@ -283,7 +283,7 @@ Here's how bind can be used to emulate `map`, for example:
 
 Similarly, `bind` can emulate `apply`. Here is how `map` and `apply` can be defined using `bind` and `return` for Options in F#:
 
-```
+```fsharp
 // map defined in terms of bind and return (Some)
 let map f = 
     Option.bind (f >> Some) 
@@ -350,7 +350,7 @@ In the normal world, function composition is associative.
 For example, we could pipe a value into a function `f` and then take that result and pipe it into another function `g`.
 Alternatively, we can compose `f` and `g` first into a single function and then pipe `a` into it.
 
-```
+```fsharp
 let groupFromTheLeft = (a |> f) |> g
 let groupFromTheRight = a |> (f >> g)
 ```
@@ -359,7 +359,7 @@ In the normal world, we expect both of these alternatives to give the same answe
 
 The third monad law says that, after using `bind` and `return`, the grouping doesn't matter either. The two examples below correspond to the examples above:
 
-```
+```fsharp
 let groupFromTheLeft = (a >>= f) >>= g
 let groupFromTheRight = a >>= (fun x -> f x >>= g)
 ```

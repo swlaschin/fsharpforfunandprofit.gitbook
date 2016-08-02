@@ -46,7 +46,7 @@ Here is how it works:
 
 Here's the code:
 
-```
+```fsharp
 let A_Parser str =
     if String.IsNullOrEmpty(str) then
         (false,"")
@@ -59,7 +59,7 @@ let A_Parser str =
 
 The signature of `A_Parser` is: 
 
-```
+```fsharp
 val A_Parser :
     string -> (bool * string)
 ```
@@ -70,14 +70,14 @@ which tells us that the input is a string, and the output is a pair consisting o
 
 Let's test it now -- first with good input:
 
-```
+```fsharp
 let inputABC = "ABC"
 A_Parser inputABC    
 ```
 
 The result is:
 
-```
+```fsharp
 (true, "BC")
 ```
 
@@ -85,14 +85,14 @@ As you can see, the `A` has been consumed and the remaining input is just `"BC"`
 
 And now with bad input:
 
-```
+```fsharp
 let inputZBC = "ZBC"
 A_Parser inputZBC    
 ```
 
 which gives the result:
 
-```
+```fsharp
 (false, "ZBC")
 ```
 
@@ -110,7 +110,7 @@ And this time, rather than returning true or false, we'll return a message indic
 
 We'll call the function `pchar` for "parse char". Here's the code:
 
-```
+```fsharp
 let pchar (charToMatch,str) =
     if String.IsNullOrEmpty(str) then
         let msg = "No more input"
@@ -130,7 +130,7 @@ This code is just like the previous example, except that the unexpected characte
 
 The signature of `pchar` is: 
 
-```
+```fsharp
 val pchar :
     (char * string) -> (string * string)
 ```
@@ -139,14 +139,14 @@ which tells us that the input is a pair of (string,character to match) and the o
 
 Let's test it now -- first with good input:
 
-```
+```fsharp
 let inputABC = "ABC"
 pchar('A',inputABC)  
 ```
 
 The result is:
 
-```
+```fsharp
 ("Found A", "BC")
 ```
 
@@ -154,14 +154,14 @@ As before, the `A` has been consumed and the remaining input is just `"BC"`.
 
 And now with bad input:
 
-```
+```fsharp
 let inputZBC = "ZBC"
 pchar('A',inputZBC)  
 ```
 
 which gives the result:
 
-```
+```fsharp
 ("Expecting 'A'. Got 'Z'", "ZBC")
 ```
 
@@ -169,7 +169,7 @@ And again, as before, the first character was *not* consumed and the remaining i
 
 If we pass in `Z`, then the parser does succeed:
 
-```
+```fsharp
 pchar('Z',inputZBC)  // ("Found Z", "BC")
 ```
 
@@ -181,7 +181,7 @@ pchar('Z',inputZBC)  // ("Found Z", "BC")
 We want to be able to tell the difference between a successful match and a failure, and returning a stringly-typed message is not very helpful,
 so let's define a special "choice" type to indicate the difference. I'll call it `Result`:
 
-```
+```fsharp
 type Result<'a> =
     | Success of 'a
     | Failure of string 
@@ -193,7 +193,7 @@ The `Success` case is generic and can contain any value. The `Failure` case cont
 
 We can now rewrite the parser to return one of the `Result` cases, like this:
 
-```
+```fsharp
 let pchar (charToMatch,str) =
     if String.IsNullOrEmpty(str) then
         Failure "No more input"
@@ -209,7 +209,7 @@ let pchar (charToMatch,str) =
 
 The signature of `pchar` is now: 
 
-```
+```fsharp
 val pchar :
     (char * string) -> Result<char * string>
 ```
@@ -218,14 +218,14 @@ which tells us that the the output is now a `Result` (which in the `Success` cas
 
 Let's test it again -- first with good input:
 
-```
+```fsharp
 let inputABC = "ABC"
 pchar('A',inputABC)  
 ```
 
 The result is:
 
-```
+```fsharp
 Success ('A', "BC")
 ```
 
@@ -233,14 +233,14 @@ As before, the `A` has been consumed and the remaining input is just `"BC"`. We 
 
 And now with bad input:
 
-```
+```fsharp
 let inputZBC = "ZBC"
 pchar('A',inputZBC)  
 ```
 
 which gives the result:
 
-```
+```fsharp
 Failure "Expecting 'A'. Got 'Z'"
 ```
 
@@ -260,7 +260,7 @@ In the previous implementation, the input to the function has been a tuple -- a 
 
 In functional languages like F#, it's more idiomatic to use a curried version, like this:
 
-```
+```fsharp
 let pchar charToMatch str = 
     if String.IsNullOrEmpty(str) then
         Failure "No more input"
@@ -278,14 +278,14 @@ Can you see the difference?  The only difference is in the first line, and even 
 
 Here's the uncurried (tuple) version:
 
-```
+```fsharp
 let pchar (charToMatch,str) =
     ...
 ```
 
 And here's the curried version:
 
-```
+```fsharp
 let pchar charToMatch str = 
     ...
 ```
@@ -293,14 +293,14 @@ let pchar charToMatch str =
 The difference is much more obvious when you look at the type signatures.
 Here's the signature for the uncurried (tuple) version:
 
-```
+```fsharp
 val pchar :
     (char * string) -> Result<char * string>
 ```
 
 And here's the signature for the curried version:
 
-```
+```fsharp
 val pchar :
     char -> string -> Result<char * string>
 ```
@@ -316,21 +316,21 @@ function can be written as a series of one-parameter functions.
 
 In other words, this two-parameter function:
 
-```
+```fsharp
 let add x y = 
     x + y
 ```
 
 can be written as a one-parameter function that returns a lambda, like this:
 
-```
+```fsharp
 let add x = 
     fun y -> x + y  // return a lambda
 ```
 
 or as a function that returns an inner function, like this:
 
-```
+```fsharp
 let add x = 
     let innerFn y = x + y
     innerFn // return innerFn 
@@ -342,7 +342,7 @@ We can take advantage of currying and rewrite the parser as a one-parameter func
 
 Here's the new implementation, with the inner function cleverly named `innerFn`:
 
-```
+```fsharp
 let pchar charToMatch = 
     // define a nested inner function
     let innerFn str =
@@ -362,7 +362,7 @@ let pchar charToMatch =
 
 The type signature for this implementation looks like this:
 
-```
+```fsharp
 val pchar :
     char -> string -> Result<char * string>
 ```
@@ -371,7 +371,7 @@ It's *exactly the same* as the previous version!
 
 That is, both of the above implementations are identical in practice:
 
-```
+```fsharp
 // two-parameter implementation
 let pchar charToMatch str = 
     ...
@@ -389,13 +389,13 @@ let pchar charToMatch =
 
 What's nice about the curried implementation is that we can [partially apply](../posts/partial-application.md) the character we want to parse, like this:
 
-```
+```fsharp
 let parseA = pchar 'A' 
 ```
 
 and then later on supply the second "input stream" parameter:
 
-```
+```fsharp
 let inputABC = "ABC"
 parseA inputABC  // Success ('A', "BC")
 
@@ -423,13 +423,13 @@ It's very important that you understand this logic before moving on, because the
 
 If we look at `parseA` (from the example above) we can see that it has a function type:
 
-```
+```fsharp
 val parseA : string -> Result<char * string>
 ```
 
 That type is a bit complicated to use, so let's encapsulate it in a "wrapper" type called `Parser`, like this:
 
-```
+```fsharp
 type Parser<'T> = Parser of (string -> Result<'T * string>)
 ```
 
@@ -445,7 +445,7 @@ The change to the implementation is very simple. We just need to change the way 
 
 That is, from this:
 
-```
+```fsharp
 let pchar charToMatch = 
     let innerFn str =
         ...
@@ -455,7 +455,7 @@ let pchar charToMatch =
 
 to this:
 
-```
+```fsharp
 let pchar charToMatch = 
     let innerFn str =
         ...
@@ -467,7 +467,7 @@ let pchar charToMatch =
 
 Ok, now let's test again:
 
-```
+```fsharp
 let parseA = pchar 'A' 
 let inputABC = "ABC"
 parseA inputABC  // compiler error 
@@ -475,7 +475,7 @@ parseA inputABC  // compiler error
 
 But now we get a compiler error:
 
-```
+```text
 error FS0003: This value is not a function and cannot be applied
 ```
 
@@ -486,7 +486,7 @@ Let's call it `run`!
 
 Here's the implementation of `run`:
 
-```
+```fsharp
 let run parser input = 
     // unwrap parser to get inner function
     let (Parser innerFn) = parser 
@@ -496,7 +496,7 @@ let run parser input =
 
 And now we can run the `parseA` parser against various inputs again:
 
-```
+```fsharp
 let inputABC = "ABC"
 run parseA inputABC  // Success ('A', "BC")
 
@@ -516,7 +516,7 @@ but now let's move up a level and develop some ways of combining parsers togethe
 We'll start with combining two parsers in sequence. For example, say that we want a parser that matches "A" and then "B".
 We could try writing something like this:
 
-```
+```fsharp
 let parseA = pchar 'A'   
 let parseB = pchar 'B'
 
@@ -540,7 +540,7 @@ The implementation logic will be as follows:
 
 Here's the code for `andThen`:
 
-```
+```fsharp
 let andThen parser1 parser2 =
     let innerFn input =
         // run parser1 with the input
@@ -576,7 +576,7 @@ The implementation follows the logic described above.
 
 We'll also define an infix version of `andThen` so that we can use it like regular `>>` composition:
 
-```
+```fsharp
 let ( .>>. ) = andThen
 ```
 
@@ -584,7 +584,7 @@ let ( .>>. ) = andThen
 
 If we look at the signature of `andThen`:
 
-```
+```fsharp
 val andThen : 
      parser1:Parser<'a> -> parser2:Parser<'b> -> Parser<'a * 'b>
 ```
@@ -597,7 +597,7 @@ Let's test it and see if it works!
 
 First, create the compound parser:
 
-```
+```fsharp
 let parseA = pchar 'A'   
 let parseB = pchar 'B'
 let parseAThenB = parseA .>>. parseB 
@@ -605,7 +605,7 @@ let parseAThenB = parseA .>>. parseB
 
 If you look at the types, you can see that all three values have type `Parser`:
 
-```
+```fsharp
 val parseA : Parser<char> 
 val parseB : Parser<char> 
 val parseAThenB : Parser<char * char> 
@@ -615,7 +615,7 @@ val parseAThenB : Parser<char * char>
 
 Now since the combined parser `parseAThenB` is just another `Parser`, we can use `run` with it as before.
 
-```
+```fsharp
 run parseAThenB "ABC"  // Success (('A', 'B'), "C")
 
 run parseAThenB "ZBC"  // Failure "Expecting 'A'. Got 'Z'"
@@ -644,7 +644,7 @@ The implementation logic would be:
 
 Here's the code for `orElse`:
 
-```
+```fsharp
 let orElse parser1 parser2 =
     let innerFn input =
         // run parser1 with the input
@@ -669,13 +669,13 @@ let orElse parser1 parser2 =
 
 And we'll define an infix version of `orElse` as well:
 
-```
+```fsharp
 let ( <|> ) = orElse
 ```
 
 If we look at the signature of `orElse`:
 
-```
+```fsharp
 val orElse : 
     parser1:Parser<'a> -> parser2:Parser<'a> -> Parser<'a>
 ```
@@ -686,7 +686,7 @@ we can see that it works for any two parsers, but they must both be the *same* t
 
 Time to test it. First, create the combined parser:
 
-```
+```fsharp
 let parseA = pchar 'A'   
 let parseB = pchar 'B'
 let parseAOrElseB = parseA <|> parseB 
@@ -694,7 +694,7 @@ let parseAOrElseB = parseA <|> parseB
 
 If you look at the types, you can see that all three values have type `Parser<char>`:
 
-```
+```fsharp
 val parseA : Parser<char> 
 val parseB : Parser<char> 
 val parseAOrElseB : Parser<char>
@@ -702,7 +702,7 @@ val parseAOrElseB : Parser<char>
 
 Now if we run `parseAOrElseB` we can see that it successfully handles an "A" or a "B" as first character.
 
-```
+```fsharp
 run parseAOrElseB "AZZ"  // Success ('A', "ZZ")
 
 run parseAOrElseB "BZZ"  // Success ('B', "ZZ")
@@ -716,7 +716,7 @@ With these two basic combinators, we can build more complex ones, such as "A and
 
 Here's how to build up `aAndThenBorC` from simpler parsers: 
 
-```
+```fsharp
 let parseA = pchar 'A'   
 let parseB = pchar 'B'
 let parseC = pchar 'C'
@@ -726,7 +726,7 @@ let aAndThenBorC = parseA .>>. bOrElseC
 
 And here it is in action:
 
-```
+```fsharp
 run aAndThenBorC "ABZ"  // Success (('A', 'B'), "Z")
 run aAndThenBorC "ACZ"  // Success (('A', 'C'), "Z")
 run aAndThenBorC "QBZ"  // Failure "Expecting 'A'. Got 'Q'"
@@ -747,7 +747,7 @@ For example, let's say that we want choose from a *list* of parsers, rather than
 Well, that's easy. If we have a pairwise way of combining things, we can extend that to combining an entire list using `reduce`
 (for more on working with `reduce`, [see this post on monoids](../posts/monoids-without-tears.md) ).
 
-```
+```fsharp
 /// Choose any of a list of parsers
 let choice listOfParsers = 
     List.reduce ( <|> ) listOfParsers 
@@ -757,7 +757,7 @@ let choice listOfParsers =
 
 The signature of `choice` is: 
 
-```
+```fsharp
 val choice :
     Parser<'a> list -> Parser<'a>
 ```
@@ -772,7 +772,7 @@ With `choice` available, we can create an `anyOf` parser that matches any charac
 
 Here's the code:
 
-```
+```fsharp
 /// Choose any of a list of characters
 let anyOf listOfChars = 
     listOfChars
@@ -782,7 +782,7 @@ let anyOf listOfChars =
 
 Let's test it by creating a parser for any lowercase character and any digit character:
 
-```
+```fsharp
 let parseLowercase = 
     anyOf ['a'..'z']
 
@@ -792,7 +792,7 @@ let parseDigit =
 
 If we test them, they work as expected:
 
-```
+```fsharp
 run parseLowercase "aBC"  // Success ('a', "BC")
 run parseLowercase "ABC"  // Failure "Expecting 'z'. Got 'A'"
 
@@ -820,7 +820,7 @@ Here's the complete listing for the parsing library so far -- it's about 90 line
 
 *The source code displayed below is also available at [this gist](https://gist.github.com/swlaschin/cb42417079ae2c5f99db#file-parserlibrary_v1-fsx).*
 
-```
+```fsharp
 open System
 
 /// Type that represents Success/Failure in parsing

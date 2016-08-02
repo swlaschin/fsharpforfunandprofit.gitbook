@@ -15,7 +15,7 @@ You might be wondering how "everything is an expression" actually works in pract
 
 Let's start with some basic expression examples that should be familiar:
 
-```
+```fsharp
 1                            // literal
 [1;2;3]                      // list expression
 -2                           // prefix operator	
@@ -28,7 +28,7 @@ No problems there. Those are obviously expressions.
 
 But here are some more complex things which are *also* expressions. That is, each of these returns a value that can be used for something else. 
 
-```
+```fsharp
 fun () -> 1                  // lambda expression
 
 match 1 with                 // match expression
@@ -53,7 +53,7 @@ let n=1 in n+2               // let expression
 
 In other languages, these might be statements, but in F# they really do return values, as you can see by binding a value to the result:
 
-```
+```fsharp
 let x1 = fun () -> 1                  
 
 let x2 = match 1 with                 
@@ -111,7 +111,7 @@ There will be some upcoming posts on these different types of control flow expre
 
 What about `let x=something`? In the examples above we saw:
 
-```
+```fsharp
 let x5 = let n=1 in n+2
 ```
 
@@ -125,7 +125,7 @@ But before we cover the important expression types in details, here are some tip
 
 Normally, each expression is put on a new line. But you can use a semicolon to separate expressions on one line if you need to. Along with its use as a separator for list and record elements, this is one of the few times where a semicolon is used in F#.
 
-```
+```fsharp
 let f x =                           // one expression per line
       printfn "x=%i" x
       x + 1
@@ -135,7 +135,7 @@ let f x = printfn "x=%i" x; x + 1   // all on same line with ";"
 
 The rule about requiring unit values until the last expression still applies, of course:
 
-```
+```fsharp
 let x = 1;2              // error: "1;" should be a unit expression
 let x = ignore 1;2       // ok
 let x = printf "hello";2 // ok
@@ -147,7 +147,7 @@ In F#, expressions are evaluated from the "inside out" -- that is, as soon as a 
 
 Have a look at the following code and try to guess what will happen, then evaluate the code and see.
 
-```
+```fsharp
 // create a clone of if-then-else
 let test b t f = if b then t else f
 
@@ -163,7 +163,7 @@ The alternative style of evaluation is called "lazy", whereby expressions are on
 
 In F#, there are a number of techniques to force expressions *not* to be evaluated immediately. The simplest it to wrap it in a function that only gets evaluated on demand:
 
-```
+```fsharp
 // create a clone of if-then-else that accepts functions rather than simple values
 let test b t f = if b then t() else f()
 
@@ -175,7 +175,7 @@ The problem with this is that now the "true" function might be evaluated twice b
 
 So, the preferred way for expressions not to be evaluated immediately is to use the `Lazy<>` wrapper.
 
-```
+```fsharp
 // create a clone of if-then-else with no restrictions...
 let test b t f = if b then t else f
 
@@ -185,7 +185,7 @@ let f = test true (lazy (printfn "true")) (lazy (printfn "false"))
 
 The final result value `f` is also a lazy value, and can be passed around without being evaluated until you are finally ready to get the result.
 
-```
+```fsharp
 f.Force()     // use Force() to force the evaluation of a lazy value
 ```
 

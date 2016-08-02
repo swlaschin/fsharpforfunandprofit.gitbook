@@ -15,7 +15,7 @@ These types act both as documentation and as a compile time constraint to ensure
 
 For example, if I have two types `CustomerId` and `OrderId`, I can represent them as separate types:
 
-```
+```fsharp
 type CustomerId = CustomerId of int
 type OrderId = OrderId of int
 ```
@@ -48,7 +48,7 @@ Admittedly, it's a bit silly adding 1 to a customer id -- we'll look at a better
 
 Anyway, here's the code:
 
-```
+```fsharp
 // type is an wrapper for a primitive type
 type CustomerId = CustomerId of int
 
@@ -80,7 +80,7 @@ Array.init 1000000 CustomerId
 
 A typical timed result looks like this:
 
-```
+```text
 Real: 00:00:00.296, CPU: 00:00:00.296, GC gen0: 6, gen1: 4, gen2: 0
 ```
 
@@ -92,7 +92,7 @@ Past performance is no guarantee of future results. Draw conclusions at your own
 
 If we increase the array size to 10 million, we get a more than 10x slower result:
 
-```
+```text
 Real: 00:00:03.489, CPU: 00:00:03.541, GC gen0: 68, gen1: 46, gen2: 2
 ```
 
@@ -110,7 +110,7 @@ Let's start with type aliases.
 
 In the type alias approach, I would simply dispense with the wrapper, but keep the type around as documentation.
 
-```
+```fsharp
 type CustomerId = int
 type OrderId = int
 ```
@@ -120,7 +120,7 @@ If I want to use the type as documentation, I must then annotate the functions a
 For example, in the `add1ToCustomerId` below
 both the parameter and the return value have been annotated so that it has the type `CustomerId -> CustomerId` rather than `int -> int`.
 
-```
+```fsharp
 let add1ToCustomerId (id:CustomerId) :CustomerId = 
     id+1
 ```
@@ -129,7 +129,7 @@ let add1ToCustomerId (id:CustomerId) :CustomerId =
 
 Let's create another micro-benchmark:
 
-```
+```fsharp
 type CustomerId = int
 
 // create two silly functions for mapping and filtering 
@@ -160,7 +160,7 @@ Array.init 1000000 (fun i -> i)
 
 The results are spectacularly better!
 
-```
+```text
 Real: 00:00:00.017, CPU: 00:00:00.015, GC gen0: 0, gen1: 0, gen2: 0
 ```
 
@@ -168,7 +168,7 @@ It takes about 17 milliseconds to do those steps, and more importantly, very lit
 
 If we increase the array size to 10 million, we get a 10x slower result, but still no garbage:
 
-```
+```text
 Real: 00:00:00.166, CPU: 00:00:00.156, GC gen0: 0, gen1: 0, gen2: 0
 ```
 
@@ -180,7 +180,7 @@ Alas, the problem with type aliases is that we have completely lost type safety 
 
 To demonstrate, here's some code that creates a `CustomerId` and an `OrderId`:
 
-```
+```fsharp
 type CustomerId = int
 type OrderId = int
 
@@ -191,7 +191,7 @@ let oid : OrderId = 12
 
 And sadly, the two ids compare equal, and we can pass an `OrderId` to function expecting a `CustomerId` without any complaint from the compiler.
 
-```
+```fsharp
 cid = oid              // true
 
 // pass OrderId to function expecting a CustomerId 
@@ -204,7 +204,7 @@ Ok, so that doesn't look promising! What next?
 
 The other common option is to use units of measure to distinguish the two types, like this:
 
-```
+```fsharp
 type [<Measure>] CustomerIdUOM 
 type [<Measure>] OrderIdUOM 
 
@@ -216,7 +216,7 @@ type OrderId = int<OrderIdUOM>
 
 We can see that this is true when we time the same steps as before:
 
-```
+```fsharp
 // create two silly functions for mapping and filtering 
 let add1ToCustomerId id  = 
     id+1<CustomerIdUOM>
@@ -243,7 +243,7 @@ Array.init 1000000 (fun i -> LanguagePrimitives.Int32WithMeasure<CustomerIdUOM> 
 
 A typical timed result looks like this:
 
-```
+```text
 Real: 00:00:00.022, CPU: 00:00:00.031, GC gen0: 0, gen1: 0, gen2: 0
 ```
 
@@ -251,7 +251,7 @@ Again, the code is very fast (22 milliseconds), and just as importantly, very li
 
 If we increase the array size to 10 million, we maintain the high performance (just as with the type alias approach) and still no garbage:
 
-```
+```text
 Real: 00:00:00.157, CPU: 00:00:00.156, GC gen0: 0, gen1: 0, gen2: 0
 ```
 
@@ -263,14 +263,14 @@ But I find them unsatisfactory from an esthetic point of view. I like my wrapper
 
 And also, units of measure are really meant to be used with numeric values. For example, I can create a customer id and order id:
 
-```
+```fsharp
 let cid = 12<CustomerIdUOM>
 let oid = 4<OrderIdUOM>
 ```
 
 and then I can divide CustomerId(12) by OrderId(4) to get three...
 
-```
+```fsharp
 let ratio = cid / oid
 // val ratio : int<CustomerIdUOM/OrderIdUOM> = 3
 ```
@@ -297,7 +297,7 @@ For this to work:
 Here's an example, using the `COMPILED` and `INTERACTIVE` directives so that you can play with it interactively.
 Obviously, in real code, you would use your own directive such as `FASTTYPES` or similar.
 
-```
+```fsharp
 #if COMPILED  // uncomment to use aliased version   
 //#if INTERACTIVE // uncomment to use wrapped version
 
@@ -333,7 +333,7 @@ You can see that for both versions I've created a constructor `createCustomerId`
 
 With this code in place, we can use `CustomerId` without caring about the implementation:
 
-```
+```fsharp
 // test the getter
 let testGetter c1 c2 =
     let i1 = customerIdValue c1
@@ -365,7 +365,7 @@ let test() =
 
 And now we can run the *same* micro-benchmark with both implementations:
 
-```
+```fsharp
 // create two silly functions for mapping and filtering 
 let add1ToCustomerId (CustomerId i) = 
     createCustomerId (i+1)
@@ -392,7 +392,7 @@ Array.init 1000000 createCustomerId
 
 The results are similar to the previous examples. The aliased version is much faster and does not create GC pressure:
 
-```
+```text
 // results using wrapped version
 Real: 00:00:00.408, CPU: 00:00:00.405, GC gen0: 7, gen1: 4, gen2: 1
 
@@ -402,7 +402,7 @@ Real: 00:00:00.022, CPU: 00:00:00.031, GC gen0: 0, gen1: 0, gen2: 0
 
 and for the 10 million element version:
 
-```
+```text
 // results using wrapped version
 Real: 00:00:03.199, CPU: 00:00:03.354, GC gen0: 67, gen1: 45, gen2: 2
 
@@ -417,7 +417,7 @@ In practice, we might want something more complex than a simple wrapper.
 For example, here is an `EmailAddress` (a simple wrapper type, but constrained to be non-empty and containing a "@") and
 some sort of `Activity` record that stores an email and the number of visits, say.
 
-```
+```fsharp
 module EmailAddress =
     // type with private constructor 
     type EmailAddress = private EmailAddress of string
@@ -460,7 +460,7 @@ from the type, or use the OCaml convention of calling the main type in a module 
 
 To make a more performant version, we replace `EmailAddress` with a type alias, and `Activity` with a struct, like this:
 
-```
+```fsharp
 module EmailAddress =
 
     // aliased type 
@@ -502,7 +502,7 @@ By making them different, the user is forced to use the getter functions rather 
 
 Both implementations have the same "API", so we can create code that works with both:
 
-```
+```fsharp
 let rand = new System.Random()
 
 let createCustomerWithRandomActivityHistory() = 
@@ -552,7 +552,7 @@ But you should really only be using this technique with small records (2-3 field
 
 Rather than using `#time`, this time I wrote a custom timer that runs a function 10 times and prints out the GC and memory used on each run.
 
-```
+```fsharp
 /// Do countN repetitions of the function f and print the 
 /// time elapsed, number of GCs and change in total memory
 let time countN label f  = 
@@ -590,7 +590,7 @@ let time countN label f  =
 
 Let's now run `mapAndFilter` with a million records in the array:
 
-```
+```fsharp
 let size = 1000000
 let label = sprintf "mapAndFilter: %i records" size 
 time 10 label (fun () -> mapAndFilter size)
@@ -598,7 +598,7 @@ time 10 label (fun () -> mapAndFilter size)
  
 The results are shown below:
  
-```
+```text
 =======================
 mapAndFilter: 1000000 records (Wrapped)
 =======================
@@ -647,7 +647,7 @@ My suggestion is to turn the DU into a struct with a tag for each case, and fiel
 For example, let's say that we have DU that classifies an `Activity` into `Active` and `Inactive`, and for the `Active` case we store the email and visits and for
 the inactive case we only store the email:
  
-```
+```fsharp
 module Classification =
     open EmailAddress
     open ActivityHistory
@@ -668,7 +668,7 @@ module Classification =
 
 To turn this into a struct, I would do something like this:
 
-```
+```fsharp
 module Classification =
     open EmailAddress
     open ActivityHistory
@@ -698,7 +698,7 @@ Note that `Visits` is not used in the `Inactive` case, so is set to a default va
 
 Now let's create a function that classifies the activity history, creates a `Classification` and then filters and extracts the email only for active customers.
 
-```
+```fsharp
 open Classification
 
 let createClassifiedCustomer activity = 
@@ -726,7 +726,7 @@ let extractActiveEmails noOfRecords =
 
 The results of profiling this function with the two different implementations are shown below:
  
-```
+```text
 =======================
 extractActiveEmails: 1000000 records (Wrapped)
 =======================

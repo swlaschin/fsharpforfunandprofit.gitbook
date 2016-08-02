@@ -12,7 +12,7 @@ In this example, we will compare the F# and C# code for downloading a web page, 
 
 We'll start with a straightforward F# implementation. 
 
-```
+```fsharp
 // "open" brings a .NET namespace into visibility
 open System.Net
 open System
@@ -40,7 +40,7 @@ the compiler would have complained that it didn't know which version of `WebRequ
 
 Now here is the equivalent C# implementation. 
 
-```
+```csharp
 class WebPageDownloader
 {
     public TResult FetchUrl<TResult>(
@@ -74,7 +74,7 @@ but in the more general case they are needed.</sub>
 
 Back in F# land, we can now test the code interactively:
 
-```
+```fsharp
 let myCallback (reader:IO.StreamReader) url = 
     let html = reader.ReadToEnd()
     let html1000 = html.Substring(0,1000)
@@ -90,7 +90,7 @@ Finally, we have to resort to a type declaration for the reader parameter (`read
 A very useful feature of F# is that you can "bake in" parameters in a function so that they don't have to be passed in every time. This is why the `url` parameter was placed *last* rather than first, as in the C# version.
 The callback can be setup once, while the url varies from call to call.
 
-```
+```fsharp
 // build a function with the callback "baked in"
 let fetchUrl2 = fetchUrl myCallback 
 
@@ -111,7 +111,7 @@ The last line (using `List.map`) shows how the new function can be easily used i
 
 Here is the equivalent C# test code:
 
-```
+```csharp
 [Test]
 public void TestFetchUrlWithCallback()
 {

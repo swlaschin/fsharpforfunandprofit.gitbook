@@ -61,7 +61,7 @@ So we'll start by first creating the internal model of the parameters, and then 
 
 Here's a first stab at the model:
 
-```
+```fsharp
 // constants used later
 let OrderByName = "N"
 let OrderBySize = "S"
@@ -82,7 +82,7 @@ The parsing logic is very similar to the `loopAndSum` example in the previous po
 * Each time through the loop, we parse one argument.
 * The options parsed so far are passed into each loop as a parameter (the "accumulator" pattern).
 
-```
+```fsharp
 let rec parseCommandLine args optionsSoFar = 
     match args with 
     // empty list means we're done.
@@ -136,13 +136,13 @@ There are two special cases:
 
 So now let's test this:
 
-```
+```fsharp
 parseCommandLine ["/v"; "/s"] 
 ```
             
 Oops! That didn't work -- we need to pass in an initial `optionsSoFar` argument! Lets try again:
 
-```
+```fsharp
 // define the defaults to pass in
 let defaultOptions = {
     verbose = false;
@@ -160,7 +160,7 @@ Check that the output is what you would expect.
 
 And we should also check the error cases:
 
-```
+```fsharp
 parseCommandLine ["/v"; "xyz"] defaultOptions
 parseCommandLine ["/o"; "xyz"] defaultOptions
 ```
@@ -179,7 +179,7 @@ Normally, this second one is the "public" one and the recursive one is hidden, s
 * Rename `parseCommandLine` to `parseCommandLineRec`. There are other naming conventions you could use as well, such as `parseCommandLine'` with a tick mark, or `innerParseCommandLine`.
 * Create a new `parseCommandLine` that calls `parseCommandLineRec` with the defaults
 
-```
+```fsharp
 // create the "helper" recursive function
 let rec parseCommandLineRec args optionsSoFar = 
 	// implementation as above
@@ -199,7 +199,7 @@ let parseCommandLine args =
 
 In this case the helper function can stand on its own. But if you really want to hide it, you can put it as a nested subfunction in the defintion of `parseCommandLine` itself.
 
-```
+```fsharp
 // create the "public" parse function
 let parseCommandLine args = 
     // create the defaults
@@ -218,7 +218,7 @@ In this case, I think it would just make things more complicated, so I have kept
 
 So, here is all the code at once, wrapped in a module:
 
-```
+```fsharp
 module CommandLineV1 =
 
     // constants used later
@@ -298,7 +298,7 @@ CommandLineV1.parseCommandLine ["/o"; "xyz"]
 
 In our initial model we used bool and string to represent the possible values. 
 
-```
+```fsharp
 type CommandLineOptions = {
     verbose: bool;
     subdirectories: bool;
@@ -313,7 +313,7 @@ There are two problems with this:
 * **The values are not self documenting.** For example, the verbose value is a bool. We only know that the bool represents the "verbose" option because of the *context* (the field named `verbose`) it is found in.
 If we passed that bool around, and took it out of context, we would not know what it represented. I'm sure we have all seen C# functions with many boolean parameters like this:
 
-```
+```csharp
 myObject.SetUpComplicatedOptions(true,false,true,false,false);
 ```
 
@@ -323,7 +323,7 @@ The solution to both these problems is to be as specific as possible when defini
 
 So here's a new version of `CommandLineOptions`:
 
-```
+```fsharp
 type OrderByOption = OrderBySize | OrderByName
 type SubdirectoryOption = IncludeSubdirectories | ExcludeSubdirectories
 type VerboseOption = VerboseOutput | TerseOutput
@@ -345,7 +345,7 @@ Once we have made the changes to the domain, it is easy to fix up the parsing lo
 
 So, here is all the revised code, wrapped in a "v2" module:
 
-```
+```fsharp
 module CommandLineV2 =
 
     type OrderByOption = OrderBySize | OrderByName
@@ -435,7 +435,7 @@ And in a real-world situation, anything more complicated than this would be a si
 
 However, just to show you it can be done with `fold`:
 
-```
+```fsharp
 module CommandLineV3 =
 
     type OrderByOption = OrderBySize | OrderByName
@@ -540,7 +540,7 @@ But in the 'fold' version, this token is swallowed and lost.
 
 To see this, compare the two implementations:
 
-```
+```fsharp
 // verbose set
 CommandLineV2.parseCommandLine ["/o"; "/v"] 
 

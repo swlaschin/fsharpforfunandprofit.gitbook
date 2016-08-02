@@ -16,7 +16,7 @@ Defining an interface is similar to defining an abstract class. So similar, in f
 
 Here's an interface definition:
 
-```
+```fsharp
 type MyInterface =
    // abstract method
    abstract member Add: int -> int -> int
@@ -30,7 +30,7 @@ type MyInterface =
 
 And here's the definition for the equivalent abstract base class:
 
-```
+```fsharp
 [<AbstractClass>]
 type AbstractBaseClass() =
    // abstract method
@@ -49,7 +49,7 @@ But in the earlier discussion on abstract methods, we stressed that the `[<Abstr
 
 The answer is trivial, but subtle. *The interface has no constructor*. That is, it does not have any parentheses after the interface name:
 
-```
+```fsharp
 type MyInterface =   // <- no parens!
 ```
 
@@ -70,7 +70,7 @@ C# has support for both explicit and implicit interface implementations, but alm
 
 So, how do you implement an interface in F#?  You cannot just "inherit" from it, as you would an abstract base class.  You have to provide an explicit implementation for each interface member using the syntax `interface XXX with`, as shown below:
 
-```
+```fsharp
 type IAddingService =
     abstract member Add: int -> int -> int
 
@@ -93,14 +93,14 @@ The above code shows how the class `MyAddingService` explicitly implements the `
 
 So now let's try to use the adding service interface:
 
-```
+```fsharp
 let mas = new MyAddingService()
 mas.Add 1 2    // error 
 ```
 
 Immediately, we run into an error. It appears that the instance does not implement the `Add` method at all. Of course, what this really means is that we must cast it to the interface first using the `:>` operator:
 
-```
+```fsharp
 // cast to the interface
 let mas = new MyAddingService()
 let adder = mas :> IAddingService
@@ -111,7 +111,7 @@ This might seem incredibly awkward, but in practice it is not a problem as in mo
 
 For example, you will typically be passing an instance to a function that specifies an interface parameter. In this case, the casting is done automatically:
 
-```
+```fsharp
 // function that requires an interface
 let testAddingService (adder:IAddingService) = 
     printfn "1+2=%i" <| adder.Add 1 2  // ok
@@ -122,7 +122,7 @@ testAddingService mas // cast automatically
 
 And in the special case of `IDisposable`, the `use` keyword will also automatically cast the instance as needed:
 
-```
+```fsharp
 let testDispose = 
     use mas = new MyAddingService()
     printfn "testing"

@@ -100,7 +100,7 @@ and a [custom DSL for load testing scenarios](http://www.frenk.com/2012/01/real-
 
 Once you have parsed or analyzed something, it is always nice if you can display the results visually, rather than as tables full of data.
 
-For example, in a [previous post](../posts/cycles-and-modularity-in-the-wild.md) I used F# in conjunction with [GraphViz](http://www.graphviz.org/index.md)
+For example, in a [previous post](../posts/cycles-and-modularity-in-the-wild.md) I used F# in conjunction with [GraphViz](http://www.graphviz.org/)
 to create diagrams of dependency relationships. You can see a sample below:
 
 ![](../assets/img/tickspec_svg.png)
@@ -145,7 +145,7 @@ To get started, just link in the type provider DLL as we have seen before.
 The site is throttled, so you'll probably need an API key if you're using it a lot
 ([api details here](http://developers.google.com/console/help/?csw=1#activatingapis))
 
-```
+```fsharp
 // sets the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 
@@ -170,7 +170,7 @@ Once the type provider is loaded, you can start asking questions, such as...
 
 *"Who are the US presidents?"*
 
-```
+```fsharp
 data.Society.Government.``US Presidents``
 |> Seq.map (fun p ->  p.``President number`` |> Seq.head, p.Name)
 |> Seq.sortBy fst
@@ -179,7 +179,7 @@ data.Society.Government.``US Presidents``
 
 Result:
 
-```
+```text
 George Washington was number 1
 John Adams was number 2
 Thomas Jefferson was number 3
@@ -198,7 +198,7 @@ Not bad for just four lines of code!
 
 How about *"what awards did Casablanca win?"*
 
-```
+```fsharp
 data.``Arts and Entertainment``.Film.Films.IndividualsAZ.C.Casablanca.``Awards Won``
 |> Seq.map (fun award -> award.Year, award.``Award category``.Name)
 |> Seq.sortBy fst
@@ -207,7 +207,7 @@ data.``Arts and Entertainment``.Film.Films.IndividualsAZ.C.Casablanca.``Awards W
 
 The result is:
 
-```
+```text
 1943 -- Academy Award for Best Director
 1943 -- Academy Award for Best Picture
 1943 -- Academy Award for Best Screenplay
@@ -225,7 +225,7 @@ Well, you can also get the same affect by getting data from Freebase, which make
 [Kit Eason](http://twitter.com/kitlovesfsharp) showed how to do this in a [tweet](http://twitter.com/kitlovesfsharp/status/296240699735695360),
 and here's an example based on his code:
 
-```
+```fsharp
 let randomElement =
     let random = new System.Random()
     fun (arr:string array) -> arr.[random.Next(arr.Length)]
@@ -274,7 +274,7 @@ On the other extreme from Freebase is the [World Bank Open Data](http://data.wor
 
 The setup is identical to Freebase, but no API key is needed.
 
-```
+```fsharp
 // sets the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 
@@ -290,7 +290,7 @@ With the type provider set up, we can do a serious query, such as:
 
 *"How do malnutrition rates compare between low income and high income countries?"*
 
-```
+```fsharp
 // Create a list of countries to process
 let groups = 
  [| data.Countries.``Low income``
@@ -314,14 +314,14 @@ let getYearValue (year:int) (ind:Runtime.WorldBank.Indicator) =
 
 The result is:
 
-```
+```text
 Low income -- Malnutrition prevalence, weight for age (% of children under 5) 2010 23.19% 
 High income -- Malnutrition prevalence, weight for age (% of children under 5) 2010 1.36% 
 ```
 
 Similarly, here is the code to compare maternal mortality rates:
 
-```
+```fsharp
 // Create a list of countries to process
 let countries = 
  [| data.Countries.``European Union``
@@ -341,7 +341,7 @@ let countries =
 
 The result is:
 
-```
+```text
 European Union -- Maternal mortality ratio (modeled estimate, per 100,000 live births) 2010 9.0 
 United Kingdom -- Maternal mortality ratio (modeled estimate, per 100,000 live births) 2010 12.0 
 United States -- Maternal mortality ratio (modeled estimate, per 100,000 live births) 2010 21.0 

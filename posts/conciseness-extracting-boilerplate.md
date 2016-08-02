@@ -19,7 +19,7 @@ Obviously, all these requirements are similar, but how would you extract any com
 
 Let's start with some straightforward implementations in C# first:
 
-```
+```csharp
 public static int Product(int n)
 {
     int product = 1;
@@ -92,7 +92,7 @@ What do all these implementations have in common?  The looping logic!  As progra
 
 Is there a way to strip the duplicate code and focus on the just the setup and inner loop logic?  Yes there is. Here are the same three functions in F#:
 
-```
+```fsharp
 let product n = 
     let initialValue = 1
     let action productSoFar x = productSoFar * x
@@ -137,7 +137,7 @@ By using `List.fold` and avoiding any loop logic at all, the F# code gains a num
 
 By the way, the sum of squares example could also be written using `fold` as well:
 
-```
+```fsharp
 let sumOfSquaresWithFold n = 
     let initialValue = 0
     let action sumSoFar x = sumSoFar + (x*x)
@@ -151,7 +151,7 @@ sumOfSquaresWithFold 100
 
 Can you use the "fold" approach in C#? Yes. LINQ does have an equivalent to `fold`, called `Aggregate`. And here is the C# code rewritten to use it:
 
-```
+```csharp
 public static int ProductWithAggregate(int n)
 {
     var initialValue = 1;
@@ -192,7 +192,7 @@ The LINQ method 'max' only returns the maximum value, not the whole element that
 
 Here's a solution using an explicit loop:
 
-```
+```csharp
 public class NameAndSize
 {
     public string Name;
@@ -225,7 +225,7 @@ Again, fold to the rescue!
 
 And here's the C# code using `Aggregate`:
 
-```
+```csharp
 public class NameAndSize
 {
     public string Name;
@@ -250,7 +250,7 @@ Note that this C# version returns null for an empty list.  That seems dangerous 
 
 Here's the F# code using fold:
 
-```
+```fsharp
 type NameAndSize= {Name:string;Size:int}
  
 let maxNameAndSize list = 
@@ -277,7 +277,7 @@ Doing this guarantees that the caller of the function has to handle both cases.
 
 And a test:
 
-```
+```fsharp
 //test
 let list = [
     {Name="Alice"; Size=10}
@@ -291,7 +291,7 @@ maxNameAndSize []
 
 Actually, I didn't need to write this at all, because F# already has a `maxBy` function!
 
-```
+```fsharp
 // use the built in function
 list |> List.maxBy (fun item -> item.Size)
 [] |> List.maxBy (fun item -> item.Size)
@@ -299,7 +299,7 @@ list |> List.maxBy (fun item -> item.Size)
 
 But as you can see, it doesn't handle empty lists well. Here's a version that wraps the `maxBy` safely.
 
-```
+```fsharp
 let maxNameAndSize list = 
     match list with
     | [] -> 

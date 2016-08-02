@@ -26,13 +26,13 @@ If we turn for guidance to the [official MSDN documention](http://msdn.microsoft
 
 For example, it says that when you see the following code within a computation expression:
 
-```
+```fsharp
 {| let! pattern = expr in cexpr |}
 ```
 
 it is simply syntactic sugar for this method call:
 
-```
+```fsharp
 builder.Bind(expr, (fun pattern -> {| cexpr |}))
 ```
 
@@ -46,7 +46,7 @@ Before going into the mechanics of computation expressions, let's look at a few 
 
 Let's start with a simple one.  Let's say we have some code, and we want to log each step. So we define a little logging function, and call it after every value is created, like so:
 
-```
+```fsharp
 let log p = printfn "expression is %A" p
 
 let loggedWorkflow = 
@@ -62,7 +62,7 @@ let loggedWorkflow =
 
 If you run this, you will see the output:
 
-```
+```text
 expression is 42
 expression is 43
 expression is 85
@@ -76,7 +76,7 @@ Funny you should ask... A computation expression can do that. Here's one that do
 
 First we define a new type called `LoggingBuilder`:
 
-```
+```fsharp
 type LoggingBuilder() =
     let log p = printfn "expression is %A" p
 
@@ -92,13 +92,13 @@ type LoggingBuilder() =
 
 Next we create an instance of the type, `logger` in this case.
 
-```
+```fsharp
 let logger = new LoggingBuilder()
 ```
 
 So with this `logger` value, we can rewrite the original logging example like this:
 
-```
+```fsharp
 let loggedWorkflow = 
     logger
         {
@@ -124,7 +124,7 @@ Then we can chain the divisions together, and after each division we need to tes
 
 Here's the helper function first, and then the main workflow:
 
-```
+```fsharp
 let divideBy bottom top =
     if bottom = 0
     then None
@@ -135,7 +135,7 @@ Note that I have put the divisor first in the parameter list. This is so we can 
 
 Let's put it to use. Here is a workflow that attempts to divide a starting number three times:
 
-```
+```fsharp
 let divideByWorkflow init x y z = 
     let a = init |> divideBy x
     match a with
@@ -155,7 +155,7 @@ let divideByWorkflow init x y z =
 
 And here it is in use:
 
-```
+```fsharp
 let good = divideByWorkflow 12 3 2 1
 let bad = divideByWorkflow 12 3 0 1
 ```
@@ -169,7 +169,7 @@ Anyway, this continual testing and branching is really ugly! Does turning it int
 
 Once more we define a new type (`MaybeBuilder`) and make an instance of the type (`maybe`).
 
-```
+```fsharp
 type MaybeBuilder() =
 
     member this.Bind(x, f) = 
@@ -187,7 +187,7 @@ I have called this one `MaybeBuilder` rather than `divideByBuilder` because the 
 
 So now that we have defined the `maybe` workflow, let's rewrite the original code to use it.
 
-```
+```fsharp
 let divideByWorkflow init x y z = 
     maybe 
         {
@@ -202,7 +202,7 @@ Much, much nicer. The `maybe` expression has completely hidden the branching log
 
 And if we test it we get the same result as before:
 
-```
+```fsharp
 let good = divideByWorkflow 12 3 2 1
 let bad = divideByWorkflow 12 3 0 1
 ```
@@ -216,7 +216,7 @@ But sometimes it is the other way around. Sometimes the flow of control depends 
 
 Let's look at a simple example. Say that we have three dictionaries and we want to find the value corresponding to a key. Each lookup might succeed or fail, so we need to chain the lookups in a series.
 
-```
+```fsharp
 let map1 = [ ("1","One"); ("2","Two") ] |> Map.ofList
 let map2 = [ ("A","Alice"); ("B","Bob") ] |> Map.ofList
 let map3 = [ ("CA","California"); ("NY","New York") ] |> Map.ofList
@@ -237,7 +237,7 @@ Because everything is an expression in F# we can't do an early return, we have t
                 
 Here's how this might be used:
 
-```
+```fsharp
 multiLookup "A" |> printfn "Result for A is %A" 
 multiLookup "CA" |> printfn "Result for CA is %A" 
 multiLookup "X" |> printfn "Result for X is %A" 
@@ -247,7 +247,7 @@ It works fine, but can it be simplified?
 
 Yes indeed. Here is an "or else" builder that allows us to simplify these kinds of lookups:
 
-```
+```fsharp
 type OrElseBuilder() =
     member this.ReturnFrom(x) = x
     member this.Combine (a,b) = 
@@ -261,7 +261,7 @@ let orElse = new OrElseBuilder()
 
 Here's how the lookup code could be altered to use it:
 
-```
+```fsharp
 let map1 = [ ("1","One"); ("2","Two") ] |> Map.ofList
 let map2 = [ ("A","Alice"); ("B","Bob") ] |> Map.ofList
 let map3 = [ ("CA","California"); ("NY","New York") ] |> Map.ofList
@@ -275,7 +275,7 @@ let multiLookup key = orElse {
 
 Again we can confirm that the code works as expected.
 
-```
+```fsharp
 multiLookup "A" |> printfn "Result for A is %A" 
 multiLookup "CA" |> printfn "Result for CA is %A" 
 multiLookup "X" |> printfn "Result for X is %A" 
@@ -287,7 +287,7 @@ Finally, let's look at callbacks.  The standard approach for doing asynchronous 
 
 Here is an example of how a web page might be downloaded using this technique:
 
-```
+```fsharp
 open System.Net
 let req1 = HttpWebRequest.Create("http://tryfsharp.org")
 let req2 = HttpWebRequest.Create("http://google.com")
@@ -316,7 +316,7 @@ In fact, managing this cascading approach is always a problem in code that requi
 
 Of course, we would never write that kind of code in F#, because F# has the `async` computation expression built in, which both simplifies the logic and flattens the code.
 
-```
+```fsharp
 open System.Net
 let req1 = HttpWebRequest.Create("http://tryfsharp.org")
 let req2 = HttpWebRequest.Create("http://google.com")
@@ -358,7 +358,7 @@ And as to the difference between a "computation expression" and a "workflow", I 
 
 In other words, in the following code, I would say that `maybe` is the workflow we are using, and the particular chunk of code `{ let! a = .... return c }` is the computation expression.
 
-```
+```fsharp
 maybe 
     {
     let! a = x |> divideBy y 

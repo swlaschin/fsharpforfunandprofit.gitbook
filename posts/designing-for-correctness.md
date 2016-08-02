@@ -23,7 +23,7 @@ We'll use a simple example. Let's say that you are designing an e-commerce site 
 
 In C#, we might think that this is simple enough and dive straight into coding. Here is a straightforward implementation in C# that seems OK at first glance. 
 
-```
+```csharp
 public class NaiveShoppingCart<TItem>
 {
    private List<TItem> items;
@@ -79,7 +79,7 @@ So many problems in such a short piece of code!
 
 What would happen if we had even more complicated requirements and the code was thousands of lines long?  For example, the fragment that is repeated everywhere:
 
-```
+```csharp
 if (!this.IsPaidFor) { do something }
 ```
 
@@ -113,7 +113,7 @@ It's worth noting that these kinds of state-oriented models are very common in b
 
 Now we have the design, we can reproduce it in F#:
 
-```
+```fsharp
 type CartItem = string    // placeholder for a more complicated type
 
 type EmptyState = NoItems // don't use empty list! We want to
@@ -140,7 +140,7 @@ We create a type for each state, and `Cart` type that is a choice of any one of 
 
 Next we can create the operations for each state. The main thing to note is each operation will always take one of the States as input and return a new Cart. That is, you start off with a particular known state, but you return a `Cart` which is a wrapper for a choice of three possible states.
 
-```
+```fsharp
 // =============================
 // operations on empty state
 // =============================
@@ -172,7 +172,7 @@ let payForActiveState state amount =
 
 Next, we attach the operations to the states as methods
 
-```
+```fsharp
 type EmptyState with
    member this.Add = addToEmptyState 
 
@@ -184,7 +184,7 @@ type ActiveState with
 
 And we can create some cart level helper methods as well. At the cart level, we have to explicitly handle each possibility for the internal state with a `match..with` expression.
 
-```
+```fsharp
 let addItemToCart cart item =  
    match cart with
    | Empty state -> state.Add item
@@ -226,7 +226,7 @@ type Cart with
 
 Let's exercise this code now:
 
-```
+```fsharp
 let emptyCart = Cart.NewCart
 printf "emptyCart="; emptyCart.Display
 
@@ -238,7 +238,7 @@ We now have an active cart with one item in it. Note that "`cartA`" is a complet
 
 Let's keep going:
 
-```
+```fsharp
 let cartAB = cartA.Add "B"
 printf "cartAB="; cartAB.Display
 
@@ -253,7 +253,7 @@ So far, so good. Again, all these are distinct objects in different states,
 
 Let's test the requirement that you cannot remove items from an empty cart:
 
-```
+```fsharp
 let emptyCart3 = emptyCart2.Remove "B"    //error
 printf "emptyCart3="; emptyCart3.Display
 ```
@@ -264,7 +264,7 @@ Now say that we want to pay for a cart. We didn't create this method at the Cart
 
 First we'll try to pay for cartA.
 
-```
+```fsharp
 //  try to pay for cartA
 let cartAPaid = 
     match cartA with
@@ -277,7 +277,7 @@ The result was a paid cart.
 
 Now we'll try to pay for the emptyCart.
 
-```
+```fsharp
 //  try to pay for emptyCart
 let emptyCartPaid = 
     match emptyCart with
@@ -290,7 +290,7 @@ Nothing happens. The cart is empty, so the Active branch is not called. We might
 
 The same thing happens if we accidentally try to pay for a cart that is already paid.
 
-```
+```fsharp
 //  try to pay for cartAB 
 let cartABPaid = 
     match cartAB with
@@ -308,7 +308,7 @@ You might argue that the client code above might not be representative of code i
 
 So what happens if we have badly written or malicious client code that tries to force payment:
 
-```
+```fsharp
 match cartABPaid with
 | Empty state -> state.Pay 100m
 | PaidFor state -> state.Pay 100m
@@ -370,7 +370,7 @@ If you are interested to see what the C# code for a solution looks like, here it
 The key thing to note is that, because C# doesn't have union types, the implementation uses a ["fold" function](../posts/match-expression.md#folds),
 a function that has three function parameters, one for each state. To use the cart, the caller passes a set of three lambdas in, and the (hidden) state determines what happens.
 
-```
+```csharp
 var paidCart = cartA.Do(
     // lambda for Empty state
     state => cartA,  
@@ -382,7 +382,7 @@ var paidCart = cartA.Do(
 
 This approach means that the caller can never call the "wrong" function, such as "Pay" for the Empty state, because the parameter to the lambda will not support it. Try it and see!
 
-```
+```csharp
 using System;
 using System.Collections.Generic;
 using System.Linq;

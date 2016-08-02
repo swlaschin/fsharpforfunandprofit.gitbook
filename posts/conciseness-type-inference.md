@@ -13,7 +13,7 @@ As you have already seen, F# uses a technique called "type inference" to greatly
 
 To see this, here are some C# methods that wrap two standard LINQ functions. The implementations are trivial, but the method signatures are extremely complex:
 
-```
+```csharp
 public IEnumerable<TSource> Where<TSource>(
     IEnumerable<TSource> source,
     Func<TSource, bool> predicate
@@ -35,7 +35,7 @@ public IEnumerable<IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(
 
 And here are the exact F# equivalents, showing that no type annotations are needed at all!
 
-```
+```fsharp
 let Where source predicate = 
     //use the standard F# implementation
     Seq.filter predicate source
@@ -51,7 +51,7 @@ You might notice that the standard F# implementations for "filter" and "groupBy"
 
 The type inference algorithm is excellent at gathering information from many sources to determine the types. In the following example, it correctly deduces that the `list` value is a list of strings.
 
-```
+```fsharp
 let i  = 1
 let s = "hello"
 let tuple  = s,i      // pack into tuple   
@@ -61,7 +61,7 @@ let list = [s2]       // type is string list
 
 And in this example, it correctly deduces that the `sumLengths` function takes a list of strings and returns an int.
 
-```
+```fsharp
 let sumLengths strList = 
     strList |> List.map String.length |> List.sum
 

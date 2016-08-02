@@ -12,7 +12,7 @@ A particularly convenient feature of F# is that complicated functions with many 
 
 Let's start with a very simple example of how this works. We'll start with a trivial function:
 
-```
+```fsharp
 // define a adding function
 let add x y = x + y
 
@@ -22,13 +22,13 @@ let z = add 1 2
 
 But we can do something strange as well ? we can call the function with only one parameter!
 
-```
+```fsharp
 let add42 = add 42
 ```
 
 The result is a new function that has the "42" baked in, and now takes only one parameter instead of two!  This technique is called "partial application", and it means that, for any function, you can "fix" some of the parameters and leave other ones open to be filled in later.
 
-```
+```fsharp
 // use the new function
 add42 2
 add42 3
@@ -36,7 +36,7 @@ add42 3
 
 With that under our belt, let's revisit the generic logger that we saw earlier:
 
-```
+```fsharp
 let genericLogger anyFunc input = 
    printfn "input is %A" input   //log the input
    let result = anyFunc input    //evaluate the function
@@ -50,7 +50,7 @@ Of course, F# being a functional programming language, we will do this by passin
 
 In this case we would pass "before" and "after" callback functions to the library function, like this:
 
-```
+```fsharp
 let genericLogger before after anyFunc input = 
    before input               //callback for custom behavior
    let result = anyFunc input //evaluate the function
@@ -60,7 +60,7 @@ let genericLogger before after anyFunc input =
 
 You can see that the logging function now has four parameters. The "before" and "after" actions are passed in as explicit parameters as well as the function and its input. To use this in practice, we just define the functions and pass them in to the library function along with the final int parameter:
 
-```
+```fsharp
 let add1 input = input + 1
 
 // reuse case 1
@@ -84,7 +84,7 @@ But you might be thinking that this is a bit ugly. A library function might expo
 
 Luckily, we know the solution for this. We can use partial application to fix some of the parameters. So in this case, let's define a new function which fixes the `before` and `after` functions, as well as the `add1` function, but leaves the final parameter open.
 
-```
+```fsharp
 // define a reusable function with the "callback" functions fixed
 let add1WithConsoleLogging = 
     genericLogger
@@ -96,7 +96,7 @@ let add1WithConsoleLogging =
 
 The new "wrapper" function is called with just an int now, so the code is much cleaner. As in the earlier example, it can be used anywhere the original `add1` function could be used without any changes.
 
-```
+```fsharp
 add1WithConsoleLogging 2
 add1WithConsoleLogging 3
 add1WithConsoleLogging 4
@@ -111,7 +111,7 @@ But classical style inheritance is now becoming frowned upon in object-oriented 
 
 Here's the F# code translated into C# (note that I had to specify the types for each Action)
 
-```
+```csharp
 public class GenericLoggerHelper<TInput, TResult>
 {
     public TResult GenericLogger(
@@ -130,7 +130,7 @@ public class GenericLoggerHelper<TInput, TResult>
 
 And here it is in use:
 
-```
+```csharp
 [NUnit.Framework.Test]
 public void TestGenericLogger()
 {

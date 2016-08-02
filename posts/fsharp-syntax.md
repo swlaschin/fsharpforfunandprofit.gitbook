@@ -15,7 +15,7 @@ In soccer, the offside rule says that in some situations, a player cannot be "ah
 
 Generally, once an offside line has been set, all the expressions must align with the line.
 
-```
+```fsharp
 //character columns
 //3456789
 let f = 
@@ -37,7 +37,7 @@ let f =
 
 Various tokens can trigger new offside lines to be created. For example, when the F# sees the "`=`" used in a let expression, a new offside line is created at the position of the very next symbol or word encountered.
 
-```
+```fsharp
 //character columns
 //34567890123456789
 let f =   let x=1  // line is now at column 11 (start of "let x=")
@@ -57,7 +57,7 @@ let f =
 
 Other tokens have the same behavior, including parentheses, "`then`", "`else`", "`try`", "`finally`" and "`do`", and "`->`" in match clauses.
 
-```
+```fsharp
 //character columns
 //34567890123456789
 let f = 
@@ -80,7 +80,7 @@ let f =
 
 The offside lines can be nested, and are pushed and popped as you would expect:
 
-```
+```fsharp
 //character columns
 //34567890123456789
 let f = 
@@ -94,7 +94,7 @@ let f =
 
 New offside lines can never go forward further than the previous line on the stack:
 
-```
+```fsharp
 let f = 
    let g = (         // let defines a new line at col 4
   1+2)               // oops! Cant define new line less than 4
@@ -107,7 +107,7 @@ There are number of special cases which have been created to make code formattin
 
 Infix operators such as "+", "|>" and ">>" are allowed to be outside the line by their length plus one space:
 
-```
+```fsharp
 //character columns
 //34567890123456789
 let x =  1   // defines a new line at col 10
@@ -120,7 +120,7 @@ let f g h =   g   // defines a new line at col 15
 
 If an infix operator starts a line, that line does not have to be strict about the alignment:
 
-```
+```fsharp
 let x =  1   // defines a new line at col 10
         + 2   // infix operators that start a line don't count
              * 3  // starts with "*" so doesn't need to align
@@ -129,7 +129,7 @@ let x =  1   // defines a new line at col 10
 
 If a "`fun`" keyword starts an expression, the "fun" does *not* start a new offside line:
 
-```
+```fsharp
 //character columns
 //34567890123456789
 let f = fun x ->  // "fun" should define a new line at col 9
@@ -152,7 +152,7 @@ By default, F# uses indentation to indicate block structure -- this is called "l
 
 Here is an example of verbose syntax with wacky indentation that would not otherwise be acceptable:
 
-```
+```fsharp
 #indent "off"
 
       let f = 
@@ -167,7 +167,7 @@ end
 
 Verbose syntax is always available, even in "light" mode, and is occasionally useful. For example, when you want to embed "let" into a one line expression:
 
-```
+```fsharp
 let x = let y = 1 in let z = 2 in y + z
 ```
 

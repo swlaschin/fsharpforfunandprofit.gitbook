@@ -17,7 +17,7 @@ In this post, we'll look at whether we can extend that concept to an even more f
 
 Let's look a simple `PersonalName` type.
 
-```
+```fsharp
 type PersonalName = 
     {
     FirstName: string;
@@ -53,7 +53,7 @@ It is important that all these applications and services have the *same* idea of
 
 For example, have you ever written code that checks the length of a string before writing it to a database? 
 
-```
+```csharp
 void SaveToDatabase(PersonalName personalName)
 { 
    var first = personalName.First;
@@ -81,7 +81,7 @@ The answer, of course, is to create wrapper types which have the constraints bui
 
 So let's knock up a quick prototype using the single case union technique we used [before](../posts/designing-with-types-single-case-dus.md).
 
-```
+```fsharp
 module String100 = 
     type T = String100 of string
     let create (s:string) = 
@@ -114,7 +114,7 @@ Note that we immediately have to deal with the case when the validation fails by
 
 For example, here is a good string and a bad string of length 2.
 
-```
+```fsharp
 let s2good = String2.create "CA"
 let s2bad = String2.create "California"
 
@@ -131,7 +131,7 @@ One problem is that we have a lot of duplicated code. In practice a typical doma
 
 Another more serious problem is that comparisons become harder. A `String50` is a different type from a `String100` so that they cannot be compared directly. 
 
-```
+```fsharp
 let s50 = String50.create "John"
 let s100 = String100.create "Smith"
 
@@ -147,7 +147,7 @@ This kind of thing will make working with dictionaries and lists harder.
 
 At this point we can exploit F#'s support for interfaces, and create a common interface that all wrapped strings have to support, and also some standard functions:
 
-```
+```fsharp
 module WrappedString = 
 
     /// An interface that all wrapped strings support
@@ -188,7 +188,7 @@ The key function is `create`, which takes a constructor function and creates new
 
 With this in place it is a lot easier to define new types:
 
-```
+```fsharp
 module WrappedString = 
 
     // ... code from above ...
@@ -238,7 +238,7 @@ The type is a simple wrapped type as we have seen before.
 
 The implementation of the `Value` method of the IWrappedString could have been written using multiple lines, like this:
 
-```
+```fsharp
 member this.Value = 
     let (String100 s) = this 
     s
@@ -246,19 +246,19 @@ member this.Value =
 
 But I chose to use a one liner shortcut:
 
-```
+```fsharp
 member this.Value = let (String100 s) = this in s
 ```
 
 The constructor function is also very simple. The canonicalize function is `singleLineTrimmed`, the validator function checks the length, and the constructor is the `String100` function (the function associated with the single case, not to be confused with the type of the same name). 
 
-```
+```fsharp
 let string100 = create singleLineTrimmed (lengthValidator 100) String100
 ```
 
 If you want to have other types with different constraints, you can easily add them. For example you might want to have a `Text1000` type that supports multiple lines and embedded tabs and is not trimmed.
 
-```
+```fsharp
 module WrappedString = 
 
     // ... code from above ...
@@ -276,7 +276,7 @@ module WrappedString =
 
 We can now play with the module interactively to see how it works:
 
-```
+```fsharp
 let s50 = WrappedString.string50 "abc" |> Option.get
 printfn "s50 is %A" s50
 let bad = WrappedString.string50 null
@@ -298,7 +298,7 @@ When we need to interact with types such as maps that use raw strings, it is eas
 
 For example, here are some helpers to work with maps:
 
-```
+```fsharp
 module WrappedString = 
 
     // ... code from above ...
@@ -316,7 +316,7 @@ module WrappedString =
 
 And here is how these helpers might be used in practice:
 
-```
+```fsharp
 let abc = WrappedString.string50 "abc" |> Option.get
 let def = WrappedString.string100 "def" |> Option.get
 let map = 
@@ -336,7 +336,7 @@ So overall, this "WrappedString" module allows us to create nicely typed strings
 
 Now we have our types, we can change the definition of the `PersonalName` type to use them.
 
-```
+```fsharp
 module PersonalName = 
     open WrappedString
 
@@ -366,7 +366,7 @@ In this case we use the simple approach of creating an option type with None to 
 
 Here it is in use:
 
-```
+```fsharp
 let name = PersonalName.create "John" "Smith"
 ```
 
@@ -383,7 +383,7 @@ Again, more decisions to make.
 
 Here's code that demonstrates all three options.
 
-```
+```fsharp
 module PersonalName = 
 
     // ... code from above ...
@@ -425,7 +425,7 @@ This can be very annoying at times, but overall I think it is a good thing.
 
 We can use this WrappedString module to reimplement the `EmailAddress` and `ZipCode` types.
 
-```
+```fsharp
 module EmailAddress = 
 
     type T = EmailAddress of string with 

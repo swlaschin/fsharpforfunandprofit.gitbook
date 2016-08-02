@@ -57,7 +57,7 @@ We'll start with the simplest kind of dependency -- what I will call a "method d
 
 Here is an example.
 
-```
+```fsharp
 module MethodDependencyExample = 
 
     type Customer(name, observer:CustomerObserver) = 
@@ -88,7 +88,7 @@ The `and` keyword is designed for just this situation -- it allows you to have t
 
 To use it, just replace the second `type` keyword with `and`. Note that using `and type`, as shown below, is incorrect. Just the single `and` is all you need.
 
-```
+```fsharp
 type Something 
 and type SomethingElse  // wrong
 
@@ -102,7 +102,7 @@ First, it only works for types declared in the same module. You can't use it acr
 
 Second, it should really only be used for tiny types. If you have 500 lines of code between the `type` and the `and`, then you are doing something very wrong.
 
-```
+```fsharp
 type Something
    // 500 lines of code
 and SomethingElse
@@ -123,7 +123,7 @@ So why don't we create a `INameObserver<'T>` interface instead, with the same `O
 
 Here's what I mean:
 
-```
+```fsharp
 module MethodDependency_ParameterizedInterface = 
 
     type INameObserver<'T> = 
@@ -156,7 +156,7 @@ But we don't have to stop there.  Now that we have an interface, do we really ne
 
 Here is the same code again, but this time the `CustomerObserver` class has been eliminated completely and the `INameObserver` created directly.
 
-```
+```fsharp
 module MethodDependency_ParameterizedInterface = 
 
     // code as above
@@ -173,7 +173,7 @@ module MethodDependency_ParameterizedInterface =
 
 This technique will obviously work for more complex interfaces as well, such as that shown below, where there are two methods:
 
-```
+```fsharp
 module MethodDependency_ParameterizedInterface2 = 
 
     type ICustomerObserver<'T> = 
@@ -214,7 +214,7 @@ module MethodDependency_ParameterizedInterface2 =
 
 In many cases, we can go even further and eliminate the interface class as well. Why not just pass in a simple function that is called when the name changes, like this:
 
-```
+```fsharp
 module MethodDependency_ParameterizedClasses_HOF  = 
 
     type Customer(name, observer) = 
@@ -236,7 +236,7 @@ module MethodDependency_ParameterizedClasses_HOF  =
 
 I think you'll agree that this snippet is "lower ceremony" than either of the previous versions.  The observer is now defined inline as needed, very simply:
 
-```
+```fsharp
 let observer(c:Customer) = 
     printfn "Customer name changed to '%s' " c.Name
 ```
@@ -250,7 +250,7 @@ As I mentioned above, a more "functional design" would be to separate the types 
 
 Here is a first pass:
 
-```
+```fsharp
 module MethodDependencyExample_SeparateTypes = 
 
     module DomainTypes = 
@@ -287,7 +287,7 @@ In this code, though, we still have the mutual dependency between `Customer` and
 
 Yes, of course. We can use the same trick as in the previous approach, eliminating the observer type and embedding a function directly in the `Customer` data structure, like this:
 
-```
+```fsharp
 module MethodDependency_SeparateTypes2 = 
 
     module DomainTypes = 
@@ -321,7 +321,7 @@ The `Customer` type still has some behavior embedded in it. In many cases, there
 
 So let's remove the `observer` from the customer type, and pass it as an extra parameter to the `changeName` function, like this:
 
-```
+```fsharp
 let changeName observer customer newName = 
     let newCustomer = {customer with name=newName}
     observer newCustomer    // call the observer with the new customer
@@ -330,7 +330,7 @@ let changeName observer customer newName =
 
 Here's the complete code:
 
-```
+```fsharp
 module MethodDependency_SeparateTypes3 = 
 
     module DomainTypes = 
@@ -362,7 +362,7 @@ You might be thinking that I have made things more complicated now -- I have to 
 
 Ah, but, you're forgetting the magic of [partial application](../posts/partial-application.md)!  You can set up a function with the observer "baked in", and then use *that* function everywhere, without needing to pass in an observer every time you use it. Clever!
 
-```
+```fsharp
 module MethodDependency_SeparateTypes3 = 
 
     // code as above
@@ -384,7 +384,7 @@ module MethodDependency_SeparateTypes3 =
 
 Let's look at the `changeName` function again:
 
-```
+```fsharp
 let changeName observer customer newName = 
     let newCustomer = {customer with name=newName}
     observer newCustomer    // call the observer with the new customer
@@ -399,7 +399,7 @@ It has the following steps:
 
 This is completely generic logic -- it has nothing to do with customers at all. So we can rewrite it as a completely generic library function. Our new function will allow *any* observer function to "hook into" into the result of *any* other function, so let's call it `hook` for now. 
 
-```
+```fsharp
 let hook2 observer f param1 param2 = 
     let y = f param1 param2 // do something to make a result value
     observer y              // call the observer with the result value
@@ -408,7 +408,7 @@ let hook2 observer f param1 param2 =
 
 Actually, I called it `hook2` because the function `f` being "hooked into" has two parameters. I could make another version for functions that have one parameter, like this:
 
-```
+```fsharp
 let hook observer f param1 = 
     let y = f param1 // do something to make a result value 
     observer y       // call the observer with the result value
@@ -424,21 +424,21 @@ Ok, back to the code -- how do we use this generic `hook` function?
 
 So, again, we create a partially applied `changeName` function, but this time we create it by passing the observer and the hooked function to `hook2`, like this:
 
-```
+```fsharp
 let observer = Observer.printNameChanged 
 let changeName = hook2 observer Customer.changeName 
 ```
 
 Note that the resulting `changeName` has *exactly the same signature* as the original `Customer.changeName` function, so it can be used interchangably with it anywhere.
 
-```
+```fsharp
 let customer = {name="Alice"}
 changeName customer "Bob"
 ```
 
 Here's the complete code:
 
-```
+```fsharp
 module MethodDependency_SeparateTypes_WithHookFunction = 
 
     [<AutoOpen>]
@@ -499,7 +499,7 @@ Voila -- mutual dependency!
 
 Here is the example in code:
 
-```
+```fsharp
 module StructuralDependencyExample = 
 
     type Employee(name, location:Location) = 
@@ -515,7 +515,7 @@ Before we get on to refactoring, let's consider how awkward this design is. How 
 
 Here's one attempt. We create a location with an empty list of employees, and then create other employees using that location:
 
-```
+```fsharp
 module StructuralDependencyExample = 
 
     // code as above
@@ -536,7 +536,7 @@ F# will sometimes allow you to use the `and` keyword in these situation too, for
 
 Let's try it. We will give `location` a list of `alice` and `bob` even though they are not declared yet. 
 
-```
+```fsharp
 module UncompilableTest = 
     let rec location = new Location("NY",[alice;bob])       
     and alice = new Employee("Alice",location  )       
@@ -548,7 +548,7 @@ And anyway, just as for types, having to use `and` for "let" definitions is a cl
 
 So, really, the only sensible solution is to use mutable structures, and to fix up the location object *after* the individual employees have been created, like this:
 
-```
+```fsharp
 module StructuralDependencyExample_Mutable = 
 
     type Employee(name, location:Location) = 
@@ -581,7 +581,7 @@ So, a lot of trouble just to create some values. This is another reason why mutu
 
 To break the dependency, we can use the parameterization trick again. We can just create a parameterized vesion of `Employee`.
 
-```
+```fsharp
 module StructuralDependencyExample_ParameterizedClasses = 
 
     type ParameterizedEmployee<'Location>(name, location:'Location) = 
@@ -610,13 +610,13 @@ module StructuralDependencyExample_ParameterizedClasses =
 
 Note that we create a type alias for `Employee`, like this:
 
-```
+```fsharp
 type Employee = ParameterizedEmployee<Location> 
 ```
 
 One nice thing about creating an alias like that is that the original code for creating employees will continue to work unchanged.
 
-```
+```fsharp
 let alice = new Employee("Alice",location)       
 ```
 
@@ -626,7 +626,7 @@ The code above assumes that the particular class being parameterized over is not
 
 For example, let's say that the `Employee` class expects a `Name` property, and the `Location` class expects an `Age` property, like this:
 
-```
+```fsharp
 module StructuralDependency_WithAge = 
 
     type Employee(name, age:float, location:Location) = 
@@ -660,7 +660,7 @@ How can we possibly parameterize this?
 
 Well, let's try using the same approach as before:
 
-```
+```fsharp
 module StructuralDependencyWithAge_ParameterizedError = 
 
     type ParameterizedEmployee<'Location>(name, age:float, location:'Location) = 
@@ -685,7 +685,7 @@ One way would be to fix this by creating interfaces such as `ILocation` and `IEm
 
 But another way is to let the Location parameter be generic and pass in an *additional function* that knows how to handle it. In this case a `getLocationName` function.
 
-```
+```fsharp
 module StructuralDependencyWithAge_ParameterizedCorrect = 
 
     type ParameterizedEmployee<'Location>(name, age:float, location:'Location, getLocationName) = 
@@ -710,7 +710,7 @@ One way of thinking about this is that we are providing the behavior externally,
 
 To use this then, we need to pass in a function along with the type parameter. This would be annoying to do all the time, so naturally we will wrap it in a function, like this:
 
-```
+```fsharp
 module StructuralDependencyWithAge_ParameterizedCorrect = 
 
     // same code as above
@@ -723,7 +723,7 @@ module StructuralDependencyWithAge_ParameterizedCorrect =
 
 With this in place, the original test code continues to work, almost unchanged (we have to change `new Employee` to just `Employee`).
 
-```
+```fsharp
 module StructuralDependencyWithAge_ParameterizedCorrect = 
 
     // same code as above
@@ -745,7 +745,7 @@ Now let's apply the functional design approach to this problem, just as we did b
 
 Again, we'll separate the types themselves from the functions that act on those types. 
 
-```
+```fsharp
 module StructuralDependencyExample_SeparateTypes = 
 
     module DomainTypes = 
@@ -784,7 +784,7 @@ module StructuralDependencyExample_SeparateTypes =
 Before we go any further, let's remove some unneeded code.  One nice thing about using a record type is that you don't need to define "getters", so the only functions you need in the modules
 are functions that manipulate the data, such as `AverageAge`.
 
-```
+```fsharp
 module StructuralDependencyExample_SeparateTypes2 = 
 
     module DomainTypes = 
@@ -814,7 +814,7 @@ For example, if the things are products, then a place full of products might be 
 
 Here are these concepts expressed in code:
 
-```
+```fsharp
 module LocationOfThings =
 
     type Location<'Thing> = {name:string; mutable things: 'Thing list}
@@ -834,7 +834,7 @@ the things they contain.
 
 So, using the "location of things" design, here is our dependency rewritten to use parameterized types.
 
-```
+```fsharp
 module StructuralDependencyExample_SeparateTypes_Parameterized = 
 
     module DomainTypes = 
@@ -872,7 +872,7 @@ After all, the functionality is much more related to how employees work than how
 
 Here's what I mean:
 
-```
+```fsharp
 module Employee = 
 
     let AverageAgeAtLocation location = 
@@ -894,7 +894,7 @@ The current relationships are held in a single master list, and so when changes 
 
 Here is a very crude example, using a simple list of `Relationship`s. 
 
-```
+```fsharp
 module StructuralDependencyExample_Normalized = 
 
     module DomainTypes = 
@@ -944,7 +944,7 @@ We'll consider a UI control hierarchy, where every control belongs to a top-leve
 
 Here's a first pass at an implementation:
 
-```
+```fsharp
 module InheritanceDependencyExample = 
 
     type Control(name, form:Form) = 
@@ -972,7 +972,7 @@ and the `Form` class itself, which doesn't.
 
 Here's some sample code:
 
-```
+```fsharp
 module InheritanceDependencyExample2 = 
 
     [<AbstractClass>]
@@ -1000,7 +1000,7 @@ module InheritanceDependencyExample2 =
 
 To remove the circular dependency, we can parameterize the classes in the usual way, as shown below.
 
-```
+```fsharp
 module InheritanceDependencyExample_ParameterizedClasses = 
 
     [<AbstractClass>]

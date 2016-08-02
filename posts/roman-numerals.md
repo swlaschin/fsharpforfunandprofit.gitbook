@@ -33,7 +33,7 @@ As before we'll start by first creating the internal model, and then look at how
 
 Here's a first stab at the model. We'll treat a `RomanNumeral` as a list of `RomanDigits`.
 
-```
+```fsharp
 type RomanDigit = int
 type RomanNumeral = RomanDigit list 
 ```
@@ -45,7 +45,7 @@ We can do this by creating a [single case union type](../posts/discriminated-uni
 
 Here's a much better version:
 
-```
+```fsharp
 type RomanDigit = I | V | X | L | C | D | M
 type RomanNumeral = RomanNumeral of RomanDigit list 
 ```
@@ -56,7 +56,7 @@ Now let's do the output logic, converting a Roman numeral to an int.
 
 The digit conversion is easy:
 
-```
+```fsharp
 /// Converts a single RomanDigit to an integer
 let digitToInt =
     function
@@ -79,7 +79,7 @@ Note that we're using the `function` keyword instead of the `match..with` expres
 To convert a list of digits, we'll use a recursive loop again.
 There is a special case when we need to look ahead to the next digit, and if it is larger than the current one, then use their difference.
 
-```
+```fsharp
 let rec digitsToInt =
     function
         
@@ -109,7 +109,7 @@ let rec digitsToInt =
 
 Finally, we can convert the `RomanNumeral` type itself by unpacking the contents into a list and calling `digitsToInt`.
 
-```
+```fsharp
 /// converts a RomanNumeral to an integer
 let toInt (RomanNumeral digits) = digitsToInt digits
 
@@ -129,7 +129,7 @@ Now let's do the input logic, converting a string to our internal model.
 
 First, let's handle a single character conversion. It seems straightforward.
 
-```
+```fsharp
 let charToRomanDigit =
     function
     | 'I' -> I
@@ -149,7 +149,7 @@ So, what should be done for bad input. How about printing an error message?
 
 Let's try again and add a case to handle all other characters:
 
-```
+```fsharp
 let charToRomanDigit =
     function
     | 'I' -> I
@@ -171,7 +171,7 @@ But on further consideration, we might also want the caller to know what the bad
 
 Here's the fixed up version:
 
-```
+```fsharp
 type ParsedChar = 
     | Digit of RomanDigit 
     | BadChar of char
@@ -192,7 +192,7 @@ Note that I have removed the error message. Since the bad char is being returned
 
 Next, we should check the function signature to make sure it is what we expect:
 
-```
+```fsharp
 charToRomanDigit : char -> ParsedChar
 ```
 
@@ -200,7 +200,7 @@ That looks good.
 
 Now, how can we convert a string into these digits? We convert the string to a char array, convert that into a list, and then do a final conversion using `charToRomanDigit`.
 
-```
+```fsharp
 let toRomanDigitList s = 
     s.ToCharArray() // error FS0072
     |> List.ofArray 
@@ -213,7 +213,7 @@ That typically happens when you use a method rather than a function.  Any object
 
 In this case, the solution is just to use an explicit type annotation on the parameter -- our first so far!
 
-```
+```fsharp
 let toRomanDigitList (s:string) = 
     s.ToCharArray() 
     |> List.ofArray 
@@ -222,7 +222,7 @@ let toRomanDigitList (s:string) =
 
 But look at the signature:
 
-```
+```fsharp
 toRomanDigitList : string -> ParsedChar list
 ```
 
@@ -232,7 +232,7 @@ It still has the pesky `ParsedChar` in it rather than `RomanDigits`. How do we w
 
 In this case, the client is the top level function that creates a `RomanNumeral` type. Here's our first attempt:
 
-```
+```fsharp
 // convert a string to a RomanNumeral
 let toRomanNumeral s = 
     toRomanDigitList s
@@ -253,7 +253,7 @@ If we do this, the output of `List.choose` will be a list of `RomanDigits`, exac
 
 Here is everything put together:
 
-```
+```fsharp
 /// Convert a string to a RomanNumeral
 /// Does not validate the input.E.g. "IVIV" would be valid
 let toRomanNumeral s = 
@@ -271,7 +271,7 @@ let toRomanNumeral s =
 
 Let's test!
 
-```
+```fsharp
 // test good cases
 
 "IIII"  |> toRomanNumeral
@@ -301,7 +301,7 @@ The validation rules were not listed in the requirements, so let's put down our 
 
 We can convert these requirements into a pattern matching function as follows:
 
-```
+```fsharp
 let runsAllowed = 
     function 
     | I | X | C | M -> true
@@ -364,7 +364,7 @@ let rec isValidDigitList digitList =
 
 And let's test the validation:
 
-```
+```fsharp
 // test valid 
 let validList = [
     [I;I;I;I]
@@ -398,7 +398,7 @@ let testInvalid = invalidList |> List.map isValidDigitList
 ```
 
 Finally, we add a top level function to test validity of the `RomanNumeral` type itself.
-```
+```fsharp
 // top level check for validity
 let isValid (RomanNumeral digitList) =
     isValidDigitList digitList
@@ -429,7 +429,7 @@ let isValid (RomanNumeral digitList) =
 
 Here's all the code in one module:
 
-```
+```fsharp
 module RomanNumeralsV1 =
 
     // ==========================================
@@ -584,7 +584,7 @@ The code works, but there is something that's bugging me about it. The validatio
 
 And also, I can think of examples that should fail validation, but pass, such as "VIV":
 
-```
+```fsharp
 "VIV" |> toRomanNumeral |> isValid
 ```
 
@@ -598,7 +598,7 @@ Let's run with it and see what happens.
 
 Here's the new types for the domain. I now have a digit type for every possible digit. The `RomanNumeral` type stays the same.
 
-```
+```fsharp
 type RomanDigit = 
     | I | II | III | IIII 
     | IV | V 
@@ -614,7 +614,7 @@ type RomanNumeral = RomanNumeral of RomanDigit list
 
 Next, converting a single `RomanDigit` to an integer is the same as before, but with more cases:
 
-```
+```fsharp
 /// Converts a single RomanDigit to an integer
 let digitToInt =
     function
@@ -635,7 +635,7 @@ CM  |> digitToInt
 
 Calculating the sum of the digits is now trivial. No special cases needed:
 
-```
+```fsharp
 /// converts a list of digits to an integer
 let digitsToInt list = 
     list |> List.sumBy digitToInt 
@@ -651,7 +651,7 @@ let digitsToInt list =
 
 Finally, the top level function is identical:
 
-```
+```fsharp
 /// converts a RomanNumeral to an integer
 let toInt (RomanNumeral digits) = digitsToInt digits
 
@@ -667,7 +667,7 @@ That means we can't just pull off one character like we did in the first version
 
 Also, we want to convert IIII into a single `IIII` digit rather than 4 separate `I` digits, so we put the longest matches at the front.
 
-```
+```fsharp
 type ParsedChar = 
     | Digit of RomanDigit 
     | BadChar of char
@@ -749,7 +749,7 @@ Well, this is much longer than the first version, but otherwise basically the sa
 
 The top level functions are unchanged.
 
-```
+```fsharp
 let toRomanDigitList (s:string) = 
     s.ToCharArray() 
     |> List.ofArray 
@@ -788,7 +788,7 @@ Finally, let's see how the new domain model affects the validation rules.  Now, 
 
 * Each digit must be smaller than the preceding digit
 
-```
+```fsharp
 // check for validity
 let rec isValidDigitList digitList =
     match digitList with
@@ -823,7 +823,7 @@ let isValid (RomanNumeral digitList) =
 
 Alas, after all that, we still didn't fix the bad case that triggered the rewrite!
 
-```
+```fsharp
 "VIV" |> toRomanNumeral |> isValid
 ```
 
@@ -833,7 +833,7 @@ There is a not-too-complicated fix for this, but I think it's time to leave it a
 
 Here's all the code in one module for the second version:
 
-```
+```fsharp
 module RomanNumeralsV2 =
 
     // ==========================================
@@ -1013,7 +1013,7 @@ Finally, let's see how we might make this object oriented. We don't care about t
 
 And here they are:
 
-```
+```fsharp
 type RomanNumeral with
 
     static member FromString s = 
@@ -1030,7 +1030,7 @@ type RomanNumeral with
 
 Let's use this in an object oriented way now:
 
-```
+```fsharp
 let r = RomanNumeral.FromString "XXIV"
 let s = r.ToString()
 let i = r.ToInt()

@@ -11,7 +11,7 @@ Let's start with the simplest type definition, a type abbreviation or alias.
 
 It has the form:
 
-```
+```fsharp
 type [typename] = [existingType]
 ```
 
@@ -19,7 +19,7 @@ where "existing type" can be any type: one of the basic types we have already se
 
 Some examples:
 
-```
+```fsharp
 type RealNumber = float
 type ComplexNumber = float * float
 type ProductCode = string
@@ -37,7 +37,7 @@ Another use is to provide some degree of decoupling between the usage of a type 
 
 However, one thing is to note is that this really is just an alias or abbreviation; you are not actually creating a new type. So if I define a function that I explicitly say is an `AdditionFunction`:
 
-```
+```fsharp
 type AdditionFunction = int->int->int
 let f:AdditionFunction = fun a b -> a + b
 ```
@@ -46,7 +46,7 @@ the compiler will erase the alias and return a plain `int->int->int` as the func
 
 In particular, there is no true encapsulation. I could use an explicit `int` anywhere I used a `CustomerId` and the compiler would not complain. And if I had attempted to create safe versions of entity ids such as this:
 
-```
+```fsharp
 type CustomerId = int
 type OrderId = int
 ```

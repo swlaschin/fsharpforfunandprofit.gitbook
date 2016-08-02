@@ -15,7 +15,7 @@ Let's say that we have created a "maybe" style workflow as before. But this time
 
 Here is our complete builder class. The key method to look at is `Combine`, in which we simply ignore any secondary expressions after the first return.
 
-```
+```fsharp
 type TraceBuilder() =
     member this.Bind(m, f) = 
         match m with 
@@ -47,7 +47,7 @@ let trace = new TraceBuilder()
 
 Let's see how it works by printing something, returning, and then printing something else:
 
-```
+```fsharp
 trace { 
     printfn "Part 1: about to return 1"
     return 1
@@ -57,7 +57,7 @@ trace {
 
 The debugging output should look something like the following, which I have annotated:
 
-```
+```text
 // first expression, up to "return"
 Delay
 Part 1: about to return 1
@@ -87,7 +87,7 @@ So, how can we avoid evaluating the second part until we need it?
 
 The answer to the question is straightforward -- simply wrap part 2 of the expression in a function and only call this function when needed, like this.
 
-```
+```fsharp
 let part2 = 
     fun () -> 
         printfn "Part 2: after return has happened"
@@ -106,7 +106,7 @@ And this is exactly what the `Delay` method is for.  Any result from `Return` or
 
 Let's change the builder to implement a delay:
 
-```
+```fsharp
 type TraceBuilder() =
     // other members as before
 
@@ -125,7 +125,7 @@ As you can see, the `Delay` method is given a function to execute. Previously, w
 
 If you compile this code, you can see that the signature of `Delay` has changed. Before the change, it returned a concrete value (an option in this case), but now it returns a function.
 
-```
+```fsharp
 // signature BEFORE the change
 member Delay : f:(unit -> 'a) -> 'a
 
@@ -135,7 +135,7 @@ member Delay : f:(unit -> 'b) -> (unit -> 'b)
 
 By the way, we could have implemented `Delay` in a much simpler way, without any tracing, just by returning the same function that was passed in, like this:
 
-```
+```fsharp
 member this.Delay(f) = 
     f
 ```
@@ -144,7 +144,7 @@ Much more concise! But in this case, I wanted to add some detailed tracing infor
 
 Now let's try again:
 
-```
+```fsharp
 trace { 
     printfn "Part 1: about to return 1"
     return 1
@@ -164,7 +164,7 @@ Hmmm. The output of the whole `trace` expression is now a *function*, not an opt
 
 One way to do this is to assign the output of the computation expression to a function value, say `f`, and then evaluate it.
 
-```
+```fsharp
 let f = trace { 
     printfn "Part 1: about to return 1"
     return 1
@@ -181,7 +181,7 @@ The `Run` method exists for exactly this reason. It is called as the final step 
 
 Here's an implementation:
 
-```
+```fsharp
 type TraceBuilder() =
     // other members as before
 
@@ -194,7 +194,7 @@ type TraceBuilder() =
 
 Let's try one more time:
 
-```
+```fsharp
 trace { 
     printfn "Part 1: about to return 1"
     return 1
@@ -229,7 +229,7 @@ Here is a diagram that represents this process visually:
 If we look at the debug trace for the example above, we can see in detail what happened. It's a little confusing, so I have annotated it.
 Also, it helps to remember that working *down* this trace is the same as working *up* from the bottom of the diagram above, because the outermost code is run first.
 
-```
+```text
 // delaying the overall expression (the output of Combine)
 <fun:clo@160-66> - Delaying using <fun:delayed@141-3>
 
@@ -263,7 +263,7 @@ When we originally wrote `Combine` we were expecting it to handle `options`.  Bu
 
 We can see this if we hard-code the types that `Combine` expects, with `int option` type annotations like this:
 
-```
+```fsharp
 member this.Combine (a: int option,b: int option) = 
     printfn "Returning early with %A. Ignoring %A" a b 
     a
@@ -271,7 +271,7 @@ member this.Combine (a: int option,b: int option) =
 
 If this is done, we get an compiler error in the "return" expression:
 
-```
+```fsharp
 trace { 
     printfn "Part 1: about to return 1"
     return 1
@@ -296,7 +296,7 @@ The answer is straightforward: just call the function that was passed in to get 
 
 Let's demonstrate that using the adding example from the previous post.
 
-```
+```fsharp
 type TraceBuilder() =
     // other members as before
 
@@ -324,7 +324,7 @@ In this new version of `Combine`, the *second* parameter is now a function, not 
 
 If we test this out:
 
-```
+```fsharp
 trace { 
     return 1
     return 2
@@ -333,7 +333,7 @@ trace {
 
 We get the following (annotated) trace:
 
-```
+```text
 // entire expression is delayed
 <fun:clo@318-69> - Delaying using <fun:delayed@295-6>
 
@@ -393,7 +393,7 @@ Similarly, the delayed type does not have to be a simple function, it could be a
 
 So, given a simple set of return expressions, like this:
 
-```
+```fsharp
     trace { 
         return 1
         return 2
@@ -407,7 +407,7 @@ Then a diagram that represents the various types and their flow would look like 
 
 And to prove that this is valid, here is an implementation with distinct types for `Internal` and `Delayed`:
 
-```
+```fsharp
 type Internal = Internal of int option
 type Delayed = Delayed of (unit -> Internal)
 
@@ -475,7 +475,7 @@ let trace = new TraceBuilder()
 
 And the method signatures in the builder class methods look like this:
 
-```
+```fsharp
 type Internal = | Internal of int option
 type Delayed = | Delayed of (unit -> Internal)
 

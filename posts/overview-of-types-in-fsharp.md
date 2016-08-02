@@ -85,7 +85,7 @@ The sum or "union" types, in particular, are very valuable, and once you get use
 
 Every type definition is similar, even though the specific details may vary.  All type definitions start with a "`type`" keyword, followed by an identifier for the type, followed by any generic type parameters, followed by the definition. For example, here are some type definitions for a variety of types:
 
-```
+```fsharp
 type A = int * int
 type B = {FirstName:string; LastName:string}
 type C = Circle of int | Rectangle of int * int
@@ -101,7 +101,7 @@ As we said in a [previous post](../posts/function-signatures.md), there is a spe
 
 Types can *only* be declared in namespaces or modules. But that doesn't mean you always have to create them at the top level -- you can create types in nested modules if you need to hide them.
 
-```
+```fsharp
 
 module sub = 
     // type declared in a module
@@ -120,7 +120,7 @@ let b = sub.helper.B ["a";"b"]
 
 Types *cannot* be declared inside functions.
 
-```
+```fsharp
 let f x = 
     type A = int * int  //unexpected keyword "type"
     x * x
@@ -130,7 +130,7 @@ let f x =
 
 After a type is defined, instances of the type are created using a "constructor" expression that often looks quite similar to the type definition itself.
 
-```
+```fsharp
 let a = (1,1)
 let b = { FirstName="Bob"; LastName="Smith" } 
 let c = Circle 99
@@ -144,7 +144,7 @@ myVal.Method()
 
 What is interesting is that the *same* "constructor" syntax is also used to "deconstruct" the type when doing pattern matching:
 
-```
+```fsharp
 let a = (1,1)                                  // "construct"
 let (a1,a2) = a                                // "deconstruct"
 

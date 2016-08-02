@@ -40,7 +40,7 @@ Let's start with a really bad idea. We'll just provide the name of the config fi
 
 Here's how this might be written in C# pseudocode:
 
-```
+```csharp
 interface IConfiguration
 {   
     string GetConfigFilename();
@@ -49,7 +49,7 @@ interface IConfiguration
 
 and the caller code would be 
 
-```
+```csharp
 var filename = config.GetConfigFilename();
 // open file
 // write new config
@@ -71,7 +71,7 @@ But of course, a malicious caller could still corrupt the config file by writing
 
 Let's lock this down by providing the caller an interface that forces them to treat the config file as a key/value store, like this:
 
-```
+```csharp
 interface IConfiguration
 {   
     void SetConfig(string key, string value);
@@ -80,7 +80,7 @@ interface IConfiguration
 
 The caller code is then something like this:
 
-```
+```csharp
 config.SetConfig("DontShowThisMessageAgain", "True");
 ```
 
@@ -91,7 +91,7 @@ They could also corrupt all the other configuration keys if they wanted to.
 
 Ok, so rather than having a generic config interface, let's provide an interface that provides specific methods for each configuration setting. 
 
-```
+```csharp
 enum MessageFlag {
    ShowThisMessageAgain,
    DontShowThisMessageAgain
@@ -113,7 +113,7 @@ But we still have a problem! What's to stop a malicious caller changing the conn
 
 Ok, so let's define a new interface that contains *only* the methods the caller should have access to, with all the other methods hidden. 
 
-```
+```csharp
 interface IWarningMessageConfiguration
 {   
     void SetMessageFlag(MessageFlag value);
@@ -203,7 +203,7 @@ In the car key analogy, this might be like having car keys that self-destruct on
 
 An interface with one method can be better realized as a function. So this interface:
 
-```
+```csharp
 interface IWarningMessageConfiguration
 {   
     void SetMessageFlag(MessageFlag value);
@@ -212,13 +212,13 @@ interface IWarningMessageConfiguration
 
 becomes just this function:
 
-```
+```csharp
 Action<MessageFlag> messageFlagCapability = // get function;
 ```
 
 or in F#:
 
-```
+```fsharp
 let messageFlagCapability = // get function;
 ```
 
@@ -303,7 +303,7 @@ a [so-called Powerbox](http://c2.com/cgi/wiki?PowerBox) plays a similar role of 
 
 Here's the code for a service that provides configuration capabilities:
 
-```
+```csharp
 interface IConfigurationCapabilities
 {   
     Action<MessageFlag> SetMessageFlag();
@@ -324,7 +324,7 @@ Here's some sample C# pseudocode to demonstrate:
 * The `ApplicationWindow` creates a checkbox.
 * The event handler for the checkbox calls the capability.
 
-```
+```csharp
 // at startup
 var messageFlagCapability = 
     configurationCapabilities.SetMessageFlag()
@@ -373,7 +373,7 @@ We start with the configuration system. Here's an overview:
 * An in-memory store (`ConfigStore`) is created for the purposes of the demo
 * Finally, the `configurationCapabilities` are created using functions that read and write to the `ConfigStore`
 
-```
+```fsharp
 module Config =
 
     type MessageFlag  = ShowThisMessageAgain | DontShowThisMessageAgain
@@ -420,7 +420,7 @@ This requires in turn that the main form creation function (`createForm`) is als
 These capabilities, and these capabilities *only* are passed in to the form. The capabilities for setting the background color or connection string are *not* passed in,
 and thus not available to be (mis)used.
 
-```
+```fsharp
 module AnnoyingPopupMessage = 
     open System.Windows.Forms
    
@@ -477,7 +477,7 @@ In addition, the capability functions are modified:
 
 Here's the code:
 
-```
+```fsharp
 module UserInterface = 
     open System.Windows.Forms
     open System.Drawing
@@ -555,7 +555,7 @@ module UserInterface =
 Finally, the top-level module, here called `Startup`, gets some of the capabilities from the Configuration subsystem, and combines them into a tuple that can be passed
 to the main form. The `ConnectionString` capabilities are *not* passed in though, so there is no way the form can accidentally show it to a user or update it.
 
-```
+```fsharp
 module Startup = 
 
     // set up capabilities

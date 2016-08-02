@@ -13,7 +13,7 @@ In C# and Java, the best practice is to have long descriptive identifiers.  In f
 
 For example, here is a crude implementation of a prime number sieve with very descriptive names for the local values.
 
-```
+```fsharp
 let primesUpTo n = 
     // create a recursive intermediate function
     let rec sieve listOfNumbers  = 
@@ -36,7 +36,7 @@ primesUpTo 100
 
 Here is the same implementation, with terser, idiomatic names and more compact code:
 
-```
+```fsharp
 let primesUpTo n = 
    let rec sieve l  = 
       match l with 
@@ -58,13 +58,13 @@ The common naming conventions are as follows:
 
 Another reason for the short names is that often, they cannot be assigned to anything meaningful.  For example, the definition of the pipe operator is:
 
-```
+```fsharp
 let (|>) x f = f x
 ```
 
 We don't know what `f` and `x` are going to be, `f` could be any function and `x` could be any value. Making this explicit does not make the code any more understandable.
 
-```
+```fsharp
 let (|>) aValue aFunction = aFunction aValue // any better?
 ```
 

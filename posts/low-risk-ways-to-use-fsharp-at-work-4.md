@@ -113,7 +113,7 @@ You can use F# interactive to do many of the same things -- you get queries, aut
 
 For example, here's one that counts customers with a certain email domain.
 
-```
+```fsharp
 [<Literal>]
 let connectionString = "Data Source=localhost; Initial Catalog=SqlInFsharp; Integrated Security=True;"
 
@@ -131,14 +131,14 @@ query {
 
 If you want to see what SQL code is generated, you can turn logging on, of course:
 
-```
+```fsharp
 // optional, turn logging on
 db.DataContext.Log <- Console.Out
 ```
 
 The logged output for this query is:
 
-```
+```text
 SELECT COUNT(*) AS [value]
 FROM [dbo].[Customer] AS [t0]
 WHERE [t0].[Email] LIKE @p0
@@ -149,7 +149,7 @@ You can also do more complicated things, such as using subqueries. Here's an exa
 
 Note that, as befitting a functional approach, queries are nice and composable.
 
-```
+```fsharp
 // Find students who have signed up at least one course.
 query {
     for student in db.Student do
@@ -162,7 +162,7 @@ query {
 And if the SQL engine doesn't support certain functions such as regexes, and assuming the size of the data is not too large,
 you can just stream the data out and do the processing in F#.
 
-```
+```fsharp
 // find the most popular domain for people born in each decade
 let getDomain email =
     Regex.Match(email,".*@(.*)").Groups.[1].Value
@@ -199,7 +199,7 @@ Now let's look at how we can use the type provider to make creating unit tests f
 First, I create a helper module (which I'll call `DbLib`) to set up the connection and to provide shared utility functions such as `resetDatabase`,
 which will be called before each test.
 
-```
+```fsharp
 module DbLib
 
 [<Literal>]
@@ -239,7 +239,7 @@ the passed in customer id is null or not.
 
 Here's what a test looks like:
 
-```
+```fsharp
 [<Test>]
 let ``When upsert customer called with null id, expect customer created with new id``() = 
     DbLib.resetDatabase() 
@@ -260,7 +260,7 @@ Note that, because the setup is expensive, I do multiple asserts in the test. Th
 
 Here's one that tests that updates work:
 
-```
+```fsharp
 [<Test>]
 let ``When upsert customer called with existing id, expect customer updated``() = 
     DbLib.resetDatabase() 
@@ -286,7 +286,7 @@ let ``When upsert customer called with existing id, expect customer updated``() 
 
 And one more, that checks for exceptions:
 
-```
+```fsharp
 [<Test>]
 let ``When upsert customer called with blank name, expect validation error``() = 
     DbLib.resetDatabase() 
@@ -317,7 +317,7 @@ records in the database.
 
 Let's say we have a `CustomerImport` table, defined as below. (We'll use this table in the next section on ETL)
 
-```
+```text
 CREATE TABLE dbo.CustomerImport (
 	CustomerId int NOT NULL IDENTITY(1,1)
 	,FirstName varchar(50) NOT NULL 
@@ -331,7 +331,7 @@ CREATE TABLE dbo.CustomerImport (
     
 Using the same code as before, we can then generate random instances of `CustomerImport`.    
 
-```
+```fsharp
 [<Literal>]
 let connectionString = "Data Source=localhost; Initial Catalog=SqlInFsharp; Integrated Security=True;"
 
@@ -364,7 +364,7 @@ Now we get to the `age` column, which is nullable. This means we can't generate 
 we have to generate random `Nullable<int>`s. This is where type checking is really useful -- the compiler has forced us to take that into account.
 So to make sure we cover all the bases, we'll generate a null value one time out of twenty.
     
-```
+```fsharp
 // Generate a random nullable age.
 // Note that because age is nullable, 
 // the compiler forces us to take that into account
@@ -384,7 +384,7 @@ let generateAge() =
 
 Putting it altogether...
 
-```
+```fsharp
 // a function to create a customer
 let createCustomerImport first last email age =
     let c = new Sql.ServiceTypes.CustomerImport()
@@ -407,7 +407,7 @@ Once we have a random generator, we can fetch as many records as we like, and in
 
 In the code below, we'll generate 10,000 records, hitting the database in batches of 1,000 records.
 
-```
+```fsharp
 let insertAll() =
     use db = Sql.GetDataContext()
 
@@ -432,7 +432,7 @@ let insertAll() =
 
 Finally, let's do it and time it.
 
-```
+```fsharp
 #time
 insertAll() 
 #time
@@ -458,7 +458,7 @@ But for some situations, such as one off imports, and where the volumes are not 
 
 Say that we are importing data into a master table that looks like this:
 
-```
+```text
 CREATE TABLE dbo.Customer (
 	CustomerId int NOT NULL IDENTITY(1,1)
 	,Name varchar(50) NOT NULL 
@@ -469,7 +469,7 @@ CREATE TABLE dbo.Customer (
 
 But the system we're importing from has a different format, like this:
 
-```
+```text
 CREATE TABLE dbo.CustomerImport (
 	CustomerId int NOT NULL IDENTITY(1,1)
 	,FirstName varchar(50) NOT NULL 
@@ -490,7 +490,7 @@ The first step is to define a function that maps source records to target record
 
 Here's some code for this:
 
-```
+```fsharp
 [<Literal>]
 let sourceConnectionString = 
     "Data Source=localhost; Initial Catalog=SqlInFsharp; Integrated Security=True;"
@@ -521,7 +521,7 @@ let makeTargetCustomer (sourceCustomer:SourceSql.ServiceTypes.CustomerImport) =
 
 With this transform in place, the rest of the code is easy, we just just read from the source and write to the target.
 
-```
+```fsharp
 let transferAll() =
     use sourceDb = SourceSql.GetDataContext()
     use targetDb = TargetSql.GetDataContext()
@@ -549,7 +549,7 @@ be processed.
 
 To see it in use, first insert a number of records using the dummy data script just discussed, and then run the transfer as follows:
 
-```
+```fsharp
 #time
 transferAll() 
 #time
@@ -586,7 +586,7 @@ For example, in the script below:
 * A `JobInfo` consists of a name plus a list of `Step`s.
 * An agent script is generated from a `JobInfo` plus a set of global properties associated with an environment, such as the databases, shared folder locations, etc.
 
-```
+```fsharp
 let thisDir = __SOURCE_DIRECTORY__
 System.IO.Directory.SetCurrentDirectory (thisDir)
 
@@ -683,7 +683,7 @@ willing to accept it as input.
 On the other hand, it would be risky to maintain scripts like. Editing the SQL code directly could be risky.
 Better to use type-checked (and more concise) F# code than untyped T-SQL!
 
-```
+```sql
 USE [msdb]
 GO
 

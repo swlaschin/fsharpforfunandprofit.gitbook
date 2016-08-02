@@ -19,13 +19,13 @@ F# supports two distinct styles of formatting text:
 
 The composite formatting technique is available in all .NET languages, and you are probably familiar with it from C#.
 
-```
+```fsharp
 Console.WriteLine("A string: {0}. An int: {1}. A float: {2}. A bool: {3}","hello",42,3.14,true)
 ```
 
 The `printf` technique, on the other hand, is based on the C-style format strings:
 
-```
+```fsharp
 printfn "A string: %s. An int: %i. A float: %f. A bool: %b" "hello" 42 3.14 true
 ```
 
@@ -43,7 +43,7 @@ Unlike `String.Format`, `printf` is *statically type checked*, both for the type
 
 For example, here are two snippets using `printf` that will fail to compile:
 
-```
+```fsharp
 // wrong parameter type
 printfn "A string: %s" 42 
 
@@ -53,7 +53,7 @@ printfn "A string: %s" "Hello" 42
 
 The equivalent code using composite formatting will compile fine but either work incorrectly but silently, or give a runtime error:
 
-```
+```fsharp
 // wrong parameter type
 Console.WriteLine("A string: {0}", 42)   //works!
 
@@ -70,7 +70,7 @@ But `printf` is a standard, well-behaved F# function, and so supports [partial a
 
 Here are some examples:
 
-```
+```fsharp
 // partial application - explicit parameters
 let printStringAndInt s i =  printfn "A string: %s. An int: %i" s i
 let printHelloAndInt i = printStringAndInt "Hello" i
@@ -83,7 +83,7 @@ do printInt 42
 
 And of course, `printf` can be used for function parameters anywhere a standard function can be used.
 
-```
+```fsharp
 let doSomething printerFn x y = 
     let result = x + y
     printerFn "result is" result 
@@ -94,7 +94,7 @@ do doSomething callback 3 4
 
 This also includes the higher order functions for lists, etc:
 
-```
+```fsharp
 [1..5] |> List.map (sprintf "i=%i")
 ```
 
@@ -102,7 +102,7 @@ This also includes the higher order functions for lists, etc:
 
 For non-primitive types, the .NET formatting functions only support using `ToString()`, but `printf` supports native F# types using the `%A` specifier:
 
-```
+```fsharp
 // tuple printing
 let t = (1,2)
 Console.WriteLine("A tuple: {0}", t)
@@ -130,7 +130,7 @@ There are a couple of "gotchas" to be aware of when using `printf`.
 
 First, if there are *too few* parameters, rather than too many, the compiler will *not* complain immediately, but might give cryptic errors later.
 
-```
+```fsharp
 // too few parameters
 printfn "A string: %s An int: %i" "Hello" 
 ```
@@ -143,7 +143,7 @@ Another issue is that the "format strings" are not actually strings.
 In the .NET formatting model, the formatting strings are normal strings, so you can pass them around, store them in  resource files, and so on.
 Which means that the following code works fine:
 
-```
+```fsharp
 let netFormatString = "A string: {0}"
 Console.WriteLine(netFormatString, "hello")
 ```
@@ -151,7 +151,7 @@ Console.WriteLine(netFormatString, "hello")
 On the other hand, the "format strings" that are the first argument to `printf` are not really strings at all, but something called a `TextWriterFormat`. 
 Which means that the following code does **not** work:
 
-```
+```fsharp
 let fsharpFormatString = "A string: %s"
 printfn fsharpFormatString  "Hello" 
 ```
@@ -164,7 +164,7 @@ If you want to emulate the compiler, you can create your own TextWriterFormat va
 
 If the format string is "inline", the compiler can deduce the type for you during binding:
 
-```
+```fsharp
 let format:Printf.TextWriterFormat<_> = "A string: %s"
 printfn format "Hello" 
 ```
@@ -175,7 +175,7 @@ and you must explicitly provide it with the constructor.
 In the example below, my first format string has a single string parameter and returns a unit, so I have to specify `string->unit` as the format type.
 And in the second case, I have to specify `string->int->unit` as the format type.
 
-```
+```fsharp
 let formatAString = "A string: %s"
 let formatAStringAndInt = "A string: %s. An int: %i"
 
@@ -217,7 +217,7 @@ These six will probably meet most of your basic needs.
 
 The `%` character on its own will cause an error. To escape it, just double it up:
 
-```
+```fsharp
 printfn "unescaped: %" // error
 printfn "escape: %%" 
 ```
@@ -234,7 +234,7 @@ You can do that with the "width" and "flags" options.
 
 Here are some examples of these in use:
 
-```
+```fsharp
 let rows = [ (1,"a"); (-22,"bb"); (333,"ccc"); (-4444,"dddd") ] 
 
 // no alignment
@@ -269,7 +269,7 @@ There are some special options for basic integer types:
 
 Here are some examples: 
 
-```
+```fsharp
 printfn "signed8: %i unsigned8: %u" -1y -1y
 printfn "signed16: %i unsigned16: %u" -1s -1s
 printfn "signed32: %i unsigned32: %u" -1 -1
@@ -283,7 +283,7 @@ What is different is how it is formatted. The unsigned specifiers treat the int 
 
 Note that `BigInteger` is *not* a basic integer type, so you must format it with `%A` or `%O`.
 
-```
+```fsharp
 printfn "bigInt: %i " 123456789I  // Error
 printfn "bigInt: %A " 123456789I  // OK
 ```
@@ -296,7 +296,7 @@ You can control the formatting of signs and zero padding using the flags:
 
 Here are some examples:
 
-```
+```fsharp
 let rows = [ (1,"a"); (-22,"bb"); (333,"ccc"); (-4444,"dddd") ] 
 
 // with alignment
@@ -335,7 +335,7 @@ For floating point types, there are also some special options:
 
 Here are some examples: 
 
-```
+```fsharp
 let pi = 3.14
 printfn "float: %f exponent: %e compact: %g" pi pi pi 
 
@@ -346,7 +346,7 @@ printfn "float: %f exponent: %e compact: %g" petabyte petabyte petabyte
 The decimal type can be used with the floating point specifiers, but you might lose some precision.
 The `%M` specifier can be used to ensure that no precision is lost.  You can see the difference with this example: 
 
-```
+```fsharp
 let largeM = 123456789.123456789M  // a decimal
 printfn "float: %f decimal: %M" largeM largeM 
 ```
@@ -355,7 +355,7 @@ You can control the precision of floats using a precision specification, such as
 For the `%f` and `%e` specifiers, the precision affects the number of digits after the decimal point, while for `%g` it is the number of digits in total.
 Here's an example:
 
-```
+```fsharp
 printfn "2 digits precision: %.2f. 4 digits precision: %.4f." 123.456789 123.456789
 // output => 2 digits precision: 123.46. 4 digits precision: 123.4568.
 printfn "2 digits precision: %.2e. 4 digits precision: %.4e." 123.456789 123.456789
@@ -366,7 +366,7 @@ printfn "2 digits precision: %.2g. 4 digits precision: %.4g." 123.456789 123.456
 
 The alignment and width flags work for floats and decimals as well.
 
-```
+```fsharp
 printfn "|%f|" pi     // normal   
 printfn "|%10f|" pi   // width
 printfn "|%010f|" pi  // zero-pad
@@ -383,7 +383,7 @@ There are two special format specifiers that allow to you pass in a function rat
 
 Here's an example of using `%t`:
 
-```
+```fsharp
 open System.IO
 
 //define the function
@@ -396,7 +396,7 @@ printfn "custom function: %t" printHello
 Obviously, since the callback function takes no parameters, it will probably be a closure that does reference some other value.
 Here's an example that prints random numbers:
 
-```
+```fsharp
 open System
 open System.IO
 
@@ -415,7 +415,7 @@ For the `%a` specifier, the callback function takes an extra parameter. That is,
 
 Here's an example of custom formatting a tuple:
 
-```
+```fsharp
 open System
 open System.IO
 
@@ -443,7 +443,7 @@ If you want to format dates, you have a couple of options:
 
 Here are the two approaches in use:
 
-```
+```fsharp
 // function to format a date
 let yymmdd1 (date:DateTime) = date.ToString("yy.MM.dd")
 
@@ -488,7 +488,7 @@ A particularly useful technique is to use partial application to "bake in" a Tex
 
 Here is an example using a StringBuilder:
 
-```
+```fsharp
 let printToSb s i = 
     let sb = new System.Text.StringBuilder()
 
@@ -507,7 +507,7 @@ printToSb "hello" 42
 
 And here is an example using a TextWriter:
 
-```
+```fsharp
 open System
 open System.IO
 
@@ -535,13 +535,13 @@ Note that in both cases above, we had to pass a format parameter when creating t
 
 That is, we had to do:
 
-```
+```fsharp
 let myPrint format = fprintf sw format
 ```
 
 rather than the point-free version:
 
-```
+```fsharp
 let myPrint  = fprintf sw 
 ```
 
@@ -556,7 +556,7 @@ The four `kXXX` functions are similar to their cousins, except that they take an
 
 Here's a simple snippet:
 
-```
+```fsharp
 let doAfter s = 
     printfn "Done"
     // return the result
@@ -576,7 +576,7 @@ Let's look at a sample that uses a external logging framework plus custom events
 First, let's create a simple logging class along the lines of log4net or System.Diagnostics.Trace.
 In practice, this would be replaced by a real third-party library.
 
-```
+```fsharp
 open System
 open System.IO
 
@@ -605,7 +605,7 @@ Next in my application code, I do the following:
 * Create an instance of the logging framework. I've hard-coded the factory method here, but you could also use an IoC container.
 * Create helper functions called `logInfo` and `logError` that call the logging framework, and in the case of `logError`, show a popup message as well.
 
-```
+```fsharp
 // my application code
 module MyApplication = 
 
@@ -634,13 +634,13 @@ module MyApplication =
 
 Finally, when we run the `test` function, we should get the message written to the console, and also see the popup message:
 
-```
+```fsharp
 MyApplication.test()
 ```
 
 You could also create an object-oriented version of the helper methods by creating a "FormattingLogger" wrapper class around the logging library, as shown below.
 
-```
+```fsharp
 type FormattingLogger(name) = 
 
     let logger = Logger.CreateLogger(name)

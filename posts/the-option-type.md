@@ -22,7 +22,7 @@ In F#, it is called the `Option` type, and is defined as union type with two cas
 
 Here is a definition:
 
-```
+```fsharp
 type Option<'a> =       // use a generic definition  
    | Some of 'a           // valid value
    | None                 // missing
@@ -34,14 +34,14 @@ IMPORTANT: if you evaluate this in the interactive window, be sure to reset the 
 
 The option type is used in the same way as any union type in construction, by specifying one of the two cases, the `Some` case or the `None` case:
 
-```
+```fsharp
 let validInt = Some 1
 let invalidInt = None
 ```
 
 and when pattern matching, as with any union type, you must always match all the cases:
 
-```
+```fsharp
 match validInt with 
 | Some x -> printfn "the valid value is %A" x
 | None -> printfn "the value is None" 
@@ -49,7 +49,7 @@ match validInt with
 
 When defining a type that references the Option type, you must specify the generic type to use.  You can do this in an explicit way, with angle brackets, or use the built-in "`option`" keyword which comes after the type. The following examples are identical:
 
-```
+```fsharp
 type SearchResult1 = Option<string>  // Explicit C#-style generics 
 type SearchResult2 = string option   // built-in postfix keyword
 ```
@@ -63,14 +63,14 @@ The option type is widely used in the F# libraries for values that might be miss
 
 For example, the `List.tryFind` function returns an option, with the `None` case used indicate that nothing matches the search predicate.
 
-```
+```fsharp
 [1;2;3;4]  |> List.tryFind (fun x-> x = 3)  // Some 3
 [1;2;3;4]  |> List.tryFind (fun x-> x = 10) // None
 ```
 
 Let's revisit the same example we used for tuples and records, and see how options might be used instead:
 
-```
+```fsharp
 // the tuple version of TryParse
 let tryParseTuple intStr = 
    try
@@ -112,7 +112,7 @@ Of these three approaches, the "option" version is generally preferred; no new t
 
 Like other union types, option types have an automatically defined equality operation
 
-```
+```fsharp
 let o1 = Some 42
 let o2 = Some 42
 
@@ -124,7 +124,7 @@ let areEqual = (o1=o2)
 
 Option types have a nice default string representation, and unlike other union types, the `ToString()` representation is also nice.
 
-```
+```fsharp
 let o = Some 42
 printfn "%A" o   // nice
 printfn "%O" o   // nice
@@ -135,7 +135,7 @@ printfn "%O" o   // nice
 The F# option is a true first class type (it's just a normal union type, after all). You can use it with *any* type.  For example, you can have an option of a complex type like Person,
 or a tuple type like `int*int`, or a function type like `int->bool`, or even an option of an option type.
 
-```
+```fsharp
 type OptionalString = string option 
 type OptionalPerson = Person option       // optional complex type
 type OptionalTuple = (int*int) option       
@@ -150,7 +150,7 @@ The option type has functions such as `IsSome`, `IsNone` and `Value`, which allo
 
 Here is how not to do it:
 
-```
+```fsharp
 let x = Some 99
 
 // testing using IsSome
@@ -162,7 +162,7 @@ printfn "x is %i" x.Value   // ugly and dangerous!!
 
 Here is how to do it properly:
 
-```
+```fsharp
 let x = Some 99
 match x with 
 | Some i -> printfn "x is %i" i
@@ -176,7 +176,7 @@ The pattern matching approach also forces you to think about and document what h
 If you are doing a lot of pattern matching on options, look into the `Option` module, as it has some useful helper functions like `map`, `bind`, `iter` and so on.
 
 For example, say that I want to multiply the value of an option by 2 if it is valid. Here's the pattern matching way:
-```
+```fsharp
 let x = Some 99
 let result = match x with 
 | Some i -> Some(i * 2)
@@ -185,14 +185,14 @@ let result = match x with
 
 And here's a more compact version written using `Option.map`:
 
-```
+```fsharp
 let x = Some 99
 x |> Option.map (fun v -> v * 2)
 ```
 
 Or perhaps I want to multiply the value of an option by 2 if it is valid but return 0 if it is `None`. Here's the pattern matching way:
 
-```
+```fsharp
 let x = Some 99
 let result = match x with 
 | Some i -> i * 2
@@ -201,14 +201,14 @@ let result = match x with
 
 And here's the same thing as a one-liner using `Option.fold`:
 
-```
+```fsharp
 let x = Some 99
 x |> Option.fold (fun _ v -> v * 2) 0 
 ```
 
 In simple cases like the one above, the `defaultArg` function can be used as well.
 
-```
+```fsharp
 let x = Some 99
 defaultArg x 0 
 ```
@@ -225,7 +225,7 @@ In a language like C# or Java, "null" means a reference or pointer to an object 
 
 For example, in the C# code below we create two string variables, one with a valid string and one with a null string. 
 
-```
+```csharp
 string s1 = "abc";
 var len1 = s1.Length;
 
@@ -240,7 +240,7 @@ Now, we know that this code will fail by just looking at it, but the compiler ca
 
 Now let's look at the nearest F# equivalent of the C# example above. In F#, to indicate missing data, you would use an option type and set it to `None`. (In this artificial example we have to use an ugly explicitly typed `None` -- normally this would not be necessary.)
 
-```
+```fsharp
 let s1 = "abc"
 var len1 = s1.Length
 
@@ -254,7 +254,7 @@ And to be clear, `Some [string]` is *also* not the same type as `string`, so you
 
 So if `Option<string>` is not a string, but you want to do something with the string it (might) contain, you are forced to have to pattern match on it (assuming you don't do bad things as described earlier).
 
-```
+```fsharp
 let s2 = Option<string>.None
 
 //which one is it?
@@ -281,7 +281,7 @@ In a true functional language there can be a concept of missing data, but there 
 
 For example, consider a value bound to the result of an expression like this:
 
-```
+```fsharp
 let x = "hello world"
 ```
 
@@ -298,7 +298,7 @@ As a general rule, nulls are never created in "pure" F#, but only by interacting
 
 Here are some examples:
 
-```
+```fsharp
 // pure F# type is not allowed to be null (in general)
 type Person = {first:string; last:string}  
 let p : Person = null                      // error! 
@@ -310,7 +310,7 @@ let line = streamReader.ReadLine()         // no error if null
 
 In these cases, it is good practice to immediately check for nulls and convert them into an option type!  
 
-```
+```fsharp
 // streamReader example
 let line = match streamReader.ReadLine()  with
            | null -> None

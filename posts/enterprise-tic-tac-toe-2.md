@@ -31,7 +31,7 @@ To recap the previous post briefly, here is the old design:
 
 Here's the code:
 
-```
+```fsharp
 module TicTacToeDomain =
 
     type HorizPosition = Left | HCenter | Right
@@ -115,7 +115,7 @@ In this case, I want to give the user the capability to mark a specific position
 
 Here's what I had before:
 
-```
+```fsharp
 type PlayerXMoves = 
     GameState * PlayerXPos -> // input
         GameState * MoveResult // output
@@ -125,7 +125,7 @@ The user is passing in the location (`PlayerXPos`) that they want to play.
 
 But let's now take away the user's ability to choose the position. Why don't I give the user a function, a `MoveCapability` say, that has the position baked in?
 
-```
+```fsharp
 type MoveCapability = 
     GameState -> // input
         GameState * MoveResult // output
@@ -135,7 +135,7 @@ In fact, why not bake the game state into the function too? That way a malicious
 
 This means that there is no "input" at all now -- everything is baked in!
 
-```
+```fsharp
 type MoveCapability = 
     unit -> // no input
         GameState * MoveResult // output
@@ -146,7 +146,7 @@ Where do these capabilities come from?
 
 Answer, the `MoveResult` of course! We'll change the `MoveResult` to return a list of capabilities rather than a list of positions.
 
-```
+```fsharp
 type MoveResult = 
     | PlayerXToMove of MoveCapability list 
     | PlayerOToMove of MoveCapability list 
@@ -160,7 +160,7 @@ And now that the `MoveCapability` contains the game state baked in, we don't nee
 
 So our move function has simplified dramatically and now looks like this:
 
-```
+```fsharp
 type MoveCapability = 
     unit -> MoveResult 
 ```
@@ -180,7 +180,7 @@ So now let's pretend we are the UI, and let's attempt to use the new design.
   
 Here's some pseudo-code for the UI game loop:  
   
-```
+```fsharp
 // loop while game not over
 let rec playMove moveResult = 
 
@@ -206,7 +206,7 @@ let rec playMove moveResult =
 Let's deal with the first issue: how does the user know which capability is associated with which square?
 
 The answer is just to create a new structure that "labels" the capability. In this case, with the cell position.
-```
+```fsharp
 type NextMoveInfo = {
     posToPlay : CellPosition 
     capability : MoveCapability }
@@ -214,7 +214,7 @@ type NextMoveInfo = {
 
 And now we must change the `MoveResult` to return a list of these labelled capabilities, rather than the unlabelled ones:
 
-```
+```fsharp
 type MoveResult = 
     | PlayerXToMove of NextMoveInfo list 
     | PlayerOToMove of NextMoveInfo list 
@@ -226,7 +226,7 @@ Note that the cell position is for the user's information only -- the actual pos
 
 Now for the second issue: how does the UI know what to display as a result of the move?  Let's just return that information to it directly in a new structure:
 
-```
+```fsharp
 /// Everything the UI needs to know to display the board
 type DisplayInfo = {
     cells : Cell list
@@ -235,7 +235,7 @@ type DisplayInfo = {
 
 And once again, the `MoveResult` must be changed, this time to return the `DisplayInfo` for each case:
 
-```
+```fsharp
 type MoveResult = 
     | PlayerXToMove of DisplayInfo * NextMoveInfo list 
     | PlayerOToMove of DisplayInfo * NextMoveInfo list 
@@ -247,7 +247,7 @@ type MoveResult =
 
 Here's our final design:
 
-```
+```fsharp
 /// The capability to make a move at a particular location.
 /// The gamestate, player and position are already "baked" into the function.
 type MoveCapability = 
@@ -281,7 +281,7 @@ and there are [normally work-arounds which you can use](../posts/removing-cyclic
 
 In this case though, I will link them together using the `and` keyword, which replaces the `type` keyword and is useful for just these kinds of cases.
 
-```
+```fsharp
 type MoveCapability = 
     // etc
 and NextMoveInfo = {
@@ -296,7 +296,7 @@ What does the API look like now?
 
 Originally, we had an API with slots for the three use-cases and also a helper function `getCells`:
 
-```
+```fsharp
 type TicTacToeAPI<'GameState>  = 
     {
     newGame : NewGame<'GameState>
@@ -312,7 +312,7 @@ And `getCells` is no longer needed either, because we are returning the `Display
 
 So after all these changes, the new API just has a single slot in it and looks like this:
 
-```
+```fsharp
 type NewGame = unit -> MoveResult
 
 type TicTacToeAPI = 
@@ -327,7 +327,7 @@ I've changed `NewGame` from a constant to a parameterless function, which is in 
 
 Here's the new design in full:
 
-```
+```fsharp
 module TicTacToeDomain =
 
     type HorizPosition = Left | HCenter | Right
@@ -408,7 +408,7 @@ First, given a `MoveCapability`, we want to transform it into another `MoveCapab
 
 Here's the code for that:
 
-```
+```fsharp
 /// Transform a MoveCapability into a logged version
 let transformCapability transformMR player cellPos (cap:MoveCapability) :MoveCapability =
     
@@ -430,7 +430,7 @@ This code works as follows:
 
 Now that we can transform a `MoveCapability`, we can go up a level and transform a `NextMoveInfo`.
   
-```
+```fsharp
 /// Transform a NextMove into a logged version
 let transformNextMove transformMR player (move:NextMoveInfo) :NextMoveInfo = 
     let cellPos = move.posToPlay 
@@ -446,7 +446,7 @@ This code works as follows:
    
 Finally, we need to implement the function that will transform a `MoveResult`:
    
-```
+```fsharp
 /// Transform a MoveResult into a logged version
 let rec transformMoveResult (moveResult:MoveResult) :MoveResult =
     
@@ -477,7 +477,7 @@ This code works as follows:
 
 Finally, we can inject logging into the API as a whole by transforming the `MoveResult` returned by `newGame`:
 
-```
+```fsharp
 /// inject logging into the API
 let injectLogging api =
    

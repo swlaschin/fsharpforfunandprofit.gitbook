@@ -11,7 +11,7 @@ In the previous post, we were introduced to the "maybe" workflow, which allowed 
 
 A typical use of the "maybe" workflow looked something like this:
 
-```
+```fsharp
 let result = 
     maybe 
         {
@@ -33,7 +33,7 @@ We will follow up these observations in this post, and we will see that this lea
 
 Let's look at another example. Say that we are accessing a database, and we want to capture the result in a Success/Error union type, like this:
 
-```
+```fsharp
 type DbResult<'a> = 
     | Success of 'a
     | Error of string
@@ -41,7 +41,7 @@ type DbResult<'a> =
 
 We then use this type in our database access methods. Here are some very simple stubs to give you an idea of how the `DbResult` type might be used:
 
-```
+```fsharp
 let getCustomerId name =
     if (name = "") 
     then Error "getCustomerId failed"
@@ -63,7 +63,7 @@ Now let's say we want to chain these calls together. First get the customer id f
 
 Here's the most explicit way of doing it. As you can see, we have to have pattern matching at each step.
 
-```
+```fsharp
 let product = 
     let r1 = getCustomerId "Alice"
     match r1 with 
@@ -85,7 +85,7 @@ Really ugly code. And the top-level flow has been submerged in the error handlin
 
 Computation expressions to the rescue!  We can write one that handles the branching of Success/Error behind the scenes:
 
-```
+```fsharp
 type DbResultBuilder() =
 
     member this.Bind(m, f) = 
@@ -103,7 +103,7 @@ let dbresult = new DbResultBuilder()
 
 And with this workflow, we can focus on the big picture and write much cleaner code:
 
-```
+```fsharp
 let product' = 
     dbresult {
         let! custId = getCustomerId "Alice"
@@ -117,7 +117,7 @@ printfn "%A" product'
 
 And if there are errors, the workflow traps them nicely and tells us where the error was, as in this example below:
 
-```
+```fsharp
 let product'' = 
     dbresult {
         let! custId = getCustomerId "Alice"
@@ -147,7 +147,7 @@ Let's look again at the definition of the `Bind` and `Return` methods of a compu
 
 We'll start off with the easy one, `Return`. The signature of `Return` [as documented on MSDN](http://msdn.microsoft.com/en-us/library/dd233182.aspx) is just this:
 
-```
+```fsharp
 member Return : 'T -> M<'T>
 ```
 
@@ -157,7 +157,7 @@ In other words, for some type `T`, the `Return` method just wraps it in the wrap
 
 And we've seen two examples of this usage. The `maybe` workflow returns a `Some`, which is an option type, and the `dbresult` workflow returns `Success`, which is part of the `DbResult` type.
 
-```
+```fsharp
 // return for the maybe workflow
 member this.Return(x) = 
     Some x
@@ -169,7 +169,7 @@ member this.Return(x) =
 
 Now let's look at `Bind`.  The signature of `Bind` is this:
 
-```
+```fsharp
 member Bind : M<'T> * ('T -> M<'U>) -> M<'U>
 ```
 
@@ -189,7 +189,7 @@ In other words, what `Bind` does is:
 
 With this understanding, here are the `Bind` methods that we have seen already:
 
-```
+```fsharp
 // return for the maybe workflow
 member this.Bind(m,f) = 
    match m with
@@ -223,7 +223,7 @@ To see this, we can revisit the example above, but rather than using strings eve
 
 We'll start with the types again, this time defining `CustomerId`, etc.
 
-```
+```fsharp
 type DbResult<'a> = 
     | Success of 'a
     | Error of string
@@ -235,7 +235,7 @@ type ProductId =  ProductId of string
 
 The code is almost identical, except for the use of the new types in the `Success` line.
 
-```
+```fsharp
 let getCustomerId name =
     if (name = "") 
     then Error "getCustomerId failed"
@@ -256,7 +256,7 @@ let getLastProductForOrder (OrderId orderId) =
 Here's the long-winded version again. 
 
 
-```
+```fsharp
 let product = 
     let r1 = getCustomerId "Alice"
     match r1 with 
@@ -281,7 +281,7 @@ There are a couple of changes worth discussing:
 
 Next up, the builder, which hasn't changed at all except for the `| Error e -> Error e` line.
 
-```
+```fsharp
 type DbResultBuilder() =
 
     member this.Bind(m, f) = 
@@ -299,7 +299,7 @@ let dbresult = new DbResultBuilder()
 
 Finally, we can use the workflow as before.  
 
-```
+```fsharp
 let product' = 
     dbresult {
         let! custId = getCustomerId "Alice"
@@ -315,7 +315,7 @@ At each line, the returned value is of a *different* type (`DbResult<CustomerId>
 
 And finally, here's the workflow with an error case.
 
-```
+```fsharp
 let product'' = 
     dbresult {
         let! custId = getCustomerId "Alice"
@@ -338,7 +338,7 @@ In other words, because a workflow returns a wrapper type, and because `let!` co
 
 For example, say that you have a workflow called `myworkflow`. Then you can write the following:
 
-```
+```fsharp
 let subworkflow1 = myworkflow { return 42 }
 let subworkflow2 = myworkflow { return 43 }
 
@@ -352,7 +352,7 @@ let aWrappedValue =
 
 Or you can even "inline" them, like this:
 
-```
+```fsharp
 let aWrappedValue = 
     myworkflow {
         let! unwrappedValue1 = myworkflow {
@@ -369,7 +369,7 @@ let aWrappedValue =
 
 If you have used the `async` workflow, you probably have done this already, because an async workflow typically contains other asyncs embedded in it:
 
-```
+```fsharp
 let a = 
     async {
         let! x = doAsyncThing  // nested workflow
@@ -390,7 +390,7 @@ The corresponding method in the "builder" class is called `ReturnFrom`. Typicall
 
 Here is a variant on the "maybe" workflow to show how it can be used:
 
-```
+```fsharp
 type MaybeBuilder() =
     member this.Bind(m, f) = Option.bind f m
     member this.Return(x) = 
@@ -405,7 +405,7 @@ let maybe = new MaybeBuilder()
 
 And here it is in use, compared with a normal `return`.
 
-```
+```fsharp
 // return an int
 maybe { return 1  }
 
@@ -415,7 +415,7 @@ maybe { return! (Some 2)  }
 
 For a more realistic example, here is `return!` used in conjunction with `divideBy`:
 
-```
+```fsharp
 // using return
 maybe 
     {

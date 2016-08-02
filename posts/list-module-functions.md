@@ -226,7 +226,7 @@ If you know the size of the collection in advance, it is generally more efficien
 
 ### Usage examples
 
-```
+```fsharp
 let list0 = List.empty
 // list0 = []
 
@@ -260,7 +260,7 @@ If you want to create a new collection of known size with each element having th
 
 ### Usage examples
 
-```
+```fsharp
 let repl = List.replicate 3 "hello"
 // val repl : string list = ["hello"; "hello"; "hello"]
 
@@ -290,7 +290,7 @@ If you want to create a new collection of known size with each element having a 
 
 ### Usage examples
 
-```
+```fsharp
 // using list initializer
 let listInit1 = List.init 5 (fun i-> i*i)
 // val listInit1 : int list = [0; 1; 4; 9; 16]
@@ -309,7 +309,7 @@ let arrayInit3 = [|1; 4; 9; 16; 25|]
 
 Literal syntax allows for an increment as well:
 
-```
+```fsharp
 // literal with +2 increment
 let listOdd= [1..2..10]
 // val listOdd : int list = [1; 3; 5; 7; 9]
@@ -317,7 +317,7 @@ let listOdd= [1..2..10]
 
 The comprehension syntax is even more flexible because you can `yield` more than once:
 
-```
+```fsharp
 // using list comprehension
 let listFunny = [
     for i in [2..3] do 
@@ -330,7 +330,7 @@ let listFunny = [
 
 and it can also be used as a quick and dirty inline filter:
 
-```
+```fsharp
 let primesUpTo n = 
    let rec sieve l  = 
       match l with 
@@ -350,7 +350,7 @@ Two other tricks:
 
 Here is an example of both tricks being used to count up to 10 by twos:
 
-```
+```fsharp
 let rec listCounter n = [
     if n <= 10 then
         yield n
@@ -375,7 +375,7 @@ If you want an infinite list, you have to use a seq rather than a list or array.
 
 ### Usage examples
 
-```
+```fsharp
 // generator version
 let seqOfSquares = Seq.initInfinite (fun i -> i*i)
 let firstTenSquares = seqOfSquares |> Seq.take 10
@@ -406,7 +406,7 @@ Sometimes you don't know how big the collection will be in advance. In this case
 
 This example reads from the console in a loop until an empty line is entered:
 
-```
+```fsharp
 let getInputFromConsole lineNo =
     let text = System.Console.ReadLine()
     if System.String.IsNullOrEmpty(text) then
@@ -422,7 +422,7 @@ let listUnfold = List.unfold getInputFromConsole 1
 `unfold` requires that a state be threaded through the generator. You can ignore it (as in the `ReadLine` example above), or you can
 use it to keep track of what you have done so far. For example, you can create a Fibonacci series generator using `unfold`:
 
-```
+```fsharp
 let fibonacciUnfolder max (f1,f2)  =
     if f1 > max then
         None
@@ -495,7 +495,7 @@ I would therefore recommend that you avoid these functions in general and use th
 
 ### Usage examples
 
-```
+```fsharp
 let head = [1;2;3] |> List.head
 // val head : int = 1
 
@@ -522,7 +522,7 @@ let badItemOpt =
 As noted, the `item` function should be avoided for lists. For example, if you want to process each item in a list, and you come from an imperative background,
 you might write a loop with something like this:
 
-```
+```fsharp
 // Don't do this!
 let helloBad = 
     let list = ["a";"b";"c"]
@@ -536,7 +536,7 @@ let helloBad =
 
 Don't do that! Use something like `map` instead. It's both more concise and more efficient:
 
-```
+```fsharp
 let helloGood = 
     let list = ["a";"b";"c"]
     list |> List.map (fun element -> "hello " + element)
@@ -584,7 +584,7 @@ If you are doing a `map` before a `find` you can often combine the two steps int
 
 ### Usage examples
 
-```
+```fsharp
 let listOfTuples = [ (1,"a"); (2,"b"); (3,"b"); (4,"a"); ]
 
 listOfTuples |> List.find ( fun (x,y) -> y = "b")
@@ -605,7 +605,7 @@ listOfTuples |> List.find ( fun (x,y) -> y = "c")
 
 With `pick`, rather than returning a bool, you return an option:
 
-```
+```fsharp
 listOfTuples |> List.pick ( fun (x,y) -> if y = "b" then Some (x,y) else None)
 // (2, "b")
 ```
@@ -617,7 +617,7 @@ That 'pick' function might seem unnecessary, but it is useful when dealing with 
 
 For example, say that there is a function `tryInt` that parses a string and returns `Some int` if the string is a valid int, otherwise `None`.
 
-```
+```fsharp
 // string -> int option
 let tryInt str = 
     match System.Int32.TryParse(str) with
@@ -633,7 +633,7 @@ And now say that we want to find the first valid int in a list. The crude way wo
 
 The code might look something like this:
 
-```
+```fsharp
 let firstValidNumber = 
     ["a";"2";"three"]
     // map the input
@@ -647,7 +647,7 @@ let firstValidNumber =
 
 But `pick` will do all these steps at once! So the code becomes much simpler:
 
-```
+```fsharp
 let firstValidNumber = 
     ["a";"2";"three"]
     |> List.pick tryInt 
@@ -705,7 +705,7 @@ To reduce the list to distinct elements, use one of these:
   
 Taking elements from the front:
 
-```
+```fsharp
 [1..10] |> List.take 3    
 // [1; 2; 3]
 
@@ -727,7 +727,7 @@ Taking elements from the front:
 
 Taking elements from the rear:
 
-```
+```fsharp
 [1..10] |> List.skip 3    
 // [4; 5; 6; 7; 8; 9; 10]
 
@@ -749,7 +749,7 @@ Taking elements from the rear:
 
 To extract other subsets of elements:
 
-```
+```fsharp
 [1..10] |> List.filter (fun i -> i%2 = 0) // even
 // [2; 4; 6; 8; 10]
 
@@ -762,7 +762,7 @@ To extract other subsets of elements:
 
 To extract a slice:
 
-```
+```fsharp
 Array.sub [|1..10|] 3 5
 // [|4; 5; 6; 7; 8|]
 
@@ -780,7 +780,7 @@ Note that slicing on lists can be slow, because they are not random access. Slic
   
 To extract the distinct elements:
   
-```
+```fsharp
 [1;1;1;2;3;3] |> List.distinct
 // [1; 2; 3]
 
@@ -798,7 +798,7 @@ In fact, `choose` is to `filter` as [`pick` is to `find`](#pick-vs-find), Rather
 
 As before, say that there is a function `tryInt` that parses a string and returns `Some int` if the string is a valid int, otherwise `None`.
 
-```
+```fsharp
 // string -> int option
 let tryInt str = 
     match System.Int32.TryParse(str) with
@@ -814,7 +814,7 @@ And now say that we want to find all the valid ints in a list. The crude way wou
 
 The code might look something like this:
 
-```
+```fsharp
 let allValidNumbers = 
     ["a";"2";"three"; "4"]
     // map the input
@@ -828,7 +828,7 @@ let allValidNumbers =
 
 But `choose` will do all these steps at once! So the code becomes much simpler:
 
-```
+```fsharp
 let allValidNumbers = 
     ["a";"2";"three"; "4"]
     |> List.choose tryInt 
@@ -836,7 +836,7 @@ let allValidNumbers =
 
 If you already have a list of options, you can filter and return the "Some" in one step by passing `id` into `choose`:
 
-```
+```fsharp
 let reduceOptions = 
     [None; Some 1; None; Some 2]
     |> List.choose id
@@ -871,7 +871,7 @@ There are lots of different ways to split a collection! Have a look at the usage
   
 ### Usage examples
   
-```
+```fsharp
 [1..10] |> List.chunkBySize 3
 // [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]; [10]]  
 // note that the last chunk has one element
@@ -900,7 +900,7 @@ let firstLetter (str:string) = str.[0]
 
 All the functions other than `splitAt` and `pairwise` handle edge cases gracefully:
 
-```
+```fsharp
 [1] |> List.chunkBySize 3
 // [[1]]
 
@@ -967,20 +967,20 @@ Finally there are some counting functions:
 `reduce` is a variant of `fold` without an initial state -- see [section 19](#19) for more on `fold`.  One way to think of it is just inserting a operator between
 each element.
 
-```
+```fsharp
 ["a";"b";"c"] |> List.reduce (+)     
 // "abc"
 ```
 
 is the same as 
 
-```
+```fsharp
 "a" + "b" + "c"
 ```
 
 Here's another example:
 
-```
+```fsharp
 [2;3;4] |> List.reduce (*)     
 // is same as
 2 * 3 * 4
@@ -994,7 +994,7 @@ Some ways of combining elements depend on the order of combining, and so there a
 
 Here's a demonstration of the difference. First `reduce`:
 
-```
+```fsharp
 [1;2;3;4] |> List.reduce (fun state x -> (state)*10 + x)
 
 // built up from                // state at each step
@@ -1008,7 +1008,7 @@ Here's a demonstration of the difference. First `reduce`:
   
 Using the *same* combining function with `reduceBack` produces a different result! It looks like this:
   
-```
+```fsharp
 [1;2;3;4] |> List.reduceBack (fun x state -> x + 10*(state))
 
 // built up from                // state at each step
@@ -1024,7 +1024,7 @@ Again, see [section 19](#19) for a more detailed discussion of the related funct
 
 The other aggregation functions are much more straightforward.
   
-```
+```fsharp
 type Suit = Club | Diamond | Spade | Heart 
 type Rank = Two | Three | King | Ace
 let cards = [ (Club,King); (Diamond,Ace); (Spade,Two); (Heart,Three); ]
@@ -1061,7 +1061,7 @@ cards |> List.minBy snd  // (Spade, Two)
 
 Most of the aggregation functions do not like empty lists!  You might consider using one of the `fold` functions to be safe -- see [section 19](#19).
 
-```
+```fsharp
 let emptyListOfInts : int list = []
 
 emptyListOfInts |> List.reduce (+)     
@@ -1116,7 +1116,7 @@ And there are also some array-only functions that sort in place:
 
 ### Usage examples
   
-```
+```fsharp
 [1..5] |> List.rev
 // [5; 4; 3; 2; 1]
 
@@ -1168,7 +1168,7 @@ These set of functions all return true or false.
 
 ### Usage examples
   
-```
+```fsharp
 [1..10] |> List.contains 5
 // true
 
@@ -1216,7 +1216,7 @@ Other transformation functions include:
   
 Here are some examples of using `map` in the conventional way, as a function that accepts a list and a mapping function and returns a new transformed list:  
 
-```
+```fsharp
 let add1 x = x + 1
 
 // map as a list transformer
@@ -1231,7 +1231,7 @@ let times2 x = x * 2
 
 You can also think of `map` as a *function transformer*. It turns an element-to-element function into a list-to-list function.
 
-```
+```fsharp
 let add1ToEachElement = List.map add1
 // "add1ToEachElement" transforms lists to lists rather than ints to ints
 // val add1ToEachElement : (int list -> int list)
@@ -1243,7 +1243,7 @@ let add1ToEachElement = List.map add1
 
 `collect` works to flatten lists. If you already have a list of lists, you can use `collect` with `id` to flatten them.
  
-```
+```fsharp
 [2..5] |> List.collect (fun x -> [x; x*x; x*x*x] )
 // [2; 4; 8; 3; 9; 27; 4; 16; 64; 5; 25; 125]
 
@@ -1260,7 +1260,7 @@ Finally, `Seq.cast` is useful when working with older parts of the BCL that have
 
 For example, the Regex library has this problem, and so the code below won't compile because `MatchCollection` is not an `IEnumerable<T>`
 
-```
+```fsharp
 open System.Text.RegularExpressions
 
 let matches = 
@@ -1274,7 +1274,7 @@ let matches =
 
 The fix is to cast `MatchCollection` to a `Seq<Match>` and then the code will work nicely:
 
-```
+```fsharp
 let matches = 
     let pattern = "\d\d\d"
     let matchCollection = Regex.Matches("123 456 789",pattern)
@@ -1301,7 +1301,7 @@ produce a useful value (a "unit function").
 The most common examples of unit functions are all about side-effects: printing to the console, updating a database, putting a message on a queue, etc.
 For the examples below, I will just use `printfn` as my unit function.
 
-```
+```fsharp
 [1..3] |> List.iter (fun i -> printfn "i is %i" i)
 (*
 i is 1
@@ -1323,7 +1323,7 @@ for i in [1..3] do
 
 As noted above, the expression inside an `iter` or for-loop must return unit.  In the following examples, we try to add 1 to the element, and get a compiler error:
 
-```
+```fsharp
 [1..3] |> List.iter (fun i -> i + 1)
 //                               ~~~
 // ERROR error FS0001: The type 'unit' does not match the type 'int'
@@ -1337,7 +1337,7 @@ for i in [1..3] do
 
 If you are sure that this is not a logic bug in your code, and you want to get rid of this error, you can pipe the results into `ignore`:
 
-```
+```fsharp
 [1..3] |> List.iter (fun i -> i + 1 |> ignore)
 
 for i in [1..3] do
@@ -1378,7 +1378,7 @@ Finally, `mapFold` combines `map` and `fold` into one awesome superpower. More c
 
 One way of thinking about `fold` is that it is like `reduce` but with an extra parameter for the initial state:
 
-```
+```fsharp
 ["a";"b";"c"] |> List.fold (+) "hello: "    
 // "hello: abc"
 // "hello: " + "a" + "b" + "c"
@@ -1390,7 +1390,7 @@ One way of thinking about `fold` is that it is like `reduce` but with an extra p
 
 As with `reduce`, `fold` and `foldBack` can give very different answers.
 
-```
+```fsharp
 [1;2;3;4] |> List.fold (fun state x -> (state)*10 + x) 0
                                 // state at each step
 1                               // 1
@@ -1402,7 +1402,7 @@ As with `reduce`, `fold` and `foldBack` can give very different answers.
 
 And here's the `foldBack` version:
 
-```
+```fsharp
 List.foldBack (fun x state -> x + 10*(state)) [1;2;3;4] 0
                                 // state at each step  
 4                               // 4
@@ -1421,7 +1421,7 @@ It's easy to get confused between `fold` vs. `foldBack`. I find it helpful to th
 Let's say we want to calculate the sum of a list. The iterative way would be to use a for-loop.
 You start with a (mutable) accumulator and thread it through each iteration, updating it as you go.
 
-```
+```fsharp
 let iterativeSum list = 
     let mutable total = 0
     for e in list do
@@ -1434,7 +1434,7 @@ if the list has a head and tail, calculate the sum of the tail (a smaller list) 
 
 Each time the tail gets smaller and smaller until it is empty, at which point you're done.
 
-```
+```fsharp
 let rec recursiveSum list = 
     match list with
     | [] -> 
@@ -1451,7 +1451,7 @@ But for things like constructing new lists, the recursive way is (`foldBack`) is
 For example, if we were going to going to create a function from scratch that turned each element into the corresponding string,
 we might write something like this:
 
-```
+```fsharp
 let rec mapToString list = 
     match list with
     | [] -> 
@@ -1470,7 +1470,7 @@ Using `foldBack` we can transfer that same logic "as is":
 
 Here is the resulting function:
 
-```
+```fsharp
 let foldToString list = 
     let folder head state = 
         head.ToString() :: state
@@ -1484,7 +1484,7 @@ On the other hand, a big advantage of `fold` is that it is easier to use "inline
 
 Luckily, you can use `fold` (for list construction at least) just like `foldBack` as long as you reverse the list at the end.
 
-```
+```fsharp
 // inline version of "foldToString"
 [1..3] 
 |> List.fold (fun state head -> head.ToString() :: state) []
@@ -1499,7 +1499,7 @@ although perhaps not as efficiently as a custom implementation.
 
 For example, here is `map` implemented using `fold`:
 
-```
+```fsharp
 /// map a function "f" over all elements
 let myMap f list = 
     // helper function
@@ -1517,7 +1517,7 @@ let myMap f list =
 
 And here is `filter` implemented using `fold`:
 
-```
+```fsharp
 /// return a new list of elements for which "pred" is true
 let myFilter pred list = 
     // helper function
@@ -1543,7 +1543,7 @@ And of course, you can emulate the other functions in a similar way.
 
 Earlier, I showed an example of the intermediate steps of `fold`:
 
-```
+```fsharp
 [1;2;3;4] |> List.fold (fun state x -> (state)*10 + x) 0
                                 // state at each step
 1                               // 1
@@ -1557,14 +1557,14 @@ For that example, I had to manually calculate the intermediate states,
 
 Well, if I had used `scan`, I would have got those intermediate states for free!
 
-```
+```fsharp
 [1;2;3;4] |> List.scan (fun state x -> (state)*10 + x) 0
 // accumulates from left ===> [0; 1; 12; 123; 1234]
 ```
 
 `scanBack` works the same way, but backwards of course:
 
-```
+```fsharp
 List.scanBack (fun x state -> (state)*10 + x) [1;2;3;4] 0
 // [4321; 432; 43; 4; 0]  <=== accumulates from right
 ```
@@ -1583,7 +1583,7 @@ Here's one way of doing it using `scan`:
 * Use `scan` to concat the words back together, generating a list of fragments, each with an extra word added.
 * Get the longest fragment under 50 chars.
 
-```
+```fsharp
 // start by splitting the text into words
 let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."
 let words = text.Split(' ')
@@ -1618,7 +1618,7 @@ Note that I'm using `Seq.scan` rather than `Array.scan`. This does a lazy scan a
 
 Finally, here is the complete logic as a utility function:
 
-```
+```fsharp
 // the whole thing as a function
 let truncText max (text:string) = 
     if text.Length <= max then
@@ -1645,7 +1645,7 @@ The `mapFold` function can do a map and a fold in one step, which can be conveni
 
 Here's an example of combining an addition and a sum in one step using `mapFold`:
 
-```
+```fsharp
 let add1 x = x + 1
 
 // add1 using map
@@ -1678,7 +1678,7 @@ Often, you need the index of the element as you do an iteration. You could use a
   
 ### Usage examples
   
-```
+```fsharp
 ['a'..'c'] |> List.mapi (fun index ch -> sprintf "the %ith element is '%c'" index ch)
 // ["the 0th element is 'a'"; "the 1th element is 'b'"; "the 2th element is 'c'"]
 
@@ -1696,7 +1696,7 @@ the 2th element is 'c'
 
 `indexed` generates a tuple with the index -- a shortcut for a specific use of `mapi`:
 
-```
+```fsharp
 ['a'..'c'] |> List.mapi (fun index ch -> (index, ch) )
 // [(0, 'a'); (1, 'b'); (2, 'c')]
 
@@ -1732,7 +1732,7 @@ The `toXXX` are used to convert from the module type to the type `XXX`. For exam
 
 ### Usage examples
   
-```
+```fsharp
 [1..5] |> List.toArray      // [|1; 2; 3; 4; 5|]
 [1..5] |> Array.ofList      // [|1; 2; 3; 4; 5|]
 // etc
@@ -1764,7 +1764,7 @@ There are some special functions (for Seq only) that change the behavior of the 
   
 Here's an example of `cache` in use:
   
-```
+```fsharp
 let uncachedSeq = seq {
     for i = 1 to 3 do
         printfn "Calculating %i" i
@@ -1778,7 +1778,7 @@ uncachedSeq |> Seq.iter ignore
 
 The result of iterating over the sequence twice is as you would expect:
 
-```
+```text
 Calculating 1
 Calculating 2
 Calculating 3
@@ -1789,7 +1789,7 @@ Calculating 3
 
 But if we cache the sequence...
 
-```
+```fsharp
 let cachedSeq = uncachedSeq |> Seq.cache
 
 // iterate twice    
@@ -1799,7 +1799,7 @@ cachedSeq |> Seq.iter ignore
 
 ... then each item is only printed once:
 
-```
+```text
 Calculating 1
 Calculating 2
 Calculating 3
@@ -1809,7 +1809,7 @@ Calculating 3
 
 Here's an example of `readonly` being used to hide the underlying type of the sequence:
 
-```
+```fsharp
 // print the underlying type of the sequence
 let printUnderlyingType (s:seq<_>) =
     let typeName = s.GetType().Name 
@@ -1826,7 +1826,7 @@ let printUnderlyingType (s:seq<_>) =
 
 Here's an example of `delay`.
 
-```
+```fsharp
 let makeNumbers max =
     [ for i = 1 to max do
         printfn "Evaluating %d." i
@@ -1847,7 +1847,7 @@ let delayedSeq =
 
 If we run the code above, we find that just by creating `eagerList`, we print all the "Evaluating" messages. But creating `delayedSeq` does not trigger the list iteration.
 
-```
+```text
 Started creating eagerList
 Evaluating 1.
 Evaluating 2.
@@ -1862,14 +1862,14 @@ Finished creating delayedSeq
 
 Only when the sequence is iterated over does the list creation happen:
 
-```
+```fsharp
 eagerList |> Seq.take 3  // list already created
 delayedSeq |> Seq.take 3 // list creation triggered
 ```
 
 An alternative to using delay is just to embed the list in a `seq` like this:
 
-```
+```fsharp
 let embeddedList = seq {
     printfn "Started creating embeddedList" 
     yield! makeNumbers 5 
@@ -1910,7 +1910,7 @@ If you have two lists, there are analogues of most of the common functions like 
   
 These functions are straightforward to use:
 
-```
+```fsharp
 let intList1 = [2;3;4]
 let intList2 = [5;6;7]
 
@@ -1959,7 +1959,7 @@ List.foldBack2 (fun i1 i2 state -> i1 + i2 + (10*state)) intList1 intList2 0
 
 By using `fold2` and `foldBack2` you can easily create your own functions. For example, some `filter2` functions can be defined like this:
 
-```
+```fsharp
 /// Apply a function to each element in a pair
 /// If either result passes, include that pair in the result
 let filterOr2 filterPredicate list1 list2 =
@@ -2015,7 +2015,7 @@ If this happens infrequently, then you could just collapse the lists into a sing
 
 Alternatively you can "lift" your function to the world of "zip lists" using applicatives. 
 
-```
+```fsharp
 let (<*>) fList xList = 
     List.map2 (fun f x -> f x) fList xList 
 
@@ -2057,7 +2057,7 @@ Finally, there are a number of functions that combine and uncombine collections.
   
 These functions are straightforward to use:
 
-```
+```fsharp
 List.append [1;2;3] [4;5;6]
 // [1; 2; 3; 4; 5; 6]
 
@@ -2082,7 +2082,7 @@ List.unzip3 [(1, 10, 100); (2, 20, 200)]
 
 Note that the `zip` functions require the lengths to be the same.
 
-```
+```fsharp
 List.zip [1;2] [10] 
 // ArgumentException: The lists had different lengths.
 ```
@@ -2117,7 +2117,7 @@ while the resource is available you may encounter errors accessing the elements 
 
 This will be an extended example, so let's start with some helper functions that emulate a database and a UI:
 
-```
+```fsharp
 // a disposable database connection
 let DbConnection() = 
     printfn "Opening connection"
@@ -2144,7 +2144,7 @@ let showCustomersinUI customers =
 
 A naive implementation will cause the sequence to be evaluated *after* the connection is closed:
 
-```
+```fsharp
 let readCustomersFromDb() =
     use dbConnection = DbConnection()
     let results = readNCustomersFromDb dbConnection 2
@@ -2156,7 +2156,7 @@ customers |> showCustomersinUI
 
 The output is below. You can see that the connection is closed and only then is the sequence evaluated.
 
-```
+```text
 Opening connection
 Disposing connection
 Loading Customer 1 from db  // error! connection closed!
@@ -2167,7 +2167,7 @@ Showing Customer 2 in UI
 
 A better implementation will convert the sequence to a list while the connection is open, causing the sequence to be evaluated immediately:
 
-```
+```fsharp
 let readCustomersFromDb() =
     use dbConnection = DbConnection()
     let results = readNCustomersFromDb dbConnection 2
@@ -2180,7 +2180,7 @@ customers |> showCustomersinUI
 
 The result is much better. All the records are loaded before the connection is disposed:
 
-```
+```text
 Opening connection
 Loading Customer 1 from db
 Loading Customer 2 from db
@@ -2191,7 +2191,7 @@ Showing Customer 2 in UI
 
 A third alternative is to embed the disposable in the sequence itself:
 
-```
+```fsharp
 let readCustomersFromDb() =
     seq {
         // put disposable inside the sequence
@@ -2205,7 +2205,7 @@ customers |> showCustomersinUI
 
 The output shows that now the UI display is also done while the connection is open:
 
-```
+```text
 Opening connection
 Loading Customer 1 from db
 Showing Customer 1 in UI

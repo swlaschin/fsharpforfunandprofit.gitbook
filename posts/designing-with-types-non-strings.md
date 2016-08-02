@@ -21,7 +21,7 @@ And `CustomerId(42)` is not equal to `OrderId(42)`. In fact, they should not eve
 
 Types to the rescue, of course.
 
-```
+```fsharp
 type CustomerId = CustomerId of int
 type OrderId = OrderId of int
 
@@ -34,14 +34,14 @@ printfn "cust is equal to order? %b" (custId = orderId)
 
 Similarly, you might want avoid mixing up semantically different date values by wrapping them in a type. (`DateTimeKind` is an attempt at this, but not always reliable.)
 
-```
+```fsharp
 type LocalDttm = LocalDttm of System.DateTime
 type UtcDttm = UtcDttm of System.DateTime
 ```
 
 With these types we can ensure that we always pass the right kind of datetime as parameters. Plus, it acts as documentation as well.
 
-```
+```fsharp
 let SetOrderDate (d:LocalDttm) = 
     () // do something
 
@@ -55,7 +55,7 @@ Just as we had validation and constraints on types such as `String50` and `ZipCo
 
 For example, an inventory management system or a shopping cart may require that certain types of number are always positive.  You might ensure this by creating a `NonNegativeInt` type.
 
-```
+```fsharp
 module NonNegativeInt = 
     type T = NonNegativeInt of int
 
@@ -82,7 +82,7 @@ Is it worth trying to avoid this issue by using constrained types? Let's look at
 
 Here is a very simple shopping cart manager using a standard `int` type for the quantity. The quantity is incremented or decremented when the related buttons are clicked. Can you find the obvious bug?
 
-```
+```fsharp
 module ShoppingCartWithBug = 
 
     let mutable itemQty = 1  // don't do this at home!
@@ -98,7 +98,7 @@ If you can't quickly find the bug, perhaps you should consider making any constr
 
 Here is the same simple shopping cart manager using a typed quantity instead. Can you find the bug now?  (Tip: paste the code into a F# script file and run it) 
 
-```
+```fsharp
 module ShoppingCartQty = 
 
     type T = ShoppingCartQty of int
@@ -132,7 +132,7 @@ Not all systems can handle all possible dates. Some systems can only store dates
 
 As with integers, it might be useful to have constraints on the valid dates built into the type, so that any out of bound issues are dealt with at construction time rather than later on.
 
-```
+```fsharp
 type SafeDate = SafeDate of System.DateTime
 
 let create dttm = 
@@ -159,7 +159,7 @@ To avoid this scenario, I often like to create separate types for seconds and mi
 
 Here's a type based approach using single case unions:
 
-```
+```fsharp
 type TimeoutSecs = TimeoutSecs of int
 type TimeoutMs = TimeoutMs of int
 
@@ -180,7 +180,7 @@ let commandTimeout (TimeoutSecs s) (cmd:System.Data.IDbCommand) =
 
 And here's the same thing using units of measure:
 
-```
+```fsharp
 [<Measure>] type sec 
 [<Measure>] type ms
 

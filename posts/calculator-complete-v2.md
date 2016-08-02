@@ -30,7 +30,7 @@ The `allowAppend` flag we added as a patch was one way to take the context into 
 
 Second there was a bit of special case code for certain inputs (`Zero` and `DecimalSeparator`), as you can see from this code snippet:
 
-```
+```fsharp
 let appendCh= 
     match digit with
     | Zero -> 
@@ -103,7 +103,7 @@ But my preferred approach (for an ad-hoc manual implementation) makes extensive 
 First, create a union type that represents all the states.
 For example, if there are three states called "A", "B" and "C", the type would look like this:
 
-```
+```fsharp
 type State = 
     | AState 
     | BState 
@@ -113,7 +113,7 @@ type State =
 In many cases, each state will need to store some data that is relevant to that state.
 So we will need to create types to hold that data as well.
 
-```
+```fsharp
 type State = 
     | AState of AStateData
     | BState of BStateData
@@ -126,7 +126,7 @@ and BStateData =
 
 Next, all possible events that can happen are defined in another union type. If events have data associated with them, add that as well.
 
-```
+```fsharp
 type InputEvent = 
     | XEvent
     | YEvent of YEventData
@@ -137,7 +137,7 @@ and YEventData =
 
 Finally, we can create a "transition" function that, given a current state and input event, returns a new state.
 
-```
+```fsharp
 let transition (currentState,inputEvent) =
     match currentState,inputEvent with
     | AState, XEvent -> // new state
@@ -160,7 +160,7 @@ Forcing yourself to consider every possible combination is thus a helpful design
 Now, even with a small number of states and events, the number of possible combinations gets large very quickly.
 To make it more manageable in practice, I typically create a series of helper functions, one for each state, like this:
 
-```
+```fsharp
 let aStateHandler stateData inputEvent = 
     match inputEvent with
     | XEvent -> // new state
@@ -194,7 +194,7 @@ let transition (currentState,inputEvent) =
 
 So let's try this approach and attempt to implement the state diagram above:
 
-```
+```fsharp
 let aStateHandler stateData inputEvent = 
     match inputEvent with
     | XEvent -> 
@@ -247,7 +247,7 @@ If you want to ignore an event, do it explicitly.
 
 Here's the fixed up code, which compiles without warnings:
 
-```
+```fsharp
 let bStateHandler stateData inputEvent = 
     match inputEvent with
     | XEvent 
@@ -562,7 +562,7 @@ Now that we've done all this work, the conversion into types is straightforward.
 
 Here are the main types:
 
-```
+```fsharp
 type Calculate = CalculatorInput * CalculatorState -> CalculatorState 
 // five states        
 and CalculatorState = 
@@ -593,7 +593,7 @@ and ErrorStateData =
 If we compare these types to the first design (below), we have now made it clear that there is something special about `Zero` and `DecimalSeparator`,
 as they have been promoted to first class citizens of the input type.
 
-```
+```fsharp
 // from the old design
 type CalculatorInput = 
     | Digit of CalculatorDigit
@@ -613,7 +613,7 @@ type CalculatorInput =
 Also, in the old design, we had a single state type (below) that stored data for all contexts, while in the new design, the state is *explicitly different* for each context.
 The types `ZeroStateData`, `AccumulatorStateData`, `ComputedStateData`, and `ErrorStateData` make this obvious.
 
-```
+```fsharp
 // from the old design
 type CalculatorState = {
     display: CalculatorDisplay
@@ -631,7 +631,7 @@ type CalculatorState =
 
 Now that we have the basics of the new design, we need to define the other types referenced by it:
 
-```
+```fsharp
 and DigitAccumulator = string
 and PendingOp = (CalculatorMathOp * Number)
 and Number = float
@@ -649,7 +649,7 @@ and MathOperationError =
 
 And finally, we can define the services:
 
-```
+```fsharp
 // services used by the calculator itself
 type AccumulateNonZeroDigit = NonZeroDigit * DigitAccumulator -> DigitAccumulator 
 type AccumulateZero = DigitAccumulator -> DigitAccumulator 
@@ -685,7 +685,7 @@ Now we can create a state-based implementation, using the pattern described earl
 
 Let's start with the main function that does the state transitions:
 
-```
+```fsharp
 let createCalculate (services:CalculatorServices) :Calculate = 
     // create some local functions with partially applied services
     let handleZeroState = handleZeroState services
@@ -714,7 +714,7 @@ But before we do that, I thought it might be instructive to compare the new stat
 
 Here is the code from the previous one:
 
-```
+```fsharp
 let createCalculate (services:CalculatorServices) :Calculate = 
     fun (input,state) -> 
         match input with
@@ -754,7 +754,7 @@ just as I have done here.
 We have already documented the requirements for each state transition, so writing the code is straightforward.
 We'll start with the code for the `ZeroState` handler:
 
-```
+```fsharp
 let handleZeroState services pendingOp input = 
     // create a new accumulatorStateData object that is used when transitioning to other states
     let accumulatorStateData = {digits=""; pendingOp=pendingOp}
@@ -785,7 +785,7 @@ Again, the *real* work is done in helper functions such as `accumulateNonZeroDig
 
 Here is the code for the `AccumulatorState` handler:
 
-```
+```fsharp
 let handleAccumulatorState services stateData input = 
     match input with
     | Zero -> 
@@ -814,7 +814,7 @@ let handleAccumulatorState services stateData input =
 
 Here is the code for the `ComputedState` handler:
 
-```
+```fsharp
 let handleComputedState services stateData input = 
     let emptyAccumulatorStateData = {digits=""; pendingOp=stateData.pendingOp}
     match input with
@@ -846,7 +846,7 @@ Finally, let's look at the helper functions:
 
 The accumulator helpers are trivial -- they just call the appropriate service and wrap the result in an `AccumulatorData` record.
 
-```
+```fsharp
 let accumulateNonZeroDigit services digit accumulatorData =
     let digits = accumulatorData.digits
     let newDigits = services.accumulateNonZeroDigit (digit,digits)
@@ -863,7 +863,7 @@ but there are a couple of changes:
 * The `match result with Success/Failure` code now returns *two* possible states: `ComputedState` or `ErrorState`.
 * If there is no pending op, we *still* need to return a valid `ComputedState`, which is what `computeStateWithNoPendingOp` does.
 
-```
+```fsharp
 let getComputationState services accumulatorStateData nextOp = 
 
     // helper to create a new ComputedState from a given displayNumber 
@@ -900,7 +900,7 @@ Finally, we have a new piece of code that wasn't in the previous implementation 
 
 What do you do when you get two math ops in a row? We just replace the old pending op (if any) with the new one (if any).
 
-```
+```fsharp
 let replacePendingOp (computedStateData:ComputedStateData) nextOp = 
     let newPending = maybe {
         let! existing,displayNumber  = computedStateData.pendingOp

@@ -31,7 +31,7 @@ The literals give the compiler a clue to the context. As we have seen, the type 
 
 Here are some examples. Run them and see their signatures in the interactive window:
 
-```
+```fsharp
 let inferInt x = x + 1
 let inferFloat x = x + 1.0
 let inferDecimal x = x + 1m     // m suffix means decimal
@@ -44,7 +44,7 @@ let inferString x = x + "my string"
 
 If there are no literals anywhere, the compiler tries to work out the types by analyzing the functions and other values that they interact with. In the cases below, the "`indirect`" function calls a function that we do know the types for, which gives us the information to deduce the types for the "`indirect`" function itself.
 
-```
+```fsharp
 let inferInt x = x + 1
 let inferIndirectInt x = inferInt x       //deduce that x is an int
 
@@ -54,14 +54,14 @@ let inferIndirectFloat x = inferFloat x   //deduce that x is a float
 
 And of course assignment counts as an interaction too.  If x is a certain type, and y is bound (assigned) to x, then y must be the same type as x.
 
-```
+```fsharp
 let x = 1
 let y = x     //deduce that y is also an int
 ```
 
 Other interactions might be control structures, or external libraries
 
-```
+```fsharp
 // if..else implies a bool 
 let inferBool x = if x then false else true      
 // for..do implies a sequence
@@ -76,7 +76,7 @@ let inferStringAndBool x = System.String.IsNullOrEmpty(x)
 
 If there are any explicit type constraints or annotations specified, then the compiler will use them. In the case below, we are explicitly telling the compiler that "`inferInt2`" takes an `int` parameter. It can then deduce that the return value for "`inferInt2`" is also an `int`, which in turn implies that "`inferIndirectInt2`" is of type int->int.
 
-```
+```fsharp
 let inferInt2 (x:int) = x 
 let inferIndirectInt2 x = inferInt2 x 
 
@@ -86,7 +86,7 @@ let inferIndirectFloat2 x = inferFloat2 x
 
 Note that the formatting codes in `printf` statements count as explicit type constraints too!
 
-```
+```fsharp
 let inferIntPrint x = printf "x is %i" x 
 let inferFloatPrint x = printf "x is %f" x 
 let inferGenericPrint x = printf "x is %A" x 
@@ -96,7 +96,7 @@ let inferGenericPrint x = printf "x is %A" x
 
 If after all this, there are no constraints found, the compiler just makes the types generic.
 
-```
+```fsharp
 let inferGeneric x = x 
 let inferIndirectGeneric x = inferGeneric x 
 let inferIndirectGenericAgain x = (inferIndirectGeneric x).ToString() 
@@ -108,7 +108,7 @@ The type inference works top-down, bottom-up, front-to-back, back-to-front, midd
 
 Consider the following example. The inner function has a literal, so we know that it returns an `int`. And the outer function has been explicitly told that it returns a `string`. But what is the type of the passed in "`action`" function in the middle?
 
-```
+```fsharp
 let outerFn action : string =  
    let innerFn x = x + 1 // define a sub fn that returns an int
    action (innerFn 2)    // result of applying action to innerFn
@@ -125,7 +125,7 @@ The type inference would work something like this:
 * Putting this together, we now know that the `action` function has signature `int->string`
 * And finally, therefore, the compiler deduces the type of `outerFn` as:
 
-```
+```fsharp
 val outerFn: (int -> string) -> string
 ```
 
@@ -135,7 +135,7 @@ The compiler can do deductions worthy of Sherlock Holmes. Here's a tricky exampl
 
 Let's say we have a `doItTwice` function that takes any input function (call it "`f`") and generates a new function that simply does the original function twice in a row. Here's the code for it:
 
-```
+```fsharp
 let doItTwice f  = (f >> f)
 ```
 
@@ -159,7 +159,7 @@ Quite a sophisticated deduction for one line of code. Luckily the compiler does 
 
 Let's test it! It's actually much simpler to understand in practice than it is in theory.
 
-```
+```fsharp
 let doItTwice f  = (f >> f)
 
 let add3 x = x + 3
@@ -195,14 +195,14 @@ A basic rule is that you must declare functions before they are used.
 
 This code fails:
 
-```
+```fsharp
 let square2 x = square x   // fails: square not defined 
 let square x = x * x
 ```
 
 But this is ok:
 
-```
+```fsharp
 let square x = x * x       
 let square2 x = square x   // square already defined earlier
 ```
@@ -215,7 +215,7 @@ A variant of the "out of order" problem occurs with recursive functions or defin
 
 When a function is being compiled, the function identifier is not available to the body. So if you define a simple recursive function, you will get a compiler error. The fix is to add the "rec" keyword as part of the function definition. For example:
 
-```
+```fsharp
 // the compiler does not know what "fib" means
 let fib n =
    if n <= 2 then 1
@@ -225,7 +225,7 @@ let fib n =
 
 Here's the fixed version with "rec fib" added to indicate it is recursive:
 
-```
+```fsharp
 let rec fib n =              // LET REC rather than LET 
    if n <= 2 then 1
    else fib (n - 1) + fib (n - 2)
@@ -233,7 +233,7 @@ let rec fib n =              // LET REC rather than LET
 
 A similar "`let rec ? and`" syntax is used for two functions that refer to each other. Here is a very contrived example that fails if you do not have the "`rec`" keyword.
 
-```
+```fsharp
 let rec showPositiveNumber x =               // LET REC rather than LET
    match x with 
    | x when x >= 0 -> printfn "%i is positive" x 
@@ -248,7 +248,7 @@ and showNegativeNumber x =                   // AND rather than LET
 
 The "`and`" keyword can also be used to declare simultaneous types in a similar way.
 
-```
+```fsharp
 type A = None | AUsesB of B
    // error FS0039: The type 'B' is not defined
 type B = None | BUsesA of A
@@ -256,7 +256,7 @@ type B = None | BUsesA of A
 
 Fixed version:
 
-```
+```fsharp
 type A = None | AUsesB of B
 and B = None | BUsesA of A    // use AND instead of TYPE
 ```
@@ -265,7 +265,7 @@ and B = None | BUsesA of A    // use AND instead of TYPE
 
 Sometimes, the compiler just doesn't have enough information to determine a type. In the following example, the compiler doesn't know what type the `Length` method is supposed to work on. But it can't make it generic either, so it complains.
 
-```
+```fsharp
 let stringLength s = s.Length
   // error FS0072: Lookup on object of indeterminate type 
   // based on information prior to this program point. 
@@ -274,13 +274,13 @@ let stringLength s = s.Length
 
 These kinds of error can be fixed with explicit annotations.
 
-```
+```fsharp
 let stringLength (s:string) = s.Length
 ```
 
 Occasionally there does appear to be enough information, but still the compiler doesn't seem to recognize it. For example, it's obvious to a human that the `List.map` function (below) is being applied to a list of strings, so why does `x.Length` cause an error?
 
-```
+```fsharp
 List.map (fun x -> x.Length) ["hello"; "world"]       //not ok
 ```
 
@@ -288,13 +288,13 @@ The reason is that the F# compiler is currently a one-pass compiler, and so info
 
 So in cases like this, you can always explicitly annotate:
 
-```
+```fsharp
 List.map (fun (x:string) -> x.Length) ["hello"; "world"]       // ok
 ```
 
 But another, more elegant way that will often fix the problem is to rearrange things so the known types come first, and the compiler can digest them before it moves to the next clause.
 
-```
+```fsharp
 ["hello"; "world"] |> List.map (fun s -> s.Length)   //ok
 ```
 
@@ -308,7 +308,7 @@ When calling an external class or method in .NET, you will often get errors due 
 
 In many cases, such as the concat example below, you will have to explicitly annotate the parameters of the external function so that the compiler knows which overloaded method to call. 
 
-```
+```fsharp
 let concat x = System.String.Concat(x)           //fails
 let concat (x:string) = System.String.Concat(x)  //works 
 let concat x = System.String.Concat(x:string)    //works
@@ -316,7 +316,7 @@ let concat x = System.String.Concat(x:string)    //works
 
 Sometimes the overloaded methods have different argument names, in which case you can also give the compiler a clue by naming the arguments. Here is an example for the `StreamReader` constructor.
 
-```
+```fsharp
 let makeStreamReader x = new System.IO.StreamReader(x)        //fails
 let makeStreamReader x = new System.IO.StreamReader(path=x)   //works
 ```
@@ -325,7 +325,7 @@ let makeStreamReader x = new System.IO.StreamReader(path=x)   //works
 
 Numeric functions can be somewhat confusing. There often appear generic, but once they are bound to a particular numeric type, they are fixed, and using them with a different numeric type will cause an error. The following example demonstrates this:
 
-```
+```fsharp
 let myNumericFn x = x * x
 myNumericFn 10
 myNumericFn 10.0             //fails
@@ -357,7 +357,7 @@ Once you have ordered and annotated everything, you will probably still get type
 
 For example:
 
-```
+```fsharp
 let myBottomLevelFn x = x
 
 let myMidLevelFn x = 
@@ -378,7 +378,7 @@ let myTopLevelFn x =
 
 In this example, we have a chain of functions. The bottom level function is definitely generic, but what about the top level one?  Well often, we might expect it be generic but instead it is not. In this case we have:
 
-```
+```fsharp
 val myTopLevelFn : string -> string
 ```
 
@@ -386,7 +386,7 @@ What went wrong? The answer is in the midlevel function. The `%s` on z forced it
 
 Now this is a pretty obvious example, but with thousands of lines of code, a single line might be buried away that causes an issue. One thing that can help is to look at all the signatures; in this case the signatures are:
 
-```
+```fsharp
 val myBottomLevelFn : 'a -> 'a       // generic as expected
 val myMidLevelFn : string -> string  // here's the clue! Should be generic
 val myTopLevelFn : string -> string

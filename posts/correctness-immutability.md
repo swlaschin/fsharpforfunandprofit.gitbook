@@ -12,7 +12,7 @@ To see why immutability is important, let's start with a small example.
 
 Here's some simple C# code that processes a list of numbers.
 
-```
+```csharp
 public List<int> MakeList() 
 {
    return new List<int> {1,2,3,4,5,6,7,8,9,10};
@@ -31,7 +31,7 @@ public List<int> EvenNumbers(List<int> list)
 
 Now let me test it:
 
-```
+```csharp
 public void Test() 
 { 
    var odds = OddNumbers(MakeList()); 
@@ -43,7 +43,7 @@ public void Test()
 
 Everything works great, and the test passes, but I notice that I am creating the list twice ? surely I should refactor this out?  So I do the refactoring, and here's the new improved version:
 
-```
+```csharp
 public void RefactoredTest() 
 { 
    var list = MakeList();
@@ -62,7 +62,7 @@ In other words, when I call the `OddNumbers` function, I am unintentionally crea
 
 Is there a way to ensure that this cannot happen?  Yes -- if the functions had used `IEnumerable` instead:
 
-```
+```csharp
 public IEnumerable<int> MakeList() {}
 public List<int> OddNumbers(IEnumerable<int> list) {} 
 public List<int> EvenNumbers(IEnumerable <int> list) {}
@@ -98,7 +98,7 @@ When a program is designed using a transformation approach, the result tends to 
 
 We saw earlier that immutable values and types are the default in F#:
 
-```
+```fsharp
 // immutable list
 let list = [1;2;3;4]    
 
@@ -111,13 +111,13 @@ Because of this, F# has a number of tricks to make life easier and to optimize t
 
 First, since you can't modify a data structure, you must copy it when you want to change it. F# makes it easy to copy another data structure with only the changes you want:
 
-```
+```fsharp
 let alice = {john with FirstName="Alice"}
 ```
 
 And complex data structures are implemented as linked lists or similar, so that common parts of the structure are shared. 
 
-```
+```fsharp
 // create an immutable list
 let list1 = [1;2;3;4]   
 

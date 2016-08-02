@@ -114,7 +114,7 @@ In the first approach, types are defined *inside* the module along with their re
 
 Here's an example:
 
-```
+```fsharp
 namespace Example
 
 // declare a module 
@@ -135,7 +135,7 @@ So the functions are accessed with names like `Person.create` and `Person.fullNa
 
 In the second approach, types are declared in the same file, but outside any module:
 
-```
+```fsharp
 namespace Example
 
 // declare the type outside the module
@@ -157,7 +157,7 @@ In this case, the functions are accessed with the same names (`Person.create` an
 
 And finally, here's the third approach. The type is declared in a special "types-only" module (typically in a different file):
 
-```
+```fsharp
 // =========================
 // File: DomainTypes.fs
 // =========================
@@ -180,7 +180,7 @@ In this particular case, the `AutoOpen` attribute has been used to make the type
 And then a different module contains all the functions that work on, say, the `Person` type.
 
 
-```
+```fsharp
 // =========================
 // File: Person.fs
 // =========================
@@ -202,7 +202,7 @@ Note that in this example, both the type and the module are called `Person`. Thi
 
 So, if you write this:
 
-```
+```fsharp
 let f (p:Person) = p.First
 ```
 
@@ -210,7 +210,7 @@ Then the compiler will understand that you are referring to the `Person` type.
 
 On the other hand, if you write this:
 
-```
+```fsharp
 let g () = Person.create "Alice" "Smith"
 ```
 
@@ -249,7 +249,7 @@ In reality, even for large projects, not having folders is not as much of a prob
 
 If you are coming from an OO design, you might run into mutual dependencies between types, such as this example, which won't compile:
 
-```
+```fsharp
 type Location = {name: string; workers: Employee list}
 
 type Employee = {name: string; worksAt: Location}
@@ -269,7 +269,7 @@ Be aware that this is still a skeleton. Some of the modules are missing, and som
 
 This kind of organization would be overkill for a small project, but there will be lots more code to come!
 
-```
+```fsharp
 /// ===========================================
 /// Common types and functions shared across multiple projects
 /// ===========================================

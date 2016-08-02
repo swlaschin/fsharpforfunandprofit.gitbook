@@ -109,7 +109,7 @@ The answer is to use a union type, with one case to represent each of the differ
 
 Here's an example of a possible type definition for the output:
 
-```
+```fsharp
 type UseCaseResult = 
     | Success
     | ValidationError 
@@ -127,7 +127,7 @@ This does solve the problem, but having one error case for each step in the flow
 
 Yes! All we *really* need is *two* cases. One for the happy path, and one for all other error paths, like this:
 
-```
+```fsharp
 type UseCaseResult = 
     | Success 
     | Failure
@@ -141,7 +141,7 @@ One more thing though -- as it stands there is no data in the result at all, jus
 
 Here's the final, completely generic and reusable version:
 
-```
+```fsharp
 type Result<'TSuccess,'TFailure> = 
     | Success of 'TSuccess
     | Failure of 'TFailure

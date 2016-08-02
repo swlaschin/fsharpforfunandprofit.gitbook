@@ -27,7 +27,7 @@ In addition to the tight integration though, there are a number of nice features
 
 The `TryParse` and `TryGetValue` functions for values and dictionaries are frequently used to avoid extra exception handling. But the C# syntax is a bit clunky. Using them from F# is more elegant because F# will automatically convert the function into a tuple where the first element is the function return value and the second is the "out" parameter. 
 
-```
+```fsharp
 //using an Int32
 let (i1success,i1) = System.Int32.TryParse("123");
 if i1success then printfn "parsed as %i" i1 else printfn "parse failed"
@@ -50,7 +50,7 @@ let (e2success,e2) = dict.TryGetValue("b");
 
 In C# (and .NET in general), you can have overloaded methods with many different parameters. F# can have trouble with this. For example, here is an attempt to create a `StreamReader`:
 
-```
+```fsharp
 let createReader fileName = new System.IO.StreamReader(fileName)
 // error FS0041: A unique overload for method 'StreamReader' 
 //               could not be determined
@@ -60,7 +60,7 @@ The problem is that F# does not know if the argument is supposed to be a string 
 
 Instead, a nice workaround is enabled by the fact that in F#, when calling methods in .NET libraries, you can specify named arguments.
 
-```
+```fsharp
 let createReader2 fileName = new System.IO.StreamReader(path=fileName)
 ```
 
@@ -74,7 +74,7 @@ A common case is that a .NET library class has a number of mutually exclusive `i
 
 For example, here's the code to test for various `isXXX` methods for `System.Char`.
 
-```
+```fsharp
 let (|Digit|Letter|Whitespace|Other|) ch = 
    if System.Char.IsDigit(ch) then Digit
    else if System.Char.IsLetter(ch) then Letter
@@ -84,7 +84,7 @@ let (|Digit|Letter|Whitespace|Other|) ch =
 
 Once the choices are defined, the normal code can be straightforward: 
 
-```
+```fsharp
 let printChar ch = 
   match ch with
   | Digit -> printfn "%c is a Digit" ch
@@ -100,7 +100,7 @@ Another common case is when you have to parse text or error codes to determine t
 
 First, set up the active pattern matching on the error number:
 
-```
+```fsharp
 open System.Data.SqlClient
 
 let (|ConstraintException|ForeignKeyException|Other|) (ex:SqlException) = 
@@ -112,7 +112,7 @@ let (|ConstraintException|ForeignKeyException|Other|) (ex:SqlException) =
 
 Now we can use these patterns when processing SQL commands:
 
-```
+```fsharp
 let executeNonQuery (sqlCommmand:SqlCommand) = 
     try
        let result = sqlCommmand.ExecuteNonQuery()
@@ -132,7 +132,7 @@ F# has another useful feature called "object expressions". This is the ability t
 
 In the example below, we create some objects that implement `IDisposable` using a `makeResource` helper function.
 
-```
+```fsharp
 // create a new object that implements IDisposable
 let makeResource name = 
    { new System.IDisposable 
@@ -171,7 +171,7 @@ The ability to create instances of an interface on the fly means that it is easy
 
 For example, say that you have a preexisting API which uses the `IAnimal` interface, as shown below.
 
-```
+```fsharp
 type IAnimal = 
    abstract member MakeNoise : unit -> string
 
@@ -181,7 +181,7 @@ let showTheNoiseAnAnimalMakes (animal:IAnimal) =
 
 But we want to have all the benefits of pattern matching, etc, so we have created pure F# types for cats and dogs instead of classes. 
 
-```
+```fsharp
 type Cat = Felix | Socks
 type Dog = Butch | Lassie 
 ```
@@ -190,7 +190,7 @@ But using this pure F# approach means that that we cannot pass the cats and dogs
 
 However, we don't have to create new sets of concrete classes just to implement `IAnimal`. Instead, we can dynamically create the `IAnimal` interface by extending the pure F# types.
 
-```
+```fsharp
 // now mixin the interface with the F# types
 type Cat with
    member this.AsAnimal = 
@@ -205,7 +205,7 @@ type Dog with
 
 Here is some test code:
 
-```
+```fsharp
 let dog = Lassie
 showTheNoiseAnAnimalMakes (dog.AsAnimal)
 
@@ -221,7 +221,7 @@ F# gets the benefit of the .NET reflection system, which means that you can do a
 
 For example, here is a way to print out the fields in a record type, and the choices in a union type.
 
-```
+```fsharp
 open System.Reflection
 open Microsoft.FSharp.Reflection
 

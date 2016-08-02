@@ -12,7 +12,7 @@ In this post, we look at a key benefit of F#, which using the type system to "ma
 
 Let's look at our `Contact` type. Thanks to the previous refactoring, it is quite simple:
 
-```
+```fsharp
 type Contact = 
     {
     Name: Name;
@@ -27,7 +27,7 @@ The answer is no. The business rule implies that a contact might have an email a
 
 The answer seems obvious -- make the addresses optional, like this:
 
-```
+```fsharp
 type Contact = 
     {
     Name: PersonalName;
@@ -50,7 +50,7 @@ If we think about the business rule carefully, we realize that there are three p
 
 Once it is put like this, the solution becomes obvious -- use a union type with a case for each possibility.
 
-```
+```fsharp
 type ContactInfo = 
     | EmailOnly of EmailContactInfo
     | PostOnly of PostalContactInfo
@@ -71,7 +71,7 @@ Note that for the "email and post" case, I just used a tuple type for now. It's 
 
 Now let's see how we might use this in practice. We'll start by creating a new contact:
 
-```
+```fsharp
 let contactFromEmail name emailStr = 
     let emailOpt = EmailAddress.create emailStr
     // handle cases when email is valid or invalid
@@ -100,7 +100,7 @@ Now if we need to add a postal address to an existing `ContactInfo`, we have no 
 
 So here's a helper method that updates the postal address. You can see how it explicitly handles each case.
 
-```
+```fsharp
 let updatePostalAddress contact newPostalAddress = 
     let {Name=name; ContactInfo=contactInfo} = contact
     let newContactInfo =
@@ -117,7 +117,7 @@ let updatePostalAddress contact newPostalAddress =
 
 And here is the code in use:
 
-```
+```fsharp
 let contact = contactOpt.Value   // see warning about option.Value below
 let newPostalAddress = 
     let state = StateCode.create "CA"
@@ -147,7 +147,7 @@ First, the business logic *is* complicated. There is no easy way to avoid it. If
 
 Second, if the logic is represented by types, it is automatically self documenting. You can look at the union cases below and immediate see what the business rule is. You do not have to spend any time trying to analyze any other code.
 
-```
+```fsharp
 type ContactInfo = 
     | EmailOnly of EmailContactInfo
     | PostOnly of PostalContactInfo

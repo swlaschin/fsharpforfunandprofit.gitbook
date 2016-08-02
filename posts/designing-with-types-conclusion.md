@@ -23,7 +23,7 @@ For this final post, let's see them all applied together.
 
 Here's the original example we started off with in the [first post](../posts/designing-with-types-intro.md) in the series:
 
-```
+```fsharp
 type Contact = 
     {
     FirstName: string;
@@ -50,7 +50,7 @@ And how does that compare to the final result after applying all the techniques 
 
 First, let's start with the types that are not application specific.  These types could probably be reused in many applications.
 
-```
+```fsharp
 // ========================================
 // WrappedString 
 // ========================================
@@ -290,7 +290,7 @@ module PersonalName =
 
 And now the application specific types.  
  
-```
+```fsharp
 
 // ========================================
 // EmailContactInfo -- state machine

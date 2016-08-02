@@ -12,7 +12,7 @@ We briefly noted earlier that when pattern matching there is a requirement to ma
 
 Let's compare some C# to F# again. Here's some C# code that uses a switch statement to handle different types of state.
 
-```
+```csharp
 enum State { New, Draft, Published, Inactive, Discontinued }
 void HandleState(State state)
 {
@@ -34,7 +34,7 @@ This code will compile, but there is an obvious bug! The compiler couldn't see i
 
 Here's the F# equivalent:
 
-```
+```fsharp
 type State = New | Draft | Published | Inactive | Discontinued
 let handleState state = 
    match state with
@@ -58,7 +58,7 @@ Now let's look at some real examples of how exhaustive matching can help you wri
 
 We'll start with an extremely common scenario where the caller should always check for an invalid case, namely testing for nulls. A typical C# program is littered with code like this:
 
-```
+```csharp
 if (myObject != null)
 {
   // do something
@@ -82,7 +82,7 @@ The `Some` choice wraps a valid value, and `None` represents a missing value.
 
 Here's an example where `Some` is returned if a file exists, but a missing file returns `None`.
 
-```
+```fsharp
 let getFileInfo filePath =
    let fi = new System.IO.FileInfo(filePath)
    if fi.Exists then Some(fi) else None
@@ -96,7 +96,7 @@ let badFileInfo = getFileInfo badFileName   // None
 
 If we want to do anything with these values, we must always handle both possible cases.
 
-```
+```fsharp
 match goodFileInfo with
   | Some fileInfo -> 
       printfn "the file %s exists" fileInfo.FullName
@@ -120,7 +120,7 @@ By avoiding nulls and by using `Option` types in this way, F# completely elimina
 
 Here's some C# code that creates a list by averaging pairs of numbers from an input list:
 
-```
+```csharp
 public IList<float> MovingAverages(IList<int> list)
 {
     var averages = new List<float>();
@@ -137,7 +137,7 @@ It compiles correctly, but it actually has a couple of issues. Can you find them
 
 Now let's try the same thing in F#:
 
-```
+```fsharp
 let rec movingAverages list = 
     match list with
     // if input is empty, return an empty list
@@ -154,7 +154,7 @@ Not only has it found a bug, it has revealed a gap in the requirements: what sho
 
 Here's the fixed up version:
 
-```
+```fsharp
 let rec movingAverages list = 
     match list with
     // if input is empty, return an empty list
@@ -188,7 +188,7 @@ In a procedural or OO language, propagating and handling exceptions across layer
 
 In the functional world, a common technique is to create a new structure to hold both the good and bad possibilities, rather than throwing an exception if the file is missing.
 
-```
+```fsharp
 // define a "union" of two different alternatives
 type Result<'a, 'b> = 
     | Success of 'a  // 'a means generic type. The actual type
@@ -220,7 +220,7 @@ The code demonstrates how `performActionOnFile` returns a `Result` object which 
 
 Now the intermediate layers can call each other, passing around the result type without worrying what its structure is, as long as they don't access it:
 
-```
+```fsharp
 // a function in the middle layer
 let middleLayerDo action filePath = 
     let fileResult = performActionOnFile action filePath
@@ -240,7 +240,7 @@ Obviously at some point, a client of the top layer does want to access the resul
 
 Here is an example of a client function that accesses the top layer:
 
-```
+```fsharp
 /// get the first line of the file
 let printFirstLineOfFile filePath = 
     let fileResult = topLayerDo (fun fs->fs.ReadLine()) filePath
@@ -262,7 +262,7 @@ You can see that this code must explicitly handle the `Success` and `Failure` ca
 
 Now it is not required that you always handle all possible cases explicitly. In the example below, the function uses the underscore wildcard to treat all the failure reasons as one. This can considered bad practice if we want to get the benefits of the strictness, but at least it is clearly done.
 
-```
+```fsharp
 /// get the length of the text in the file
 let printLengthOfFile filePath = 
    let fileResult = 
@@ -280,7 +280,7 @@ Now let's see all this code work in practice with some interactive tests.
 
 First set up a good file and a bad file.
 
-```
+```fsharp
 /// write some text to a file
 let writeSomeText filePath someText = 
     use writer = new System.IO.StreamWriter(filePath:string)
@@ -295,7 +295,7 @@ writeSomeText goodFileName "hello"
 
 And now test interactively:
 
-```
+```fsharp
 printFirstLineOfFile goodFileName 
 printLengthOfFile goodFileName 
 
@@ -318,7 +318,7 @@ Finally, exhaustive pattern matching is a valuable tool for ensuring that code s
 
 Let's say that the requirements change and we need to handle a third type of error: "Indeterminate". To implement this new requirement, change the first `Result` type as follows, and re-evaluate all the code. What happens?
 
-```
+```fsharp
 type Result<'a, 'b> = 
     | Success of 'a 
     | Failure of 'b
@@ -327,7 +327,7 @@ type Result<'a, 'b> =
 
 Or sometimes a requirements change will remove a possible choice. To emulate this, change the first `Result` type to eliminate all but one of the choices. 
 
-```
+```fsharp
 type Result<'a> = 
     | Success of 'a 
 ```

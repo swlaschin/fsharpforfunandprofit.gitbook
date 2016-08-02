@@ -26,13 +26,13 @@ Each of these is addressed below.
 In C# and Java, it is has become good practice to create immutable classes whenever possible. In F#, you get this for free.
 
 Here is an immutable type in F#:
-```
+```fsharp
 type PersonalName = {FirstName:string; LastName:string}
 ```
 
 And here is how the same type is typically coded in C#:
 
-```
+```csharp
 class ImmutablePersonalName
 {
     public ImmutablePersonalName(string firstName, string lastName)
@@ -54,7 +54,7 @@ In F#, you don't have to override `ToString()` for most types -- you get pretty 
 
 You have probably already seen this when running the earlier examples. Here is another simple example:
 
-```
+```fsharp
 type USAddress = 
    {Street:string; City:string; State:string; Zip:string}
 type UKAddress = 
@@ -76,7 +76,7 @@ printfn "Bob is %A" bob
 
 The output is:
 
-```
+```fsharp
 Alice is {Name = "Alice";
  Address = US {Street = "123 Main";
                City = "LA";
@@ -90,7 +90,7 @@ In C#, you often have to implement the `IEquatable` interface so that you can te
 
 In F#, you get this for free with most F# types. For example, using the `PersonalName` type from above, we can compare two names straight away.
 
-```
+```fsharp
 type PersonalName = {FirstName:string; LastName:string}
 let alice1 = {FirstName="Alice"; LastName="Adams"}
 let alice2 = {FirstName="Alice"; LastName="Adams"}
@@ -108,7 +108,7 @@ In C#, you often have to implement the `IComparable` interface so that you can s
 
 Again, in F#, you get this for free with most F# types. For example, here is a simple definition of a deck of cards.
 
-```
+```fsharp
 
 type Suit = Club | Diamond | Spade | Heart
 type Rank = Two | Three | Four | Five | Six | Seven | Eight 
@@ -118,7 +118,7 @@ type Rank = Two | Three | Four | Five | Six | Seven | Eight
 			
 We can write a function to test the comparison logic:
 
-```
+```fsharp
 let compareCard card1 card2 = 
     if card1 < card2 
     then printfn "%A is greater than %A" card2 card1 
@@ -127,7 +127,7 @@ let compareCard card1 card2 =
 
 And let's see how it works:
 
-```
+```fsharp
 let aceHearts = Heart, Ace
 let twoHearts = Heart, Two
 let aceSpades = Spade, Ace
@@ -142,7 +142,7 @@ But also note that the Two of Hearts is automatically greater than the Ace of Sp
 
 Here's an example of a hand of cards:
 
-```
+```fsharp
 let hand = [ Club,Ace; Heart,Three; Heart,Ace; 
              Spade,Jack; Diamond,Two; Diamond,Ace ]
 
@@ -152,7 +152,7 @@ List.sort hand |> printfn "sorted hand is (low to high) %A"
 
 And as a side benefit, you get min and max for free too!
 
-```
+```fsharp
 List.max hand |> printfn "high card is %A"
 List.min hand |> printfn "low card is %A"
 ```

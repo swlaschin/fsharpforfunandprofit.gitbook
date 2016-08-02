@@ -83,7 +83,7 @@ Let's start with a very crude model of a file system:
 
 Here's how I might model that:
 
-```
+```fsharp
 type FileSystemItem =
     | File of File
     | Directory of Directory
@@ -95,7 +95,7 @@ I admit it's a pretty bad model, but it's just good enough for this example!
 
 Ok, here are some sample files and directories:
 
-```
+```fsharp
 let readme = File {name="readme.txt"; fileSize=1}
 let config = File {name="config.xml"; fileSize=2}
 let build  = File {name="build.bat"; fileSize=3}
@@ -111,7 +111,7 @@ Let's start by looking at the signatures to figure out what we need.
 The `File` constructor takes a `File` and returns a `FileSystemItem`. Using the guidelines above, the handler for the `File` case
 needs to have the signature `File -> 'r`.
 
-```
+```fsharp
 // case constructor
 File  : File -> FileSystemItem
 
@@ -121,7 +121,7 @@ fFile : File -> 'r
 
 That's simple enough. Let's put together an initial skeleton of `cataFS`, as I'll call it:
 
-```
+```fsharp
 let rec cataFS fFile fDir item :'r = 
     let recurse = cataFS fFile fDir 
     match item with
@@ -139,7 +139,7 @@ One way is to "explode" the `Directory` record into a tuple of `(string,int,File
  
 In other words, we have this sequence of transformations:
  
-```
+```fsharp
 // case constructor (Directory as record)
 Directory : Directory -> FileSystemItem
 
@@ -158,7 +158,7 @@ so we can just use `List.map` passing in `recurse` as the mapping function, and 
 
 Putting it all together, we get this implementation:
 
-```
+```fsharp
 let rec cataFS fFile fDir item :'r = 
     let recurse = cataFS fFile fDir 
     match item with
@@ -171,7 +171,7 @@ let rec cataFS fFile fDir item :'r =
 
 and if we look at the type signature, we can see that it is just what we want:
 
-```
+```fsharp
 val cataFS :
     fFile : (File -> 'r) ->
     fDir  : (string * int * 'r list -> 'r) -> 
@@ -189,7 +189,7 @@ Alrighty then, let's use it in practice.
   
 To start with, we can easily define a `totalSize` function that returns the total size of an item and all its subitems:
 
-```
+```fsharp
 let totalSize fileSystemItem =
     let fFile (file:File) = 
         file.fileSize
@@ -200,7 +200,7 @@ let totalSize fileSystemItem =
 
 And here are the results:
 
-```
+```fsharp
 readme |> totalSize  // 1
 src |> totalSize     // 16 = 10 + (1 + 2 + 3)
 root |> totalSize    // 31 = 5 + 16 + 10
@@ -218,7 +218,7 @@ So let's make `'r` a `File option` instead.
   
 The function for the `File` case should return `Some file` then:
   
-```
+```fsharp
 let fFile (file:File) = 
     Some file
 ```
@@ -228,7 +228,7 @@ The function for the `Directory` case needs more thought:
 * If list of subfiles is empty, then return `None`
 * If list of subfiles is non-empty, then return the largest one
 
-```
+```fsharp
 let fDir (name,size,subfiles) = 
     match subfiles with
     | [] -> 
@@ -248,7 +248,7 @@ Let's write a helper function to provide the size of a `File option`, using this
 
 Here's the code:
 
-```
+```fsharp
 // helper to provide a default if missing
 let ifNone deflt opt =
     defaultArg opt deflt 
@@ -262,7 +262,7 @@ let fileSize fileOpt =
 
 Putting it all together then, we have our `largestFile` function:
   
-```
+```fsharp
 let largestFile fileSystemItem =
 
     // helper to provide a default if missing
@@ -295,7 +295,7 @@ let largestFile fileSystemItem =
   
 If we test it, we get the results we expect:
 
-```
+```fsharp
 readme |> largestFile  
 // Some {name = "readme.txt"; fileSize = 1}
 
@@ -324,7 +324,7 @@ Let's work with a slightly more complicated domain. This time, imagine that we m
 
 Here's the domain modelled as types:
   
-```
+```fsharp
 type Product =
     | Bought of BoughtProduct 
     | Made of MadeProduct 
@@ -345,7 +345,7 @@ Note that the types are mutally recursive. `Product` references `MadeProduct` wh
 
 Here are some example products:
 
-```
+```fsharp
 let label = 
     Bought {name="label"; weight=1; vendor=Some "ACME"}
 let bottle = 
@@ -372,7 +372,7 @@ Now to design the catamorphism, we need to do is replace the `Product` type with
 
 Just as with the previous example, the `Bought` case is easy:
 
-```
+```fsharp
 // case constructor
 Bought  : BoughtProduct -> Product
 
@@ -385,7 +385,7 @@ Finally we get to the inner `Product`, and we can then mechanically replace that
 
 Here's the sequence of transformations:
 
-```
+```fsharp
 // case constructor
 Made  : MadeProduct -> Product
 
@@ -404,7 +404,7 @@ When implementing the `cataProduct` function we need to the same kind of mapping
 
 We'll need a helper for that:
 
-```
+```fsharp
 // Converts a Component into a (int * 'r) tuple
 let convertComponentToTuple comp =
     (comp.qty,recurse comp.product)
@@ -414,7 +414,7 @@ You can see that this uses the `recurse` function to turn the inner product (`co
 
 With `convertComponentToTuple` available, we can convert all the components to tuples using `List.map`:
 
-```
+```fsharp
 let componentTuples = 
     made.components 
     |> List.map convertComponentToTuple 
@@ -424,7 +424,7 @@ let componentTuples =
 
 The complete implementation of `cataProduct` looks like this:
 
-```
+```fsharp
 let rec cataProduct fBought fMade product :'r = 
     let recurse = cataProduct fBought fMade 
 
@@ -446,7 +446,7 @@ let rec cataProduct fBought fMade product :'r =
 
 We can now use `cataProduct` to calculate the weight, say.
 
-```
+```fsharp
 let productWeight product =
 
     // handle Bought case
@@ -471,7 +471,7 @@ let productWeight product =
 
 Let's test it interactively to make sure it works:
 
-```
+```fsharp
 label |> productWeight    // 1
 shampoo |> productWeight  // 17 = 10 + (2x1 + 1x2 + 1x3)
 twoPack |> productWeight  // 39 = 5  + (2x17)
@@ -494,13 +494,13 @@ You might think that it's just a score of some kind, but we also need to know th
 
 So let's make `'r` a `VendorScore option`, where we are going to create a little type `VendorScore`, rather than using a tuple.
 
-```
+```fsharp
 type VendorScore = {vendor:string; score:int}
 ```
 
 We'll also define some helpers to get data from a `VendorScore` easily:
 
-```
+```fsharp
 let vendor vs = vs.vendor
 let score vs = vs.score
 ```
@@ -516,7 +516,7 @@ The logic for the `Bought` case is then:
 * If the vendor is present, return a `VendorScore` with score = 1, but as a one-element list rather than as a single item.
 * If the vendor is missing, return an empty list.
   
-```
+```fsharp
 let fBought (bought:BoughtProduct) = 
     // set score = 1 if there is a vendor
     bought.vendor
@@ -544,7 +544,7 @@ At this point the `cata` function will return a `VendorScore list`. To get the h
 
 Here's the complete `mostUsedVendor` function:
 
-```
+```fsharp
 let mostUsedVendor product =
 
     let fBought (bought:BoughtProduct) = 
@@ -581,7 +581,7 @@ let mostUsedVendor product =
 
 Now let's test it:
 
-```
+```fsharp
 label |> mostUsedVendor    
 // Some {vendor = "ACME"; score = 1}
 

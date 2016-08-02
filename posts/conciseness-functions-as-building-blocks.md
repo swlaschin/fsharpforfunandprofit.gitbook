@@ -12,7 +12,7 @@ A well-known principle of good design is to create a set of basic operations and
 
 Let's start with a simple example using integers. Say that we have created some basic functions to do arithmetic:
 
-```
+```fsharp
 // building blocks
 let add2 x = x + 2
 let mult3 x = x * 3
@@ -26,7 +26,7 @@ let square x = x * x
 
 Now we want to create new functions that build on these:
 
-```
+```fsharp
 // new composed functions
 let add2ThenMult3 = add2 >> mult3
 let mult3ThenSquare = mult3 >> square 
@@ -38,7 +38,7 @@ Note how concise this way of combining functions is. There are no parameters, ty
 
 To be sure, the examples could also have been written less concisely and more explicitly as:
 
-```
+```fsharp
 let add2ThenMult3 x = mult3 (add2 x)
 let mult3ThenSquare x = square (mult3 x) 
 ```
@@ -50,7 +50,7 @@ But this more explicit style is also a bit more cluttered:
 
 Now let's test these compositions:
 
-```
+```fsharp
 // test
 add2ThenMult3 5
 mult3ThenSquare 5
@@ -62,7 +62,7 @@ mult3ThenSquare 5
 
 Now say that we want to decorate these existing functions with some logging behavior. We can compose these as well, to make a new function with the logging built in.
 
-```
+```fsharp
 // helper functions;
 let logMsg msg x = printf "%s%i" msg x; x     //without linefeed 
 let logMsgN msg x = printfn "%s%i" msg x; x   //with linefeed
@@ -84,7 +84,7 @@ Our new function, `mult3ThenSquareLogged`, has an ugly name, but it is easy to u
 
 But wait, there's more!  Functions are first class entities in F#, and can be acted on by any other F# code. Here is an example of using the composition operator to collapse a list of functions into a single operation.
 
-```
+```fsharp
 let listOfFunctions = [
    mult3; 
    square;
@@ -109,7 +109,7 @@ But in many cases, it is easier to stay within the syntax of F#, and just design
 
 The ability to create new types concisely and then match against them makes it very easy to set up fluent interfaces quickly. For example, here is a little function that calculates dates using a simple vocabulary. Note that two new enum-style types are defined just for this one function.
 
-```
+```fsharp
 // set up the vocabulary
 type DateScale = Hour | Hours | Day | Days | Week | Weeks
 type DateDirection = Ago | Hence
@@ -142,7 +142,7 @@ Say that we are creating a drawing program with various shapes. Each shape has a
 
 Here is an example of what a simple method chain for a fluent interface in C# might look like:
 
-```
+```fsharp
 FluentShape.Default
    .SetColor("red")
    .SetLabel("box")
@@ -153,7 +153,7 @@ Now the concept of "fluent interfaces" and "method chaining" is really only rele
 
 Let's start with the underlying Shape type:
 
-```
+```fsharp
 // create an underlying type
 type FluentShape = {
     label : string; 
@@ -164,7 +164,7 @@ type FluentShape = {
 	
 We'll add some basic functions:
 
-```
+```fsharp
 let defaultShape = 
     {label=""; color=""; onClick=fun shape->shape}
 
@@ -180,7 +180,7 @@ For "method chaining" to work, every function should return an object that can b
 
 Next we create some helper functions which we expose as the "mini-language", and will be used as building blocks by the users of the language. 
 
-```
+```fsharp
 let setLabel label shape = 
    {shape with FluentShape.label = label}
 
@@ -196,7 +196,7 @@ Notice that `appendClickAction` takes a function as a parameter and composes it 
 
 Now as a user of this "mini-language", I can compose the base helper functions into more complex functions of my own, creating my own function library. (In C# this kind of thing might be done using extension methods.)
 
-```
+```fsharp
 // Compose two "base" functions to make a compound function.
 let setRedBox = setColor "red" >> setLabel "box" 
 
@@ -210,7 +210,7 @@ let changeColorOnClick color = appendClickAction (setColor color)
 
 I can then combine these functions together to create objects with the desired behavior.
 
-```
+```fsharp
 //setup some test values
 let redBox = defaultShape |> setRedBox
 let blueBox = defaultShape |> setBlueBox 
@@ -234,7 +234,7 @@ In the second case, I actually pass two functions to `appendClickAction`, but I 
 
 Here is a more complex example. We will create a function "`showRainbow`" that, for each color in the rainbow, sets the color and displays the shape.
 
-```
+```fsharp
 let rainbow =
     ["red";"orange";"yellow";"green";"blue";"indigo";"violet"]
 

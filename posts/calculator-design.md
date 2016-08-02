@@ -66,7 +66,7 @@ In my designs, every use-case is a function, with one input and one output.
 
 For this example then, we need to model the public interface to the Calculator as a function. Here's the signature:
 
-```
+```fsharp
 type Calculate = CalculatorInput -> CalculatorOutput
 ```
 
@@ -106,7 +106,7 @@ In this case, I think not. In a cheap pocket calculator, any errors are shown ri
 
 So here's the new version of the function:
 
-```
+```fsharp
 type Calculate = CalculatorInput * CalculatorState -> CalculatorState 
 ```
 
@@ -126,7 +126,7 @@ although, at implementation time, they will of course be added to the functions 
 
 Now let's look at the `CalculatorState`. All I can think of that we need right now is something to hold the information to display.
 
-```
+```fsharp
 type Calculate = CalculatorInput * CalculatorState -> CalculatorState 
 and CalculatorState = {
     display: CalculatorDisplay
@@ -140,7 +140,7 @@ So what should the type of the display be? A float? A string? A list of characte
 
 Well, I'm going to go for `string`, because, as I said above, we might need to display errors. 
 
-```
+```fsharp
 type Calculate = CalculatorInput * CalculatorState -> CalculatorState 
 and CalculatorState = {
     display: CalculatorDisplay
@@ -152,7 +152,7 @@ Notice that I am using `and` to connect the type definitions together. Why?
 
 Well, F# compiles from top to bottom, so you must define a type before it is used. The following code will not compile:
 
-```
+```fsharp
 type Calculate = CalculatorInput * CalculatorState -> CalculatorState 
 type CalculatorState = {
     display: CalculatorDisplay
@@ -171,7 +171,7 @@ The reason is that `and` can [hide cycles between types](../posts/cyclic-depende
 
 For the `CalculatorInput` type, I'll just list all the buttons on the calculator!
 
-```
+```fsharp
 // as above
 and CalculatorInput = 
     | Zero | One | Two | Three | Four 
@@ -197,7 +197,7 @@ Let's start with how the digits are handled.
 
 When a digit key is pressed, we want to append the digit to the current display. Let's define a function type that represents that:
 
-```
+```fsharp
 type UpdateDisplayFromDigit = CalculatorDigit * CalculatorDisplay -> CalculatorDisplay
 ```
 
@@ -206,7 +206,7 @@ The `CalculatorDisplay` type is the one we defined earlier, but what is this new
 Well obviously we need some type to represent all the possible digits that can be used as input.
 Other inputs, such as `Add` and `Clear`, would not be valid for this function.
 
-```
+```fsharp
 type CalculatorDigit = 
     | Zero | One | Two | Three | Four 
     | Five | Six | Seven | Eight | Nine
@@ -215,7 +215,7 @@ type CalculatorDigit =
 
 So the next question is, how do we get a value of this type? Do we need a function that maps a `CalculatorInput` to a `CalculatorDigit` type, like this?
 
-```
+```fsharp
 let convertInputToDigit (input:CalculatorInput) =
     match input with
         | Zero -> CalculatorDigit.Zero
@@ -230,7 +230,7 @@ And also, how would this function deal with non-digits such as `Add` and `Clear`
 
 So let's just redefine the `CalculatorInput` type to use the new type directly:
 
-```
+```fsharp
 type CalculatorInput = 
     | Digit of CalculatorDigit
     | Add | Subtract | Multiply | Divide
@@ -244,7 +244,7 @@ and as for `Equals | Clear`, I'll just call them "actions" for lack of better wo
 
 Here's the complete refactored design with new types `CalculatorDigit`, `CalculatorMathOp` and `CalculatorAction`:
 
-```
+```fsharp
 type Calculate = CalculatorInput * CalculatorState -> CalculatorState 
 and CalculatorState = {
     display: CalculatorDisplay
@@ -289,7 +289,7 @@ These are all binary operations, taking two numbers and spitting out a new resul
 
 A function type to represent this would look like this:
 
-```
+```fsharp
 type DoMathOperation = CalculatorMathOp * Number * Number -> Number
 ```
 
@@ -299,7 +299,7 @@ Next decision: what numeric type should we use? Should we make it generic?
 
 Again, let's just keep it simple and use `float`. But we'll keep the `Number` alias around to decouple the representation a bit. Here's the updated code:
 
-```
+```fsharp
 type DoMathOperation = CalculatorMathOp * Number * Number -> Number
 and Number = float
 ```
@@ -320,7 +320,7 @@ Let's create a new type that represents a result of a math operation, and make t
 
 The new type, `MathOperationResult` will have two choices (discriminated union) between `Success` and `Failure`.
 
-```
+```fsharp
 type DoMathOperation = CalculatorMathOp * Number * Number -> MathOperationResult 
 and Number = float
 and MathOperationResult = 
@@ -345,19 +345,19 @@ One approach would be to store a `Number` in the state along with the string dis
 
 I'm going to take a simpler approach, and just get the number from the display directly. In other words, we need a function that looks like this:
 
-```
+```fsharp
 type GetDisplayNumber = CalculatorDisplay -> Number
 ```
 
 Thinking about it though, the function could fail, because the display string could be "error" or something. So let's return an option instead.
  
-```
+```fsharp
 type GetDisplayNumber = CalculatorDisplay -> Number option
 ```
 
 Similarly, when we *do* have a successful result, we will want to display it, so we need a function that works in the other direction:
 
-```
+```fsharp
 type SetDisplayNumber = Number -> CalculatorDisplay 
 ```
 
@@ -378,7 +378,7 @@ Where will we keep track of this? In the `CalculatorState` of course!
 
 Here's our first attempt to add the new fields:
 
-```
+```fsharp
 and CalculatorState = {
     display: CalculatorDisplay
     pendingOp: CalculatorMathOp 
@@ -388,7 +388,7 @@ and CalculatorState = {
 
 But sometimes there isn't a pending operation, so we have to make it optional:
 
-```
+```fsharp
 and CalculatorState = {
     display: CalculatorDisplay
     pendingOp: CalculatorMathOp option
@@ -400,7 +400,7 @@ But this is wrong too!  Can we have a `pendingOp` without a `pendingNumber`, or 
 
 This implies that the state should contain a pair, and the whole pair is optional, like this:
 
-```
+```fsharp
 and CalculatorState = {
     display: CalculatorDisplay
     pendingOp: (CalculatorMathOp * Number) option
@@ -420,7 +420,7 @@ Well, it obviously just resets the state so that the display is empty and any pe
 
 I'm going to call this function `InitState` rather than "clear", and here is its signature:
 
-```
+```fsharp
 type InitState = unit -> CalculatorState 
 ```
 
@@ -435,7 +435,7 @@ This is where all these types come in handy. We can define a set of "services" t
 
 Here's what I mean:
 
-```
+```fsharp
 type CalculatorServices = {
     updateDisplayFromDigit: UpdateDisplayFromDigit 
     doMathOperation: DoMathOperation 
@@ -463,7 +463,7 @@ creating a bunch of interfaces for services and then injecting them into the cor
 So let's review -- with the addition of the services, our initial design is complete.
 Here is all the code so far:
 
-```
+```fsharp
 type Calculate = CalculatorInput * CalculatorState -> CalculatorState 
 and CalculatorState = {
     display: CalculatorDisplay

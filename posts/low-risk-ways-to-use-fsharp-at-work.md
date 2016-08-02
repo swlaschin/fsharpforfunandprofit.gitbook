@@ -93,7 +93,7 @@ To use the F# interactive window in Visual Studio:
 
 For example:
 
-```
+```fsharp
 let x = 1
 let y = 2
 x + y;;
@@ -152,7 +152,7 @@ All these questions can be found in the MSDN documentation, of course, but can a
 
 I want to use 24 hour clock in a custom format. I know that it's "h", but is it upper or lowercase "h"?
 
-```
+```fsharp
 open System
 DateTime.Now.ToString("yyyy-MM-dd hh:mm")  // "2014-04-18 01:08"
 DateTime.Now.ToString("yyyy-MM-dd HH:mm")  // "2014-04-18 13:09"
@@ -162,7 +162,7 @@ DateTime.Now.ToString("yyyy-MM-dd HH:mm")  // "2014-04-18 13:09"
 
 How exactly, does XML serialization work with dates? Let's find out!
 
-```
+```fsharp
 // TIP: sets the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 
@@ -190,7 +190,7 @@ testSerialization d
 
 The output is:
 
-```
+```text
 <DateSerTest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Local>2014-07-04T00:00:00+01:00</Local>
   <Utc>2014-07-04T00:00:00Z</Utc>
@@ -203,7 +203,7 @@ So I can see it uses "Z" for UTC times.
 
 This can be answered with a simple snippet:
 
-```
+```fsharp
 Environment.GetEnvironmentVariable "ProgramFiles" = 
     Environment.GetEnvironmentVariable "PROGRAMFILES"
 // answer => true 
@@ -221,7 +221,7 @@ You are not restricted to playing with the .NET libraries, of course. Sometimes 
 
 To do this, just reference the DLL and then open the namespace as shown below.
 
-```
+```fsharp
 
 // set the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
@@ -254,7 +254,7 @@ via `nuget install Microsoft.AspNet.WebApi.OwinSelfHost -o Packages -ExcludeVers
 
 Once these libraries are in place, you can use the code below as a skeleton for a simple WebAPI app.
 
-```
+```fsharp
 // sets the current directory to be same as the script directory
 System.IO.Directory.SetCurrentDirectory (__SOURCE_DIRECTORY__)
 
@@ -393,7 +393,7 @@ do
 
 Here's the output:
 
-```
+```text
 StatusCode: 200, ReasonPhrase: 'OK', Version: 1.1, Content: System.Net.Http.StreamContent, Headers:
 {
   Date: Fri, 18 Apr 2014 22:29:04 GMT
@@ -440,7 +440,7 @@ Another use for F# interactive is to play with UI's while they are running -- li
 
 Here's an example of developing a WinForms screen interactively.
 
-```
+```fsharp
 open System.Windows.Forms 
 open System.Drawing
 
@@ -461,7 +461,7 @@ And here's the window after clicking, with the title bar changed:
 
 Now let's add a FlowLayoutPanel and a button.
 
-```
+```fsharp
 let panel = new FlowLayoutPanel()
 form.Controls.Add(panel)
 panel.Dock = DockStyle.Fill 
@@ -479,7 +479,7 @@ Here's the window now:
 
 But the button is too small -- we need to set `AutoSize` to be true.
 
-```
+```fsharp
 greenButton.AutoSize <- true
 ```
 
@@ -489,7 +489,7 @@ That's better!
 
 Let's add a yellow button too:
 
-```
+```fsharp
 let yellowButton = new Button()
 yellowButton.Text <- "Make me yellow" 
 yellowButton.AutoSize <- true
@@ -501,7 +501,7 @@ panel.Controls.Add(yellowButton)
 
 But the button is cut off, so let's change the flow direction:
 
-```
+```fsharp
 panel.FlowDirection <- FlowDirection.TopDown
 ```
 
@@ -509,7 +509,7 @@ panel.FlowDirection <- FlowDirection.TopDown
 
 But now the yellow button is not the same width as the green button, which we can fix with `Dock`:
 
-```
+```fsharp
 yellowButton.Dock <- DockStyle.Fill
 ```
 

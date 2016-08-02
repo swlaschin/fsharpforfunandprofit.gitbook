@@ -66,7 +66,7 @@ you need is stored there.
 
 So the code we need will look something like this:
 
-```
+```text
 Open API connection
 Get product ids purchased by customer id using the API
 For each product id:
@@ -91,7 +91,7 @@ First let's define the domain types:
 
 Here are the types:
 
-```
+```fsharp
 type CustId = CustId of string
 type ProductId = ProductId of string
 type ProductInfo = {ProductName: string; } 
@@ -108,7 +108,7 @@ Notes:
 * To make it more realistic, I've also added dummy methods for `Open`, `Close` and `Dispose`.
 * All methods trace a log to the console.
 
-```
+```fsharp
 type ApiClient() =
     // static storage
     static let mutable data = Map.empty<string,obj>
@@ -157,7 +157,7 @@ type ApiClient() =
 
 Let's do some tests:
 
-```
+```fsharp
 do
     use api = new ApiClient()
     api.Get "K1" |> printfn "[K1] %A"
@@ -171,7 +171,7 @@ do
 
 And the results are:
 
-```
+```text
 [API] Get "K1"
 [K1] Failure ["Key "K1" not found"]
 [API] Set "K2"
@@ -190,7 +190,7 @@ And the results are:
 
 For our first attempt at implementing the scenario, let's start with the pseudo-code from above:
 
-```
+```fsharp
 let getPurchaseInfo (custId:CustId) : Result<ProductInfo list> =
 
     // Open api connection       
@@ -219,7 +219,7 @@ Ok, how do we create our `productInfosResult`?
 Well that should be easy. If the `productIdsResult` is Success, then loop through each id and get the info for each id.
 If the `productIdsResult` is Failure, then just return that failure.
 
-```
+```fsharp
 let getPurchaseInfo (custId:CustId) : Result<ProductInfo list> =
 
     // Open api connection       
@@ -254,7 +254,7 @@ so `productInfos` is not the right type at all!
 
 Let's add code to test each `ProductInfo` result. If it's a success, then add it to the list of product infos, and if it's a failure, then return the failure.
 
-```
+```fsharp
 let getPurchaseInfo (custId:CustId) : Result<ProductInfo list> =
 
     // Open api connection       
@@ -303,7 +303,7 @@ It would be great if we could hide all this unwrapping and testing of `Result`s.
 
 If we create a computation expression for `Result` we can write the code like this:
 
-```
+```fsharp
 /// CustId -> Result<ProductInfo list>
 let getPurchaseInfo (custId:CustId) : Result<ProductInfo list> =
    
@@ -340,7 +340,7 @@ because the `for productId in productIds do` is not actually a real `for` loop, 
 Which brings us onto the implementation of the `result` computation expression.  In the previous posts, `ResultBuilder` only had two methods, `Return` and `Bind`,
 but in order to get the `for..in..do` functionality, we have to implement a lot of other methods too, and it ends up being a bit more complicated.
 
-```
+```fsharp
 module Result = 
 
     let bind f xResult = ...
@@ -398,7 +398,7 @@ There a number of problems with this approach:
 
 We can solve both of these problems by separating the creation of an `ApiClient` from its use by parameterizing the action, like this.
 
-```
+```fsharp
 let executeApiAction apiAction  =
    
     // Open api connection       
@@ -417,7 +417,7 @@ let executeApiAction apiAction  =
 
 The action function that is passed in would look like this, with a parameter for the `ApiClient` as well as for the `CustId`:
 
-```
+```fsharp
 /// CustId -> ApiClient -> Result<ProductInfo list>
 let getPurchaseInfo (custId:CustId) (api:ApiClient) =
    
@@ -439,7 +439,7 @@ Note that `getPurchaseInfo` has *two* parameters, but `executeApiAction` expects
 
 No problem! Just use partial application to bake in the first parameter:
 
-```
+```fsharp
 let action = getPurchaseInfo (CustId "C1")  // partially apply
 executeApiAction action 
 ```
@@ -450,7 +450,7 @@ That's why the `ApiClient` is the *second* parameter in the parameter list -- so
 
 We might need to get the product ids for some other purpose, and also the productInfo, so let's refactor those out into separate functions too:
 
-```
+```fsharp
 /// CustId -> ApiClient -> Result<ProductId list>
 let getPurchaseIds (custId:CustId) (api:ApiClient) =
     api.Get<ProductId list> custId
@@ -480,7 +480,7 @@ Now, we have these nice core functions `getPurchaseIds` and `getProductInfo`, bu
 
 Ideally, what I'd like to do is pipe the output of `getPurchaseIds` into `getProductInfo` like this:
 
-```
+```fsharp
 let getPurchaseInfo (custId:CustId) =
     custId 
     |> getPurchaseIds 
@@ -527,14 +527,14 @@ Let's give this api-consuming function a name. Let's call it `ApiAction`.
 
 In fact, let's do more than that -- let's make it a type!
 
-```
+```fsharp
 type ApiAction<'a> = (ApiClient -> 'a)
 ```
 
 Unfortunately, as it stands, this is just a type alias for a function, not a separate type.
 We need to wrap it in a [single case union](../posts/designing-with-types-single-case-dus.md) to make it a distinct type.
 
-```
+```fsharp
 type ApiAction<'a> = ApiAction of (ApiClient -> 'a)
 ```
 
@@ -544,7 +544,7 @@ Now that we have a real type to use, we can rewrite our core domain functions to
 
 First `getPurchaseIds`:
 
-```
+```fsharp
 // CustId -> ApiAction<Result<ProductId list>>
 let getPurchaseIds (custId:CustId) =
        
@@ -561,7 +561,7 @@ given an api, will make a list of ProductIds".
 
 Similarly, `getProductInfo` can be rewritten to return an `ApiAction`:
 
-```
+```fsharp
 // ProductId -> ApiAction<Result<ProductInfo>>
 let getProductInfo (productId:ProductId) =
 
@@ -617,7 +617,7 @@ Enough diagrams -- let's write some code now.
 
 First, we need to define `map`, `apply`, `return` and `bind` for `ApiAction`:
 
-```
+```fsharp
 module ApiAction = 
 
     /// Evaluate the action with a given api
@@ -674,7 +674,7 @@ And at the bottom, there is a `execute` function that creates an `ApiClient`, op
 And with the core functions for `ApiAction` defined, we can go ahead and define the functions for the compound type `ApiActionResult`,
 just as we did for `AsyncResult` in the [previous post](../posts/elevated-world-5.md#asyncresult):
 
-```
+```fsharp
 module ApiActionResult = 
 
     let map f  = 
@@ -786,7 +786,7 @@ Well, we just saw this! It's `bind`.  So if we do that as well, we are finished.
 
 And here it is expressed as code:
 
-```
+```fsharp
 let getPurchaseInfo =
     let getProductInfo1 = traverse getProductInfo
     let getProductInfo2 = ApiActionResult.bind getProductInfo1 
@@ -795,7 +795,7 @@ let getPurchaseInfo =
 
 Or to make it a bit less ugly:
 
-```
+```fsharp
 let getPurchaseInfo =
     let getProductInfoLifted =
         getProductInfo
@@ -806,7 +806,7 @@ let getPurchaseInfo =
 
 Let's compare that with the earlier version of `getPurchaseInfo`:
 
-```
+```fsharp
 let getPurchaseInfo (custId:CustId) (api:ApiClient) =
    
     let result = Result.result {
@@ -856,7 +856,7 @@ As I noted earlier, it can be implemented mechanically, following a template.
 
 Here it is:
 
-```
+```fsharp
 let traverse f list =
     // define the applicative functions
     let (<*>) = ApiActionResult.apply
@@ -879,7 +879,7 @@ Let's test it!
 
 First we need a helper function to show results:
 
-```
+```fsharp
 let showResult result =
     match result with
     | Success (productInfoList) -> 
@@ -890,7 +890,7 @@ let showResult result =
 
 Next, we need to load the API with some test data:
 
-```
+```fsharp
 let setupTestData (api:ApiClient) =
     //setup purchases
     api.Set (CustId "C1") [ProductId "P1"; ProductId "P2"] |> ignore
@@ -917,7 +917,7 @@ Let's see how this works out for different customer ids.
 
 We'll start with Customer C1. For this customer we expect both product infos to be returned:
 
-```
+```fsharp
 CustId "C1"
 |> getPurchaseInfo
 |> ApiAction.execute
@@ -926,7 +926,7 @@ CustId "C1"
 
 And here are the results:
 
-```
+```text
 [API] Opening
 [API] Get CustId "C1"
 [API] Get ProductId "P1"
@@ -938,7 +938,7 @@ SUCCESS: [{ProductName = "P1-Name";}; {ProductName = "P2-Name";}]
 
 What happens if we use a missing customer, such as CX?
 
-```
+```fsharp
 CustId "CX"
 |> getPurchaseInfo
 |> ApiAction.execute
@@ -947,7 +947,7 @@ CustId "CX"
 
 As expected, we get a nice "key not found" failure, and the rest of the operations are skipped as soon as the key is not found.
 
-```
+```text
 [API] Opening
 [API] Get CustId "CX"
 [API] Closing
@@ -957,7 +957,7 @@ FAILURE: ["Key CustId "CX" not found"]
 
 What about if one of the purchased products has no info? For example, customer C2 purchased PX and P2, but there is no info for PX.
 
-```
+```fsharp
 CustId "C2"
 |> getPurchaseInfo
 |> ApiAction.execute
@@ -966,7 +966,7 @@ CustId "C2"
 
 The overall result is a failure. Any bad product causes the whole operation to fail.
 
-```
+```text
 [API] Opening
 [API] Get CustId "C2"
 [API] Get ProductId "PX"
@@ -999,7 +999,7 @@ The answer is simple -- we just need to modify the `traverse` function to skip f
 First, we need to create a new helper function for `ApiActionResult`. It will allow us to pass in two functions, one for the success case
 and one for the error case:
 
-```
+```fsharp
 module ApiActionResult = 
 
     let map = ...
@@ -1022,7 +1022,7 @@ This helper function helps us match both cases inside a `ApiAction` without doin
 
 By the way, note that `ApiActionResult.bind` can be defined in terms of `either`:
 
-```
+```fsharp
 let bind f = 
     either 
         // Success? Run the function
@@ -1033,7 +1033,7 @@ let bind f =
 
 Now we can define our "traverse with logging of failures" function:
 
-```
+```fsharp
 let traverseWithLog log f list =
     // define the applicative functions
     let (<*>) = ApiActionResult.apply
@@ -1054,7 +1054,7 @@ let traverseWithLog log f list =
 
 The only difference between this and the previous implementation is this bit:
 
-```
+```fsharp
 let folder head tail = 
     (f head) 
     |> ApiActionResult.either 
@@ -1071,7 +1071,7 @@ This says that:
 
 Let's create a new function `getPurchasesInfoWithLog` and try it with customer C2 and the missing product PX:
 
-```
+```fsharp
 let getPurchasesInfoWithLog =
     let log errs = printfn "SKIPPED %A" errs 
     let getProductInfoLifted =
@@ -1088,7 +1088,7 @@ CustId "C2"
 
 The result is a Success now, but only one `ProductInfo`, for P2, is returned. The log shows that PX was skipped.
 
-```
+```text
 [API] Opening
 [API] Get CustId "C2"
 [API] Get ProductId "PX"
@@ -1111,7 +1111,7 @@ So in the spirit of "parameterize all the things", why not make it a parameter?
 
 That means that we could have defined `ApiAction` as follows:
 
-```
+```fsharp
 type ApiAction<'anything,'a> = ApiAction of ('anything -> 'a)
 ```
 
@@ -1120,7 +1120,7 @@ But if it can be *anything*, why call it `ApiAction` any more? It could represen
 
 We are not the first people to discover this! This type is commonly called the `Reader` type and is defined like this:  
 
-```
+```fsharp
 type Reader<'environment,'a> = Reader of ('environment -> 'a)
 ```
 
@@ -1129,14 +1129,14 @@ that is passed around as an extra parameter to all your functions, just as a `ap
 
 In fact, we can actually define `ApiAction` in terms of `Reader` very easily:
 
-```
+```fsharp
 type ApiAction<'a> = Reader<ApiClient,'a>
 ```
 
 The set of functions for `Reader` are exactly the same as for `ApiAction`. I have just taken the code and replaced `ApiAction` with `Reader` and
 `api` with `environment`!  
 
-```
+```fsharp
 module Reader = 
 
     /// Evaluate the action with a given environment

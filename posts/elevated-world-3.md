@@ -140,7 +140,7 @@ To see how both the applicative style and monadic style can be used, let's look 
 
 Say that we have a simple domain containing a `CustomerId`, an `EmailAddress`, and a `CustomerInfo` which is a record containing both of these.
 
-```
+```fsharp
 type CustomerId = CustomerId of int
 type EmailAddress = EmailAddress of string
 type CustomerInfo = {
@@ -156,7 +156,7 @@ How would we do this?
 
 First we create a type to represent the success/failure of validation.
 
-```
+```fsharp
 type Result<'a> = 
     | Success of 'a
     | Failure of string list
@@ -166,7 +166,7 @@ Note that I have defined the `Failure` case to contain a *list* of strings, not 
 
 With `Result` in hand, we can go ahead and define the two constructor/validation functions as required:
 
-```
+```fsharp
 let createCustomerId id =
     if id > 0 then
         Success (CustomerId id)
@@ -193,7 +193,7 @@ That means that both of these validation functions are world-crossing functions,
 
 Since we are dealing with world-crossing functions, we know that we will have to use functions like `apply` and `bind`, so let's define them for our `Result` type.
 
-```
+```fsharp
 module Result = 
 
     let map f xResult = 
@@ -254,7 +254,7 @@ Now that we have have the domain and the toolset around `Result`, let's try usin
 The outputs of the validation are already elevated to `Result`, so we know we'll need to use some sort of "lifting" approach to work with them.
 
 First we'll create a function in the normal world that creates a `CustomerInfo` record given a normal `CustomerId` and a normal `EmailAddress`:
-```
+```fsharp
 let createCustomer customerId email = 
     { id=customerId;  email=email }
 // CustomerId -> EmailAddress -> CustomerInfo
@@ -264,7 +264,7 @@ Note that the signature is `CustomerId -> EmailAddress -> CustomerInfo`.
 
 Now we can use the lifting technique with `<!>` and `<*>` that was explained in the previous post:
 
-```
+```fsharp
 let (<!>) = Result.map
 let (<*>) = Result.apply
 
@@ -282,7 +282,7 @@ The signature of this shows that we start with a normal `int` and `string` and r
 
 Let's try it out with some good and bad data:
 
-```
+```fsharp
 let goodId = 1
 let badId = 0
 let goodEmail = "test@example.com"
@@ -311,7 +311,7 @@ Now let's do another implementation, but this time using monadic style. In this 
 
 Here's the code:
 
-```
+```fsharp
 let (>>=) x f = Result.bind f x
 
 // monadic version
@@ -329,7 +329,7 @@ which will be reflected in the different results we get.
 
 ![](../assets/img/vgfp_monadic_style.png)
 
-```
+```fsharp
 let goodCustomerM =
     createCustomerResultM goodId goodEmail
 // Result<CustomerInfo> =
@@ -374,7 +374,7 @@ Finally, let's build a computation expression for these `Result` types.
 
 To do this, we just define a class with members called `Return` and `Bind`, and then we create an instance of that class, called `result`, say:
 
-```
+```fsharp
 module Result = 
 
     type ResultBuilder() =
@@ -386,7 +386,7 @@ module Result =
 
 We can then rewrite the `createCustomerResultM` function to look like this:
 
-```
+```fsharp
 let createCustomerResultCE id email = result {
     let! customerId = createCustomerId id 
     let! emailAddress = createEmailAddress email  
@@ -413,7 +413,7 @@ The trick for doing this is to convert all them to the *same* type, after which 
 
 Let's revisit the previous validation example, but let's change the record so that it has an extra property, a `name` of type string:
 
-```
+```fsharp
 type CustomerId = CustomerId of int
 type EmailAddress = EmailAddress of string
 
@@ -426,7 +426,7 @@ type CustomerInfo = {
 
 As before, we want to create a function in the normal world that we will later lift to the `Result` world.
 
-```
+```fsharp
 let createCustomer customerId name email = 
     { id=customerId; name=name; email=email }
 // CustomerId -> String -> EmailAddress -> CustomerInfo
@@ -434,7 +434,7 @@ let createCustomer customerId name email =
 
 Now we are ready to update the lifted `createCustomer` with the extra parameter:
 
-```
+```fsharp
 let (<!>) = Result.map
 let (<*>) = Result.apply
 
@@ -451,7 +451,7 @@ The problem is that `idResult` and `emailResult` are both Results, but `name` is
 The fix is just to lift `name` into the world of results (say `nameResult`) by using `return`, which for `Result` is just `Success`.
 Here is the corrected version of the function that does work:
 
-```
+```fsharp
 let createCustomerResultA id name email = 
     let idResult = createCustomerId id
     let emailResult = createEmailAddress email

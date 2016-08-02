@@ -79,7 +79,7 @@ Finally, the associated module `Turtle` (that contains the functions) is going h
 * `RequireQualifiedAccess` means the module name *must* be used when accessing the functions (just like `List` module)
 * `ModuleSuffix` is needed so the that module can have the same name as the state type. This would not be required for generic types (e.g if we had `Turtle<'a>` instead).
 
-```
+```fsharp
 module AdtTurtle = 
 
     /// A private structure representing the turtle 
@@ -102,7 +102,7 @@ module AdtTurtle =
 
 An alternative way to avoid collisions is to have the state type have a different case, or a different name with a lowercase alias, like this: 
 
-```
+```fsharp
 type TurtleState = { ... }
 type turtle = TurtleState 
 
@@ -116,7 +116,7 @@ If there are no parameters to the constructor, and the state is immutable, then 
 
 Otherwise we can define a function called `make` (or `create` or similar):
 
-```
+```fsharp
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Turtle =
@@ -138,7 +138,7 @@ Let's look the client now.
 
 First, let's check that the state really is private. If we try to create a state explicitly, as shown below, we get a compiler error:
 
-```
+```fsharp
 let initialTurtle = {
     position = initialPosition
     angle = 0.0<Degrees>
@@ -152,7 +152,7 @@ let initialTurtle = {
 
 If we use the constructor and then try to directly access a field directly (such as `position`), we again get a compiler error:
 
-```
+```fsharp
 let turtle = Turtle.make(Red)
 printfn "%A" turtle.position
 // Compiler error FS1093: 
@@ -162,7 +162,7 @@ printfn "%A" turtle.position
 
 But if we stick to the functions in the `Turtle` module, we can safely create a state value and then call functions on it, just as we did before:
 
-```
+```fsharp
 // versions with log baked in (via partial application)
 let move = Turtle.move log
 let turn = Turtle.turn log
@@ -218,7 +218,7 @@ I have [a whole series of posts devoted to it](../posts/capability-based-securit
 
 The first thing is to define the record of functions that will be returned after each call:
 
-```
+```fsharp
 type MoveResponse = 
     | MoveOk 
     | HitABarrier
@@ -260,14 +260,14 @@ Finally, note the difference between the signature of `MoveFn` in this design an
 
 Earlier version:
 
-```
+```fsharp
 val move : 
     Log -> Distance -> TurtleState -> (MoveResponse * TurtleState)
 ```
 
 New version:
 
-```
+```fsharp
 val move : 
     Distance -> (MoveResponse * TurtleFunctions)
 ```
@@ -280,7 +280,7 @@ This means that somehow, the output of every API function must be changed to be 
    
 In order to decide whether we can indeed move, or use a particular color, we first need to augment the `TurtleState` type to track these factors:
     
-```
+```fsharp
 type Log = string -> unit
 
 type private TurtleState = {
@@ -305,7 +305,7 @@ The `TurtleState` is getting a bit ugly now, but that's alright, because it's pr
 
 With this augmented state available, we can change `move`. First we'll make it private, and second we'll set the `canMove` flag (using `moveResult <> HitABarrier`) before returning a new state:
   
-```
+```fsharp
 /// Function is private! Only accessible to the client via the TurtleFunctions record
 let private move log distance state =
 
@@ -331,7 +331,7 @@ We need some way of changing `canMove` back to true! So let's assume that if you
 
 Let's add that logic to the `turn` function then:
 
-```
+```fsharp
 let private turn log angle state =
     log (sprintf "Turn %0.1f" angle)
     // calculate new angle
@@ -346,7 +346,7 @@ The `penUp` and `penDown` functions are unchanged, other than being made private
 
 And for the last operation, `setColor`, we'll remove the ink from the availability set as soon as it is used just once!
 
-```
+```fsharp
 let private setColor log color state =
     let colorResult = 
         if color = Red then OutOfInk else ColorOk
@@ -364,7 +364,7 @@ Finally we need a function that can create a `TurtleFunctions` record from the `
 
 Here's the complete code, and I'll discuss it in detail below:
   
-```
+```fsharp
 /// Create the TurtleFunctions structure associated with a TurtleState
 let rec private createTurtleFunctions state =
     let ctf = createTurtleFunctions  // alias
@@ -434,7 +434,7 @@ First, note that this function needs the `rec` keyword attached, as it refers to
 
 Next, new versions of each of the API functions are created. For example, a new `turn` function is defined like this:
 
-```
+```fsharp
 let turn angle = 
     let newState = turn state.logger angle state
     ctf newState
@@ -445,7 +445,7 @@ This calls the original `turn` function with the logger and state, and then uses
 For an optional function like `move`, it is a bit more complicated. An inner function `f` is defined, using the orginal `move`, and then either `f` is returned as `Some`,
 or `None` is returned, depending on whether the `state.canMove` flag is set:
 
-```
+```fsharp
 // create the move function,
 // if the turtle can't move, return None
 let move = 
@@ -464,7 +464,7 @@ let move =
 
 Similarly, for `setColor`, an inner function `f` is defined and then returned or not depending on whether the color parameter is in the `state.availableInk` collection:
 
-```
+```fsharp
 let setColor color = 
     // the inner function
     let f() = 
@@ -481,7 +481,7 @@ let setColor color =
 
 Finally, all these functions are added to the record:
 
-```
+```fsharp
 // return the structure
 {
 move     = move
@@ -498,7 +498,7 @@ And that's how you build a `TurtleFunctions` record!
   
 We need one more thing: a constructor to create some initial value of the `TurtleFunctions`, since we no longer have direct access to the API. This is now the ONLY public function available to the client!
   
-```
+```fsharp
 /// Return the initial turtle.
 /// This is the ONLY public function!
 let make(initialColor, log) = 
@@ -523,7 +523,7 @@ and so at that point the `move` function should no longer be available.
 
 First, we create the `TurtleFunctions` record with `Turtle.make`. Then we can't just move immediately, we have to test to see if the `move` function is available first:
 
-```
+```fsharp
 let testBoundary() =
     let turtleFns = Turtle.make(Red,log)
     match turtleFns.move with
@@ -539,7 +539,7 @@ The output of the function is a pair: a `MoveResponse` type and a new `TurtleFun
 
 We'll ignore the `MoveResponse` and check the `TurtleFunctions` record again to see if we can do the next move:
 
-```
+```fsharp
 let testBoundary() =
     let turtleFns = Turtle.make(Red,log)
     match turtleFns.move with
@@ -556,7 +556,7 @@ let testBoundary() =
 
 And finally, one more time:
 
-```
+```fsharp
 let testBoundary() =
     let turtleFns = Turtle.make(Red,log)
     match turtleFns.move with
@@ -578,7 +578,7 @@ let testBoundary() =
 
 If we run this, we get the output:
 
-```
+```text
 Move 60.0
 ...Draw line from (0.0,0.0) to (60.0,0.0) using Red
 Move 60.0
@@ -590,7 +590,7 @@ Which shows that indeed, the concept is working!
 
 That nested option matching is really ugly, so let's whip up a quick `maybe` workflow to make it look nicer:
 
-```
+```fsharp
 type MaybeBuilder() =         
     member this.Return(x) = Some x
     member this.Bind(x,f) = Option.bind f x
@@ -600,7 +600,7 @@ let maybe = MaybeBuilder()
 
 And a logging function that we can use inside the workflow:
 
-```
+```fsharp
 /// A function that logs and returns Some(),
 /// for use in the "maybe" workflow
 let logO message =
@@ -610,7 +610,7 @@ let logO message =
 
 Now we can try setting some colors using the `maybe` workflow:
 
-```
+```fsharp
 let testInk() =
     maybe {
     // create a turtle
@@ -647,7 +647,7 @@ let testInk() =
 
 The output of this is:
 
-```
+```text
 SetColor Red
 Move 60.0
 ...Draw line from (0.0,0.0) to (60.0,0.0) using Red
@@ -673,7 +673,7 @@ You'd want to come up with something a bit better for real code, but I hope that
 * The client's logic is much more convoluted as it can never be sure that a function will be available! It has to check every time. 
 * The API is not easily serializable, unlike some of the data-oriented APIs.
 
-For more on capability-based security, see [my posts](../posts/capability-based-security.md) or watch my ["Enterprise Tic-Tac-Toe" video](http://fsharpforfunandprofit.com/ettt/index.md).
+For more on capability-based security, see [my posts](../posts/capability-based-security.md) or watch my ["Enterprise Tic-Tac-Toe" video](http://fsharpforfunandprofit.com/ettt/).
 
 *The source code for this version is available [here](https://github.com/swlaschin/13-ways-of-looking-at-a-turtle/blob/master/15-CapabilityBasedTurtle.fsx).*
 

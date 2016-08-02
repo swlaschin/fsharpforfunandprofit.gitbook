@@ -74,7 +74,7 @@ So, how do you define a list in a recursive way?
 Well, it's either empty, or it consists of an element plus another list.
 In other words we can define it as a choice type ("discriminated union") like this:
 
-```
+```fsharp
 type LinkedList<'a> = 
     | Empty
     | Cons of head:'a * tail:LinkedList<'a>
@@ -84,13 +84,13 @@ The `Empty` case represents an empty list. The `Cons` case has a tuple: the head
 
 We can then define a particular `LinkedList` value like this:
 
-```
+```fsharp
 let linkedList = Cons (1, Cons (2, Cons(3, Empty)))  
 ```
 
 Using the native F# list type, the equivalent definition would be:
 
-```
+```fsharp
 let linkedList = 1 :: 2 :: 3 :: []
 ```
 
@@ -101,7 +101,7 @@ which is just `[1; 2; 3]`
 Following the rules in the [first post in this series](../posts/recursive-types-and-folds.md#rules),
 we can mechanically create a `cata` function by replacing `Empty` and `Cons` with `fEmpty` and `fCons`:
 
-```
+```fsharp
 module LinkedList = 
 
     let rec cata fCons fEmpty list :'r=
@@ -117,7 +117,7 @@ module LinkedList =
 
 As always, the signatures of the case handling functions are parallel to the signatures of the type constructors, with `LinkedList` replaced by `'r`.
 
-```
+```fsharp
 val cata : 
     fCons:('a -> 'r -> 'r) ->   
     fEmpty:'r ->                
@@ -129,7 +129,7 @@ val cata :
 
 We can also create a top-down iterative `fold` function using the rules in the [earlier post](../posts/recursive-types-and-folds-2.md#rules).
 
-```
+```fsharp
 module LinkedList = 
 
     let rec cata ...
@@ -147,7 +147,7 @@ module LinkedList =
 This `foldWithEmpty` function is not quite the same as the standard `List.fold` function, because it has an extra function parameter for the empty case (`fEmpty`).
 However, if we eliminate that parameter and just return the accumulator we get this variant:
 
-```
+```fsharp
 module LinkedList = 
 
     let rec fold fCons acc list :'r=
@@ -163,7 +163,7 @@ module LinkedList =
 If we compare the signature with the [List.fold documentation](https://msdn.microsoft.com/en-us/library/ee353894.aspx) we can see that they are equivalent,
 with `'State` replaced by `'r` and `'T list` replaced by `LinkedList<'a>`:
 
-```
+```fsharp
 LinkedList.fold : ('r     -> 'a -> 'r    ) -> 'r      -> LinkedList<'a> -> 'r
 List.fold       : ('State -> 'T -> 'State) -> 'State -> 'T list         -> 'State
 ```
@@ -171,7 +171,7 @@ List.fold       : ('State -> 'T -> 'State) -> 'State -> 'T list         -> 'Stat
 
 Let's test that `fold` works by doing a small sum:
 
-```
+```fsharp
 let linkedList = Cons (1, Cons (2, Cons(3, Empty)))  
 linkedList |> LinkedList.fold (+) 0
 // Result => 6
@@ -181,7 +181,7 @@ linkedList |> LinkedList.fold (+) 0
 
 Finally we can create a `foldBack` function, using the "function accumulator" approach described in the previous post:
 
-```
+```fsharp
 module LinkedList = 
 
     let rec cata ...
@@ -202,7 +202,7 @@ module LinkedList =
 Again, if we compare the signature with the [List.foldBack documentation](https://msdn.microsoft.com/en-us/library/ee353846.aspx), they are also equivalent,
 with `'State` replaced by `'r` and `'T list` replaced by `LinkedList<'a>`:
 
-```
+```fsharp
 LinkedList.foldBack : ('a -> 'r     -> 'r    ) -> LinkedList<'a> -> 'r     -> 'r
 List.foldBack       : ('T -> 'State -> 'State) -> 'T list        -> 'State -> 'State
 ```
@@ -215,7 +215,7 @@ Let's demonstrate that now by creating some functions that convert from `LinkedL
 
 To convert a `LinkedList` to a native `list` all we need to do is replace `Cons` with `::` and `Empty` with `[]`:
 
-```
+```fsharp
 module LinkedList = 
 
     let toList linkedList = 
@@ -226,7 +226,7 @@ module LinkedList =
 
 To convert the other way, we need to replace `::` with `Cons` and `[]` with `Empty`:
 
-```
+```fsharp
 module LinkedList = 
 
     let ofList list = 
@@ -237,7 +237,7 @@ module LinkedList =
 
 Simple!  Let's test `toList`:
 
-```
+```fsharp
 let linkedList = Cons (1, Cons (2, Cons(3, Empty)))  
 linkedList |> LinkedList.toList       
 // Result => [1; 2; 3]
@@ -245,7 +245,7 @@ linkedList |> LinkedList.toList
 
 and `ofList`:
 
-```
+```fsharp
 let list = [1;2;3]
 list |> LinkedList.ofList       
 // Result => Cons (1,Cons (2,Cons (3,Empty)))
@@ -261,7 +261,7 @@ Let's see for ourselves by implementing some other common functions using `foldB
 
 Here's `map` defined in terms of `foldBack`:
 
-```
+```fsharp
 module LinkedList = 
 
     /// map a function "f" over all elements
@@ -275,7 +275,7 @@ module LinkedList =
 
 And here's a test:
 
-```
+```fsharp
 let linkedList = Cons (1, Cons (2, Cons(3, Empty)))  
 
 linkedList |> LinkedList.map (fun i -> i+10)
@@ -284,7 +284,7 @@ linkedList |> LinkedList.map (fun i -> i+10)
 
 Here's `filter` defined in terms of `foldBack`:
 
-```
+```fsharp
 module LinkedList = 
 
     /// return a new list of elements for which "pred" is true
@@ -301,7 +301,7 @@ module LinkedList =
 
 And here's a test:
 
-```
+```fsharp
 let isOdd n = (n%2=1)
 let linkedList = Cons (1, Cons (2, Cons(3, Empty)))  
 
@@ -311,7 +311,7 @@ linkedList |> LinkedList.filter isOdd
 
 Finally, here's `rev` defined in terms of `fold`:
 
-```
+```fsharp
 /// reverse the elements of the list
 let rev list = 
     // helper function
@@ -323,7 +323,7 @@ let rev list =
 
 And here's a test:
 
-```
+```fsharp
 let linkedList = Cons (1, Cons (2, Cons(3, Empty)))  
 linkedList |> LinkedList.rev
 // Result => Cons (3,Cons (2,Cons (1,Empty)))
@@ -339,7 +339,7 @@ As we have seen, `foldBack` is reverse iteration, which means that it is the sam
 
 So we could implement it like this:
 
-```
+```fsharp
 let foldBack_ViaRev fCons list acc :'r=
     let fCons' acc element = 
         // just swap the params!
@@ -361,7 +361,7 @@ In the rest of this post, we'll look at the `Gift` type and see if we can make i
 
 As a reminder, here is the original design:
 
-```
+```fsharp
 type Gift =
     | Book of Book
     | Chocolate of Chocolate 
@@ -379,7 +379,7 @@ But if we want to focus on *reusability* instead of domain modelling, then we sh
 To make this ready for reuse, then, let's collapse all the non-recursive cases into one case, say `GiftContents`,
 and all the recursive cases into another case, say `GiftDecoration`, like this:  
 
-```
+```fsharp
 // unified data for non-recursive cases
 type GiftContents = 
     | Book of Book
@@ -406,7 +406,7 @@ The main `Gift` type has only two cases now: the non-recursive one and the recur
 
 Now that the type is simplified, we can "genericize" it by allowing *any* kind of contents *and* any kind of decoration.
 
-```
+```fsharp
 type Container<'ContentData,'DecorationData> =
     | Contents of 'ContentData
     | Decoration of 'DecorationData * Container<'ContentData,'DecorationData> 
@@ -414,7 +414,7 @@ type Container<'ContentData,'DecorationData> =
 
 And as before, we can mechanically create a `cata` and `fold` and `foldBack` for it, using the standard process:
 
-```
+```fsharp
 module Container = 
 
     let rec cata fContents fDecoration (container:Container<'ContentData,'DecorationData>) :'r = 
@@ -485,13 +485,13 @@ module Container =
 
 Let's convert the gift type to this generic Container type:
 
-```
+```fsharp
 type Gift = Container<GiftContents,GiftDecoration>
 ```
 
 Now we need some helper methods to construct values while hiding the "real" cases of the generic type:
 
-```
+```fsharp
 let fromBook book = 
     Contents (Book book)
 
@@ -513,7 +513,7 @@ let withCard message innerGift =
 
 Finally we can create some test values:
 
-```
+```fsharp
 let wolfHall = {title="Wolf Hall"; price=20m}
 let yummyChoc = {chocType=SeventyPercent; price=5m}
 
@@ -540,7 +540,7 @@ will need some pattern matching to get at the "real" data.
 
 Here's the code:
 
-```
+```fsharp
 let totalCost gift =  
 
     let fContents costSoFar contentData = 
@@ -568,7 +568,7 @@ let totalCost gift =
 
 And the code works as expected:
 
-```
+```fsharp
 birthdayPresent |> totalCost 
 // 22.5m
 
@@ -581,7 +581,7 @@ christmasPresent |> totalCost
 The "description" function needs to be written using `foldBack`, since it *does* need the inner data. As with the code above,
 we need some pattern matching to get at the "real" data for each case.
 
-```
+```fsharp
 let description gift =
 
     let fContents contentData = 
@@ -606,7 +606,7 @@ let description gift =
 
 And again the code works as we want:
 
-```
+```fsharp
 birthdayPresent |> description
 // CORRECT "'Wolf Hall' wrapped in HappyBirthday paper with a card saying 'Happy Birthday'"
 
@@ -628,7 +628,7 @@ without creating any new generic types at all!
 The `Gift` type is basically a linear sequence of decorations, with some content as the final step. We can just model this as a pair -- a `Content` and a list of `Decoration`.
 Or to make it a little friendlier, a record with two fields: one for the content and one for the decorations.
 
-```
+```fsharp
 type Gift = {contents: GiftContents; decorations: GiftDecoration list}
 ```
 
@@ -638,7 +638,7 @@ That's it! No other new types needed!
 
 As before, let's create some helpers to construct values using this type:
 
-```
+```fsharp
 let fromBook book = 
     { contents = (Book book); decorations = [] }
 
@@ -660,7 +660,7 @@ let withCard message innerGift =
 
 With these helper functions, the way the values are constructed is *identical* to the previous version. This is why it is good to hide your raw constructors, folks!
 
-```
+```fsharp
 let wolfHall = {title="Wolf Hall"; price=20m}
 let yummyChoc = {chocType=SeventyPercent; price=5m}
 
@@ -681,7 +681,7 @@ let christmasPresent =
 
 The `totalCost` function is even easier to write now. 
 
-```
+```fsharp
 let totalCost gift =  
     
     let contentCost = 
@@ -711,7 +711,7 @@ let totalCost gift =
 
 Similarly, the `description` function is also easy to write.
 
-```
+```fsharp
 let description gift =
 
     let contentDescription = 
@@ -743,7 +743,7 @@ But as it happens, the three different definitions are actually interchangable:
 
 **The original version**
 
-```
+```fsharp
 type Gift =
     | Book of Book
     | Chocolate of Chocolate 
@@ -754,7 +754,7 @@ type Gift =
 
 **The generic container version**
 
-```
+```fsharp
 type Container<'ContentData,'DecorationData> =
     | Contents of 'ContentData
     | Decoration of 'DecorationData * Container<'ContentData,'DecorationData> 
@@ -773,7 +773,7 @@ type Gift = Container<GiftContents,GiftDecoration>
 
 **The record version**
 
-```
+```fsharp
 type GiftContents = 
     | Book of Book
     | Chocolate of Chocolate 

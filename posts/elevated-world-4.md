@@ -87,7 +87,7 @@ But this requires *two* passes through the list. Can we do it in one pass?
 Yes! If we think about how a list is built, there is a "cons" function (`::` in F#) that is used to join the head to the tail.
 If we elevate this to the `Option` world, we can use `Option.apply` to join a head `Option` to a tail `Option` using the lifted version of `cons`.
 
-```
+```fsharp
 let (<*>) = Option.apply
 let retn = Some
 
@@ -112,7 +112,7 @@ Note also that I am explicitly defining `retn` and using it in the implementatio
 
 Now let's test it!
 
-```
+```fsharp
 let parseInt str =
     match (System.Int32.TryParse str) with
     | true,i -> Some i
@@ -138,7 +138,7 @@ Let's repeat this, but this time using the `Result` type from the earlier valida
 
 Here's the `mapResult` function:
 
-```
+```fsharp
 let (<*>) = Result.apply
 let retn = Success
 
@@ -155,7 +155,7 @@ Again I am explicitly defining a `retn` rather than just using `Success`. And be
 
 Now let's change `parseInt` to return a `Result` rather than an `Option`:
 
-```
+```fsharp
 let parseInt str =
     match (System.Int32.TryParse str) with
     | true,i -> Success i
@@ -164,7 +164,7 @@ let parseInt str =
 
 And then we can rerun the tests again, but this time getting more informative errors in the failure case:
 
-```
+```fsharp
 let good = ["1";"2";"3"] |> mapResult parseInt
 // Success [1; 2; 3]
 
@@ -182,7 +182,7 @@ can we make a completely generic version of `mapXXX` that works for *all* elevat
 
 The obvious thing would be able to pass these two functions in as an extra parameter, like this:
 
-```
+```fsharp
 let rec mapE (retn,ap) f list =
     let cons head tail = head :: tail
     let (<*>) = ap 
@@ -199,7 +199,7 @@ But even if it did, we'd want to make sure that the *same* two parameters were p
 
 We might attempt this by creating a record structure containing the two parameters, and then create one instance for each type of elevated world:
 
-```
+```fsharp
 type Applicative<'a,'b> = {
     retn: 'a -> E<'a>
     apply: E<'a->'b> -> E<'a> -> E<'b>
@@ -214,7 +214,7 @@ let applResult = {retn = Result.Success; apply=Result.apply}
 
 The instance of the `Applicative` record (`appl` say) would be an extra parameter to our generic `mapE` function, like this:
 
-```
+```fsharp
 let rec mapE appl f list =
     let cons head tail = head :: tail
     let (<*>) = appl.apply
@@ -229,7 +229,7 @@ let rec mapE appl f list =
 
 In use, we would pass in the specific applicative instance that we want, like this:
 
-```
+```fsharp
 // build an Option specific version...
 let mapOption = mapE applOption    
 
@@ -334,7 +334,7 @@ Let's see how this works with our trusty `Result` type.
 
 First, we'll implement `traverseResult` using both applicative and monadic approaches.
 
-```
+```fsharp
 module List =
 
     /// Map a Result producing function over a list to get a new Result 
@@ -397,7 +397,7 @@ On the other hand, if the result is good, the next element in the list is proces
 
 Alright, let's test the two functions and see how they differ. First we need our `parseInt` function:
       
-```
+```fsharp
 /// parse an int and return a Result
 /// string -> Result<int>
 let parseInt str =
@@ -408,7 +408,7 @@ let parseInt str =
 
 Now if we pass in a list of good values (all parsable), the result for both implementations is the same.
 
-```
+```fsharp
 // pass in strings wrapped in a List
 // (applicative version)
 let goodA = ["1"; "2"; "3"] |> List.traverseResultA parseInt
@@ -424,7 +424,7 @@ let goodM = ["1"; "2"; "3"] |> List.traverseResultM parseInt
 
 But if we pass in a list with some bad values, the results differ.
 
-```
+```fsharp
 // pass in strings wrapped in a List
 // (applicative version)
 let badA = ["1"; "x"; "y"] |> List.traverseResultA parseInt
@@ -453,7 +453,7 @@ So, here are the re-implementations of `traverseResult`, using `List.foldBack`. 
 but delegated the looping over the list to the fold function, rather than creating a recursive function. 
 
 
-```
+```fsharp
 /// Map a Result producing function over a list to get a new Result 
 /// using applicative style
 /// ('a -> Result<'b>) -> 'a list -> Result<'b list>
@@ -506,7 +506,7 @@ Yes. For example, an `Option` can be considered a one-element list, and we can u
 
 For example, here's an implementation of `traverseResultA` for `Option` 
 
-```
+```fsharp
 module Option = 
 
     /// Map a Result producing function over an Option to get a new Result 
@@ -529,7 +529,7 @@ module Option =
 
 Now we can wrap a string in an `Option` and use `parseInt` on it.  Rather than getting a `Option` of `Result`, we invert the stack and get a `Result` of `Option`.
 
-```
+```fsharp
 // pass in an string wrapped in an Option
 let good = Some "1" |> Option.traverseResultA parseInt
 // get back a Result containing an Option
@@ -538,7 +538,7 @@ let good = Some "1" |> Option.traverseResultA parseInt
 
 If we pass in an unparsable string, we get failure:
 
-```
+```fsharp
 // pass in an string wrapped in an Option
 let bad = Some "x" |> Option.traverseResultA parseInt
 // get back a Result containing an Option
@@ -547,7 +547,7 @@ let bad = Some "x" |> Option.traverseResultA parseInt
 
 If we pass in `None`, we get `Success` containing `None`! 
 
-```
+```fsharp
 // pass in an string wrapped in an Option
 let goodNone = None |> Option.traverseResultA parseInt
 // get back a Result containing an Option
@@ -618,7 +618,7 @@ Just as with `traverse`, there can be applicative and monadic versions of `seque
 
 Let's implement and test a `sequence` implementation for `Result`:
 
-```
+```fsharp
 module List =   
 
     /// Transform a "list<Result>" into a "Result<list>"
@@ -634,7 +634,7 @@ module List =
 
 Ok, that was too easy! Now let's test it, starting with the applicative version:
 
-```
+```fsharp
 let goodSequenceA = 
     ["1"; "2"; "3"] 
     |> List.map parseInt
@@ -650,7 +650,7 @@ let badSequenceA =
 
 and then the monadic version:
 
-```
+```fsharp
 let goodSequenceM = 
     ["1"; "2"; "3"] 
     |> List.map parseInt
@@ -684,7 +684,7 @@ In many cases, the problem is unique to a context, and there is no need to creat
 
 Let me demonstrate with an example.  Say that you are given a list of options, where each option contains a tuple, like this:
 
-```
+```fsharp
 let tuples = [Some (1,2); Some (3,4); None; Some (7,8);]
 // List<Option<Tuple<int>>>
 ```
@@ -692,7 +692,7 @@ let tuples = [Some (1,2); Some (3,4); None; Some (7,8);]
 This data is in the form `List<Option<Tuple<int>>>`. And now say, that for some reason, you need to turn it into a *tuple* of two lists, where each list contains options,
 like this:
 
-```
+```fsharp
 let desiredOutput = [Some 1; Some 3; None; Some 7],[Some 2; Some 4; None; Some 8]
 // Tuple<List<Option<int>>>
 ```
@@ -736,14 +736,14 @@ Once we know how the solution will look, we can start coding mechanically.
 
 First, the tuple is playing the role of the applicative, so we need to define the `apply` and `return` functions:
 
-```
+```fsharp
 let tupleReturn x = (x, x)
 let tupleApply (f,g) (x,y) = (f x, g y)
 ```
 
 Next, define `listSequenceTuple` using exactly the same right fold template as we did before, with `List` as the traversable and tuple as the applicative:
 
-```
+```fsharp
 let listSequenceTuple list =
     // define the applicative functions
     let (<*>) = tupleApply 
@@ -763,7 +763,7 @@ There is no thinking going on here. I'm just following the template!
 
 We can test it immediately:
 
-```
+```fsharp
 [ (1,2); (3,4)] |> listSequenceTuple    
 // Result => ([1; 3], [2; 4])
 ```
@@ -773,7 +773,7 @@ And it gives a tuple with two lists, as expected.
 Similarly, define `optionSequenceTuple` using the same right fold template again.
 This time `Option` is the traversable and tuple is still the applicative:
 
-```
+```fsharp
 let optionSequenceTuple opt =
     // define the applicative functions
     let (<*>) = tupleApply 
@@ -788,7 +788,7 @@ let optionSequenceTuple opt =
 
 We can test it too:
 
-```
+```fsharp
 Some (1,2) |> optionSequenceTuple
 // Result => (Some 1, Some 2)
 ```
@@ -797,7 +797,7 @@ And it gives a tuple with two options, as expected.
 
 Finally, we can glue all the parts together. Again, no thinking required!
 
-```
+```fsharp
 let convert input =
     input
     
@@ -810,7 +810,7 @@ let convert input =
 
 And if we use it, we get just what we wanted:
 
-```
+```fsharp
 let output = convert tuples
 // ( [Some 1; Some 3; None; Some 7], [Some 2; Some 4; None; Some 8] )
 
@@ -833,7 +833,7 @@ At the beginning of this post I noted our tendency as functional programmers to 
 In other words, given a `Result` producing function like `parseInt`, we would start by collecting the results and only then figure out how to deal with them.
 Our code would look something like this, then:
 
-```
+```fsharp
 ["1"; "2"; "3"] 
 |> List.map parseInt
 |> List.sequenceResultM
@@ -842,7 +842,7 @@ Our code would look something like this, then:
 But of course, this does involve two passes over the list, and we saw how `traverse` could combine the `map` and the `sequence` in one step,
 making only one pass over the list, like this:
 
-```
+```fsharp
 ["1"; "2"; "3"] 
 |> List.traverseResultM parseInt
 ```

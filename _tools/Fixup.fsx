@@ -3,7 +3,8 @@ System.IO.Directory.SetCurrentDirectory __SOURCE_DIRECTORY__
 // ==============================================
 // Script file to fixup files for publishing to GitBook
 //
-// == Inputs and outputs ==
+// The idea is that I can copy the source .md files from the Jekyll-based static site 
+// into the subdirectories here and then fix them up with this script
 //
 // The tool will process all code under the parent directory (../) by default
 
@@ -18,6 +19,8 @@ module Helpers =
         Regex.Replace(input,pattern,replacement)
 
     (*
+    // test the regexes
+
     replaceRegex @"(?m)^\{\%\s+highlight.*?$" "```" "{% highlight fsharp %}\r\nabc"
     replaceRegex @"(?m)^\d\d\d\d-\d\d-\d\d-(.*?$)" "$1" "2012-09-01-myfile.md"
 
@@ -32,11 +35,18 @@ module Helpers =
 
     let ifNone v opt = defaultArg opt v
 
+// ==========================
+// Rename and organize files
+//
+// This works only with newly copied files.
+// Any existing files must be deleted first. 
+// ==========================
 
 module FixupFiles = 
 
     let rec fixupFileNames (d:DirectoryInfo) = 
 
+        // remove date "2014-08-12-XXX" prefix from files
         let renameIfNeeded (fi:FileInfo) =
             let oldName = fi.Name
             let newName = replaceRegex "(?m)^\d\d\d\d-\d\d-\d\d-(.*?$)" "$1" oldName 
@@ -54,11 +64,20 @@ module FixupFiles =
         d.EnumerateDirectories() 
         |> Seq.iter fixupFileNames 
 
+// ==========================
+// Fixup the text in the files
+//
+// * Replace Liquid code block markup {%highlight%} with GH markup (```)
+// * Replace absolute paths with relative ones, e.g. for /posts/ and /series/
+// * For video pages, replace relative ones with online absolute http links 
+// * Fixup the smart quotes into ASCII friendly ones.
+// ==========================
+
 module FixupText = 
 
     let replaceCodeBlockDelimiters text = 
         text
-        |> replaceRegex "(?m)^\{\%\s+highlight.*?$" "```"
+        |> replaceRegex "(?m)^\{\%\s+highlight\s*(\S*).*\%\}.*$" "```$1"
         |> replaceRegex "(?m)^\{\%\s+endhighlight.*?$" "```"
 
     let fixupLinkPaths text = 
@@ -110,6 +129,14 @@ module FixupText =
         |> Seq.iter fixupDirectory
 
 
+// ==========================
+// Fixup the series pages
+//
+// In the Jekyll blog, the links for series pages are generated in the template
+// Instead, generate them explicitly here and append to the series page
+//
+// Note this should only be run once, otherwise another TOC will be appended!
+// ==========================
 
 module Series = 
 
@@ -135,6 +162,8 @@ module Series =
                 None
             )
         (*
+        // test the regexes
+
         let pattern = """title:\s*"([^"]+)"\s*"""
         let m = Regex.Match("""title:"abc" """,pattern) in m.Value
         let m = Regex.Match("""title:"abc" """,pattern) in m.Groups.[1].Value
@@ -165,6 +194,8 @@ module Series =
         }
 
         (*
+        // test the code
+
         let fi = FileInfo("..")
         let lines = 
             [
@@ -198,6 +229,7 @@ module Series =
         |> List.choose (fun (keyOpt,vals) -> keyOpt |> Option.map (fun key -> key,vals))
         |> Map.ofList
 
+    // test
     // Series.seriesIdToPostPages()
 
     let seriesIdToSeriesIndexPages()  = 
@@ -208,6 +240,7 @@ module Series =
         |> Seq.toList
         |> List.choose (fun page -> page.SeriesIndexId |> Option.map (fun key -> key,page))
 
+    // test
     // Series.seriesIdToSeriesIndexPages()
 
     type SeriesInfo = {
@@ -236,6 +269,16 @@ module Series =
             {SeriesPage=seriesPage; PostPages=postPages}
             )
         |> List.iter updateSeriesPageContent
+
+// ==========================
+// Ensure all the images exist
+//
+// In the Jekyll blog, there are many image files. Only some are needed here.
+// So collect the image links from the posts, and check if they exist locally, 
+// then emit a list of missing ones.
+//
+// Missing files are then copied over manually.
+// ==========================
         
 module Images = 
 
@@ -258,7 +301,7 @@ module Images =
         imagePath
         |> File.Exists 
 
-    let rec findImages (d:DirectoryInfo) = 
+    let rec collectMissingImages (d:DirectoryInfo) = 
         seq {
         yield! 
             d.EnumerateFiles("*.md") 
@@ -266,7 +309,7 @@ module Images =
 
         yield! 
             d.EnumerateDirectories() 
-            |> Seq.collect findImages 
+            |> Seq.collect collectMissingImages 
         }
         |> Seq.distinct
         |> Seq.toList
@@ -282,4 +325,4 @@ FixupText.fixupDirectory d
 
 // Series.updateSeriesInfoPages()
 
-Images.findImages d
+Images.collectMissingImages d

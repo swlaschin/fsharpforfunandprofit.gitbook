@@ -172,7 +172,7 @@ the parameter order affects how you might use map functions in practice.
 
 Here are two examples of how map can be defined for options and lists in F#.
 
-```
+```fsharp
 /// map for Options
 let mapOption f opt =
     match opt with
@@ -199,7 +199,7 @@ These functions are built-in of course, so we don't need to define them, I've do
 
 Here are some examples of how map can be used in F#:
 
-```
+```fsharp
 // Define a function in the normal world
 let add1 x = x + 1
 // has type : int -> int
@@ -215,14 +215,14 @@ let add1ToEachElement = List.map add1
 
 With these mapped versions in place you can write code like this:
 
-```
+```fsharp
 Some 2 |> add1IfSomething    // Some 3 
 [1;2;3] |> add1ToEachElement // [2; 3; 4]
 ```
 
 In many cases, we don't bother to create an intermediate function -- partial application is used instead:
 
-```
+```fsharp
 Some 2 |> Option.map add1    // Some 3 
 [1;2;3] |> List.map add1     // [2; 3; 4]
 ```
@@ -298,7 +298,7 @@ This function goes by many names, but I'm going to be consistent and call it `re
 
 Here are two examples of `return` implementations in F#:
 
-```
+```fsharp
 // A value lifted to the world of Options
 let returnOption x = Some x
 // has type : 'a -> 'a option
@@ -351,7 +351,7 @@ You can continue to use this technique to work with as many parameters as you wi
 
 Here are some examples of defining `apply` for two different types in F#:
 
-```
+```fsharp
 module Option =
 
     // The apply function for Options
@@ -386,7 +386,7 @@ I did this for clarity in showing how `apply` works. It's easy enough to create 
 Using the `apply` function as it stands can be awkward, so it is common to create an infix version, typically called `<*>`.
 With this in place you can write code like this:
 
-```
+```fsharp
 let resultOption =  
     let (<*>) = Option.apply
     (Some add) <*> (Some 2) <*> (Some 3)
@@ -411,7 +411,7 @@ This gives you the same result as if you had simply done `map` in the first plac
 This trick also means that our infix notation can be simplified a little. The initial `return` then `apply` can be replaced with `map`,
 and we so typically create an infix operator for `map` as well, such as `<!>` in F#.
 
-```
+```fsharp
 let resultOption2 =  
     let (<!>) = Option.map
     let (<*>) = Option.apply
@@ -432,7 +432,7 @@ but now `x` and `y` can be elevated values rather than normal values.  Some peop
 
 Here's one more for fun:
 
-```
+```fsharp
 let batman = 
     let (<!>) = List.map
     let (<*>) = List.apply
@@ -492,7 +492,7 @@ Note that `lift1` is just `map`, and so it is not usually defined as a separate 
 
 Here's what an implementation might look like:
 
-```
+```fsharp
 module Option = 
     let (<*>) = apply 
     let (<!>) = Option.map
@@ -516,7 +516,7 @@ by using one of the pre-made `lift` functions, we can avoid the `<*>` syntax.
 
 First, here's an example of lifting a two-parameter function:
 
-```
+```fsharp
 // define a two-parameter function to test with
 let addPair x y = x + y 
 
@@ -530,7 +530,7 @@ addPairOpt (Some 1) (Some 2)
 
 And here's an example of lifting a three-parameter function:
 
-```
+```fsharp
 // define a three-parameter function to test with
 let addTriple x y z = x + y + z
 
@@ -550,7 +550,7 @@ For example, when using `lift2`, the first parameter is a parameter specifying h
 
 Here's an example where the same values are combined in two different ways: first with addition, then with multiplication.
 
-```
+```fsharp
 Option.lift2 (+) (Some 2) (Some 3)   // Some 5
 Option.lift2 (*) (Some 2) (Some 3)   // Some 6
 ```
@@ -566,7 +566,7 @@ Here's what it looks like in a diagram:
 
 and here's how you might implement it for options and lists:
 
-```
+```fsharp
 // define a tuple creation function
 let tuple x y = x,y
 
@@ -581,7 +581,7 @@ let combineList x y = List.lift2 tuple x y
 
 Let's see what happens when we use the combiners:
 
-```
+```fsharp
 combineOpt (Some 1) (Some 2)        
 // Result => Some (1, 2)
 
@@ -593,7 +593,7 @@ Now that we have an elevated tuple, we can work with the pair in any way we want
 
 Want to add the values? Just use `+` in the `map` function:
 
-```
+```fsharp
 combineOpt (Some 2) (Some 3)        
 |> Option.map (fun (x,y) -> x + y)  
 // Result => // Some 5
@@ -605,7 +605,7 @@ combineList [1;2] [100;200]
 
 Want to multiply the values? Just use `*` in the `map` function:
 
-```
+```fsharp
 combineOpt (Some 2) (Some 3)        
 |> Option.map (fun (x,y) -> x * y)  
 // Result => Some 6
@@ -625,7 +625,7 @@ That is, we can define `apply` in terms of the `lift2` function by setting the c
 
 Here's a demonstration of how this works for `Option`:
 
-```
+```fsharp
 module Option = 
 
     /// define lift2 from scratch
@@ -648,7 +648,7 @@ Notice that in all the combiners we've looked at, if one of the elevated values 
 For example, with `combineList`, if one of the parameters is an empty list, the result is also an empty list,
 and with `combineOpt`, if one of the parameters is `None`, the result is also `None`.
 
-```
+```fsharp
 combineOpt (Some 2) None    
 |> Option.map (fun (x,y) -> x + y)    
 // Result => None
@@ -667,7 +667,7 @@ In some cases you might have two elevated values, and want to discard the value 
 
 Here's an example for lists:
 
-```
+```fsharp
 let ( <* ) x y = 
     List.lift2 (fun left right -> left) x y 
 
@@ -677,14 +677,14 @@ let ( *> ) x y =
 
 We can then combine a 2-element list and a 3-element list to get a 6-element list as expected, but the contents come from only one side or the other.
 
-```
+```fsharp
 [1;2] <* [3;4;5]   // [1; 1; 1; 2; 2; 2]
 [1;2] *> [3;4;5]   // [3; 4; 5; 3; 4; 5]
 ```
 
 We can turn this into a feature! We can replicate a value N times by crossing it with `[1..n]`.
 
-```
+```fsharp
 let repeat n pattern =
     [1..n] *> pattern 
 
@@ -705,7 +705,7 @@ On a more practical note though, why might this "throwing away data" be useful? 
 
 For example, in a parser, you might see code like this:
 
-```
+```fsharp
 let readQuotedString =
    readQuoteChar *> readNonQuoteChars <* readQuoteChar
 ```
@@ -741,7 +741,7 @@ commonly called `ZipList` or some variant of that.
 In this implementation, the corresponding elements in each list are processed at the same time, and then both lists are shifted to get the next element. 
 That is, the list of functions `[f; g]` applied to the list of values `[x; y]` becomes the two-element list `[f x; g y]`
 
-```
+```fsharp
 // alternate "zip" implementation
 // [f;g] apply [x;y] becomes [f x; g y]
 let rec zipList fList xList  = 
@@ -763,7 +763,7 @@ while others silently ignore the extra data (as the implementation above does).
 
 Ok, let's see it in use:
 
-```
+```fsharp
 let add10 x = x + 10
 let add20 x = x + 20
 let add30 x = x + 30
@@ -780,7 +780,7 @@ Note that the result is `[11; 22; 33]` -- only three elements. If we had used th
 
 We saw above that `List.apply`, or rather `List.lift2`, could be intepreted as a combiner. Similarly, so can `zipList`. 
 
-```
+```fsharp
 let add x y = x + y
 
 let resultAdd =  
@@ -811,7 +811,7 @@ ZipList world, it has to be an infinitely repeated value!
 In a non-lazy language like F#, we can't do this, but if we replace `List` with `Seq` (aka `IEnumerable`) then
 we *can* create an infinitely repeated value, as shown below:
 
-```
+```fsharp
 module ZipSeq =
 
     // define "return" for ZipSeqWorld

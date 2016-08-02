@@ -38,7 +38,7 @@ First, we define a utility function that will:
 
 Here's the code:
 
-```
+```fsharp
 open System
 open System.Threading
 
@@ -65,7 +65,7 @@ let createTimer timerInterval eventHandler =
 
 Now test it interactively:
 
-```
+```fsharp
 // create a handler. The event args are ignored
 let basicHandler _ = printfn "tick %A" DateTime.Now
 
@@ -78,7 +78,7 @@ Async.RunSynchronously basicTimer1
 
 Now let's create a similar utility method to create a timer, but this time it will return an "observable" as well, which is the stream of events.
 
-```
+```fsharp
 let createTimerAndObservable timerInterval =
     // setup a timer
     let timer = new System.Timers.Timer(float timerInterval)
@@ -100,7 +100,7 @@ let createTimerAndObservable timerInterval =
 
 And again test it interactively:
 
-```
+```fsharp
 // create the timer and the corresponding observable
 let basicTimer2 , timerEventStream = createTimerAndObservable 1000
 
@@ -125,7 +125,7 @@ In this next example, we'll have a slightly more complex requirement:
 
 To do this in a classic imperative way, we would probably create a class with a mutable counter, as below:
 
-```
+```fsharp
 type ImperativeTimerCount() =
     
     let mutable count = 0
@@ -138,7 +138,7 @@ type ImperativeTimerCount() =
 
 We can reuse the utility functions we created earlier to test it:
 
-```
+```fsharp
 // create a handler class
 let handler = new ImperativeTimerCount()
 
@@ -151,7 +151,7 @@ Async.RunSynchronously timerCount1
 
 Let's see how we would do this same thing in a functional way:
 
-```
+```fsharp
 // create the timer and the corresponding observable
 let timerCount2, timerEventStream = createTimerAndObservable 500
 
@@ -193,13 +193,13 @@ First let's create some code that both implementations can use.
 
 We'll want a generic event type that captures the timer id and the time of the tick.
     
-```
+```fsharp
 type FizzBuzzEvent = {label:int; time: DateTime}
 ```
 
 And then we need a utility function to see if two events are simultaneous. We'll be generous and allow a time difference of up to 50ms.
 
-```
+```fsharp
 let areSimultaneous (earlierEvent,laterEvent) =
     let {label=_;time=t1} = earlierEvent
     let {label=_;time=t2} = laterEvent
@@ -209,7 +209,7 @@ let areSimultaneous (earlierEvent,laterEvent) =
 In the imperative design, we'll need to keep track of the previous event, so we can compare them. 
 And we'll need special case code for the first time, when the previous event doesn't exist
 
-```
+```fsharp
 type ImperativeFizzBuzzHandler() =
  
     let mutable previousEvent: FizzBuzzEvent option = None
@@ -237,7 +237,7 @@ Now the code is beginning to get ugly fast! Already we have mutable state, compl
 
 Let's test it:
         
-```
+```fsharp
 // create the class
 let handler = new ImperativeFizzBuzzHandler()
 
@@ -259,14 +259,14 @@ Can the functional version do better? Let's see!
 
 First, we create *two* event streams, one for each timer:
 
-```
+```fsharp
 let timer3, timerEventStream3 = createTimerAndObservable 300
 let timer5, timerEventStream5 = createTimerAndObservable 500
 ```
 
 Next, we convert each event on the "raw" event streams into our FizzBuzz event type:
  
-```
+```fsharp
 // convert the time events into FizzBuzz events with the appropriate id
 let eventStream3  = 
    timerEventStream3  
@@ -288,7 +288,7 @@ It's actually easier than it sounds, because we can:
 
 Here's the actual code to do this:
  
-```
+```fsharp
 // combine the two streams
 let combinedStream = 
     Observable.merge eventStream3 eventStream5
@@ -305,7 +305,7 @@ let simultaneousStream, nonSimultaneousStream =
 
 Finally, we can split the `nonSimultaneousStream` again, based on the event id:
 
-```
+```fsharp
 // split the non-simultaneous stream based on the id
 let fizzStream, buzzStream  =
     nonSimultaneousStream  
@@ -324,7 +324,7 @@ Let's review so far. We have started with the two original event streams and fro
 
 Now all we need to do is attach behavior to each stream:
 
-```
+```fsharp
 //print events from the combinedStream
 combinedStream 
 |> Observable.subscribe (fun {label=id;time=t} -> 
@@ -344,7 +344,7 @@ buzzStream
 
 Let's test it:
         
-```
+```fsharp
 // run the two timers at the same time
 [timer3;timer5]
 |> Async.Parallel
@@ -353,7 +353,7 @@ Let's test it:
 
 Here's all the code in one complete set:
 
-```
+```fsharp
 // create the event streams and raw observables
 let timer3, timerEventStream3 = createTimerAndObservable 300
 let timer5, timerEventStream5 = createTimerAndObservable 500
@@ -417,7 +417,7 @@ associate behavior with it.
 * It is easy to debug. For example, I could easily "tap" the output of the `simultaneousStream` to see if it
 contains what I think it contains:
 
-```
+```fsharp
 // debugging code
 //simultaneousStream |> Observable.subscribe (fun e -> printfn "sim %A" e)
 //nonSimultaneousStream |> Observable.subscribe (fun e -> printfn "non-sim %A" e)

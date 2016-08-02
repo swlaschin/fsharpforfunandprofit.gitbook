@@ -18,7 +18,7 @@ Some of these will be dealt with in much more depth in a later series on .NET in
 
 First, here are some examples of an interface, an abstract class, and a concrete class that inherits from the abstract class.
 
-```
+```fsharp
 // interface
 type IEnumerator<'a> = 
     abstract member Current : 'a
@@ -52,7 +52,7 @@ r.Print()
 
 Classes can have multiple constructors, mutable properties, and so on.
 
-```
+```fsharp
 type Circle(rad:int) = 
     inherit Shape()
 
@@ -86,7 +86,7 @@ printfn "The width is %i" c2.Width
 
 F# supports generics and all the associated constraints.
 
-```
+```fsharp
 // standard generics
 type KeyValuePair<'a,'b>(key:'a, value: 'b) = 
     member this.Key = key
@@ -105,7 +105,7 @@ type Container<'a,'b
 
 F# supports not just classes, but the .NET struct types as well, which can help to boost performance in certain cases.
 
-```
+```fsharp
 
 type Point2D =
    struct
@@ -123,7 +123,7 @@ let p2 = Point2D(2.0,3.0)  // explicitly initialized
 
 F# can create exception classes, raise them and catch them.
 
-```
+```fsharp
 // create a new Exception class
 exception MyError of string
 
@@ -141,7 +141,7 @@ with
 
 Just as in C#, F# can extend existing classes with extension methods.
 
-```
+```fsharp
 type System.String with
     member this.StartsWithA = this.StartsWith "A"
 
@@ -161,7 +161,7 @@ if i.IsEven then printfn "'%i' is even" i
 
 Just like C#'s variable length "params" keyword, this allows a variable length list of arguments to be converted to a single array parameter.
 
-```
+```fsharp
 open System
 type MyConsole() =
     member this.WriteLine([<ParamArray>] args: Object[]) =
@@ -176,7 +176,7 @@ cons.WriteLine("abc", 42, 3.14, true)
 
 F# classes can have events, and the events can be triggered and responded to.
 
-```
+```fsharp
 type MyButton() =
     let clickEvent = new Event<_>()
 
@@ -198,7 +198,7 @@ myButton.TestEvent("Hello World!")
 
 F# can do delegates.
 
-```
+```fsharp
 // delegates
 type MyDelegate = delegate of int -> int
 let f = MyDelegate (fun x -> x * x)
@@ -209,7 +209,7 @@ let result = f.Invoke(5)
 
 F# supports CLI enums types, which look similar to the "union" types, but are actually different behind the scenes.
 
-```
+```fsharp
 // enums
 type Color = | Red=1 | Green=2 | Blue=3
 
@@ -229,7 +229,7 @@ Finally, F# can work with the WinForms and WPF user interface libraries, just li
 
 Here is a trivial example of opening a form and handling a click event.
 
-```
+```fsharp
 open System.Windows.Forms 
 
 let form = new Form(Width= 400, Height = 300, Visible = true, Text = "Hello World") 

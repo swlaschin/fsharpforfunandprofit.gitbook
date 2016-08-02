@@ -272,21 +272,21 @@ There is no direct "cast" syntax in F#, but there are helper functions to cast b
 
 So for example, in C# you might write:
 
-```
+```csharp
 var x = (int)1.23
 var y = (double)1   
 ```
 
 In F# the equivalent would be:
 
-```
+```fsharp
 let x = int 1.23
 let y = float 1
 ```
 
 In F# there are only casting functions for numeric types. In particular, there is no cast for bool, and you must use `Convert` or similar.
 
-```
+```fsharp
 let x = bool 1  //error
 let y = System.Convert.ToBoolean(1)  // ok
 ```
@@ -301,7 +301,7 @@ occasions where it can be an issue.
 First, lets look at the transparent case. In the example below, we define a function that takes a parameter of type `Object`, and simply returns it.
 If we pass in an `int`, it is silently boxed into an object, as can be seen from the test code, which returns an `object` not an `int`.
 
-```
+```fsharp
 // create a function with parameter of type Object
 let objFunction (o:obj) = o
 
@@ -315,14 +315,14 @@ let result = objFunction 1
 
 The fact that `result` is an object, not an int, can cause type errors if you are not careful. For example, the result cannot be directly compared with the original value:
  
-```
+```fsharp
 let resultIsOne = (result = 1)
 // error FS0001: This expression was expected to have type obj 
 // but here has type int    
 ```
 
 To work with this situation, and other similar ones, you can convert a primitive type to an object directly, by using the `box` keyword:
-```
+```fsharp
 let o = box 1
 
 // retest the comparison example above, but with boxing
@@ -332,7 +332,7 @@ let resultIsOne = (result = box 1)  // OK
 
 To convert an object back to an primitive type, use the `unbox` keyword, but unlike `box`, you must either supply a specific type to unbox to, or be sure that the compiler has enough information to make an accurate type inference.
 
-```
+```fsharp
 // box an int
 let o = box 1
 
@@ -348,14 +348,14 @@ let k = 1 + unbox o  // OK
 
 So the comparison example above could also be done with `unbox`. No explicit type annotation is needed because it is being compared with an int. 
 
-```
+```fsharp
 let result = objFunction 1
 let resultIsOne = (unbox result = 1)  // OK
 ```
 
 A common problem occurs if you do not specify enough type information -- you will encounter the infamous "Value restriction" error, as shown below:
 
-```
+```fsharp
 let o = box 1
 
 // no type specified
@@ -368,7 +368,7 @@ The solution is to reorder the code to help the type inference, or when all else
 
 Let's say that you want to have a function that matches based on the type of the parameter, using the `:?` operator:
 
-```
+```fsharp
 let detectType v =
     match v with
         | :? int -> printfn "this is an int"
@@ -377,7 +377,7 @@ let detectType v =
 
 Unfortunately, this code will fail to compile, with the following error:
 
-```
+```fsharp
 // error FS0008: This runtime coercion or type test from type 'a to int    
 // involves an indeterminate type based on information prior to this program point. 
 // Runtime type tests are not allowed on some types. Further type annotations are needed.
@@ -387,7 +387,7 @@ The message tells you the problem: "runtime type tests are not allowed on some t
 
 The answer is to "box" the value which forces it into a reference type, and then you can type check it:
 
-```
+```fsharp
 let detectTypeBoxed v =
     match box v with      // used "box v" 
         | :? int -> printfn "this is an int"

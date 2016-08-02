@@ -16,7 +16,7 @@ This means that your programs will be more type-safe, more self documenting, and
 
 Here are some examples of one-liner types in F#: 
 
-```
+```fsharp
 open System
 
 // some "record" types
@@ -39,7 +39,7 @@ Furthermore, "value" objects in DDD should have structural equality, meaning tha
 
 To show how easy it is to create DDD types in F#, here are some example types that might be created for a simple "customer" domain. 
 
-```
+```fsharp
 type PersonalName = {FirstName:string; LastName:string}
 
 // Addresses

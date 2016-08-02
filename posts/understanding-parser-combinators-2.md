@@ -25,7 +25,7 @@ so surely we could use the same technique that we used to define `anyOf` in the 
 
 Here's a (failed) attempt to create a `pstring` parser using that approach:
 
-```
+```fsharp
 let pstring str = 
     str
     |> Seq.map pchar // convert into parsers
@@ -39,7 +39,7 @@ In order to solve this, we'll need to use a different technique.
 To get started, let's try just matching a string of a specific length.
 Say, for example, that we want to match a three digits in a row. Well, we can do that using `andThen`:
 
-```
+```fsharp
 let parseDigit =
     anyOf ['0'..'9']
 
@@ -49,13 +49,13 @@ let parseThreeDigits =
 
 If we run it like this:
 
-```
+```fsharp
 run parseThreeDigits "123A"
 ```
 
 then we get the result:
  
-```
+```fsharp
 Success ((('1', '2'), '3'), "A")
 ```
 
@@ -100,7 +100,7 @@ The logic is:
 
 Here's the code (I've named the map function `mapP` to avoid confusion with other map functions):
 
-```
+```fsharp
 let mapP f parser = 
     let innerFn input =
         // run parser with the input
@@ -122,7 +122,7 @@ let mapP f parser =
 
 If we look at the signature of `mapP`:
 
-```
+```fsharp
 val mapP : 
     f:('a -> 'b) -> Parser<'a> -> Parser<'b>
 ```
@@ -131,14 +131,14 @@ we can see that it has exactly the signature we want, transforming a function `'
 
 It's common to define an infix version of `map` as well:
 
-```
+```fsharp
 let ( <!> ) = mapP
 ```
 
 And in the context of parsing, we'll often want to put the mapping function *after* the parser, with the parameters flipped.
 This makes using `map` with the pipeline idiom much more convenient:
 
-```
+```fsharp
 let ( |>> ) x f = mapP f x
 ```
 
@@ -148,7 +148,7 @@ With `mapP` available, we can revisit `parseThreeDigits` and turn the tuple into
 
 Here's the code:
 
-```
+```fsharp
 let parseDigit = anyOf ['0'..'9']
 
 let parseThreeDigitsAsStr = 
@@ -166,7 +166,7 @@ let parseThreeDigitsAsStr =
 
 Or, if you prefer a more compact implementation:
 
-```
+```fsharp
 let parseThreeDigitsAsStr = 
     (parseDigit .>>. parseDigit .>>. parseDigit)
     |>> fun ((c1, c2), c3) -> String [| c1; c2; c3 |]
@@ -175,26 +175,26 @@ let parseThreeDigitsAsStr =
 
 And if we test it, we get a string in the result now, rather than a tuple: 
 
-```
+```fsharp
 run parseThreeDigitsAsStr "123A"  // Success ("123", "A")
 ```
 
 We can go further, and map the string into an int:
 
-```
+```fsharp
 let parseThreeDigitsAsInt = 
     mapP int parseThreeDigitsAsStr 
 ```
 
 If we test this, we get an `int` in the Success branch.
 
-```
+```fsharp
 run parseThreeDigitsAsInt "123A"  // Success (123, "A")
 ```
 
 Let's check the type of `parseThreeDigitsAsInt`:
 
-```
+```fsharp
 val parseThreeDigitsAsInt : Parser<int>
 ```
 
@@ -215,7 +215,7 @@ Here's a diagram of `returnP`:
 
 And here is the implementation of `returnP`:
 
-```
+```fsharp
 let returnP x = 
     let innerFn input =
         // ignore the input and return x
@@ -226,7 +226,7 @@ let returnP x =
 
 The signature of `returnP` is just as we want:
 
-```
+```fsharp
 val returnP : 
     'a -> Parser<'a>
 ```
@@ -237,7 +237,7 @@ Now here's a diagram of `applyP`:
 
 And here is the implementation of `applyP`, which uses `.>>.` and `map`:
 
-```
+```fsharp
 let applyP fP xP = 
     // create a Parser containing a pair (f,x)
     (fP .>>. xP) 
@@ -247,13 +247,13 @@ let applyP fP xP =
 
 The infix version of `applyP` is written as `<*>`:
 
-```
+```fsharp
 let ( <*> ) = applyP
 ```
     
 Again, the signature of `applyP` is just as we want:
 
-```
+```fsharp
 val applyP : 
     Parser<('a -> 'b)> -> Parser<'a> -> Parser<'b>
 ```
@@ -264,7 +264,7 @@ What's great about `returnP` and `applyP` is that, together, they can lift *any*
 
 For example, we now can define a `lift2` function that will lift a two parameter function into Parser World like this:
 
-```
+```fsharp
 // lift a two parameter function to Parser World
 let lift2 f xP yP =
     returnP f <*> xP <*> yP
@@ -272,7 +272,7 @@ let lift2 f xP yP =
 
 The signature of `lift2` is:
 
-```
+```fsharp
 val lift2 : 
     f:('a -> 'b -> 'c) -> Parser<'a> -> Parser<'b> -> Parser<'c>
 ```
@@ -285,14 +285,14 @@ Here's a diagram of `lift2`:
 
 Let's see some examples of using `lift2` in practice. First, lifting integer addition to addition of Parsers:
 
-```
+```fsharp
 let addP = 
     lift2 (+)
 ```
 
 The signature is:
 
-```
+```fsharp
 val addP : 
     Parser<int> -> Parser<int> -> Parser<int>
 ```
@@ -302,7 +302,7 @@ which shows that `addP` does indeed take two `Parser<int>` parameters and return
 
 And here's the `startsWith` function being lifted to Parser World:
 
-```
+```fsharp
 let startsWith (str:string) prefix =
     str.StartsWith(prefix)  
 
@@ -312,7 +312,7 @@ let startsWithP =
 
 Again, the signature of `startsWithP` is parallel to the signature of `startsWith`, but lifted to the world of Parsers.
 
-```
+```fsharp
 val startsWith : 
     str:string -> prefix:string -> bool
     
@@ -334,7 +334,7 @@ We now have the tools we need to implement our sequencing combinator! The logic 
 
 Here's the implementation:
 
-```
+```fsharp
 let rec sequence parserList =
     // define the "cons" function, which is a two parameter function
     let cons head tail = head::tail
@@ -352,7 +352,7 @@ let rec sequence parserList =
 
 The signature of `sequence` is:
 
-```
+```fsharp
 val sequence : 
     Parser<'a> list -> Parser<'a list>
 ```
@@ -361,7 +361,7 @@ which shows that the input is a list of `Parser`s and the output is a `Parser` c
 
 Let's test it by creating a list of three parsers, and then combining them into one:
 
-```
+```fsharp
 let parsers = [ pchar 'A'; pchar 'B'; pchar 'C' ]
 let combined = sequence parsers
 
@@ -384,7 +384,7 @@ The logic is:
 
 Here's the code:
 
-```
+```fsharp
 /// Helper to create a string from a list of chars
 let charListToStr charList = 
      String(List.toArray charList)
@@ -404,7 +404,7 @@ let pstring str =
 
 Let's test it:
 
-```
+```fsharp
 let parseABC = pstring "ABC"
 
 run parseABC "ABCDE"  // Success ("ABC", "DE")
@@ -436,7 +436,7 @@ Before creating these, we'll define a helper function which matches a parser zer
 
 Here's the code:
 
-```
+```fsharp
 let rec parseZeroOrMore parser input =
     // run parser with the input
     let firstResult = run parser input 
@@ -456,7 +456,7 @@ let rec parseZeroOrMore parser input =
 
 With this helper function, we can easily define `many` now -- it's just a wrapper over `parseZeroOrMore`:
 
-```
+```fsharp
 /// match zero or more occurences of the specified parser
 let many parser = 
 
@@ -469,14 +469,14 @@ let many parser =
 
 The signature of `many` shows that the output is indeed a list of values wrapped in a `Parser`:
 
-```
+```fsharp
 val many : 
     Parser<'a> -> Parser<'a list>
 ```
 
 Now let's test `many`:
 
-```
+```fsharp
 let manyA = many (pchar 'A')
 
 // test some success cases
@@ -492,7 +492,7 @@ Note that in the last case, even when there is nothing to match, the function su
 
 There's nothing about `many` that restricts its use to single characters. For example, we can use it to match repetitive string sequences too:
 
-```
+```fsharp
 let manyAB = many (pstring "AB")
 
 run manyAB "ABCD"  // Success (["AB"], "CD")
@@ -503,7 +503,7 @@ run manyAB "AZCD"  // Success ([], "AZCD")
 
 Finally, let's implement the original example of matching whitespace:
 
-```
+```fsharp
 let whitespaceChar = anyOf [' '; '\t'; '\n']
 let whitespace = many whitespaceChar 
 
@@ -522,7 +522,7 @@ We can also define the "one or more" combinator `many1`, using the following log
   * Call the helper function `parseZeroOrMore` to get the remaining values.
   * Then combine the first value and the remaining values.
 
-```
+```fsharp
 /// match one or more occurences of the specified parser
 let many1 parser = 
     let rec innerFn input =
@@ -543,14 +543,14 @@ let many1 parser =
 
 Again, the signature of `many1` shows that the output is indeed a list of values wrapped in a `Parser`:
 
-```
+```fsharp
 val many1 : 
     Parser<'a> -> Parser<'a list>
 ```
 
 Now let's test `many1`:
 
-```
+```fsharp
 // define parser for one digit
 let digit = anyOf ['0'..'9']
 
@@ -578,7 +578,7 @@ Using `many1`, we can create a parser for an integer. The implementation logic i
 
 Here's the code:
 
-```
+```fsharp
 let pint = 
     // helper
     let resultToInt digitList = 
@@ -598,7 +598,7 @@ let pint =
 
 And let's test it:
 
-```
+```fsharp
 run pint "1ABC"  // Success (1, "ABC")
 run pint "12BC"  // Success (12, "BC")
 run pint "123C"  // Success (123, "C")
@@ -620,7 +620,7 @@ We can define an `opt` combinator easily:
 
 Here's the code:
 
-```
+```fsharp
 let opt p = 
     let some = p |>> Some
     let none = returnP None
@@ -629,7 +629,7 @@ let opt p =
 
 Here's an example of it in use -- we match a digit followed by an optional semicolon:
 
-```
+```fsharp
 let digit = anyOf ['0'..'9']
 let digitThenSemicolon = digit .>>. opt (pchar ';')
 
@@ -639,7 +639,7 @@ run digitThenSemicolon "1"   // Success (('1', None), "")
 
 And here is `pint` rewritten to handle an optional minus sign:
 
-```
+```fsharp
 let pint = 
     // helper
     let resultToInt (sign,charList) = 
@@ -663,7 +663,7 @@ Note that the `resultToInt` helper function now needs to handle the sign option 
 
 And here it is in action:
 
-```
+```fsharp
 run pint "123C"   // Success (123, "C")
 run pint "-123C"  // Success (-123, "C")
 ```
@@ -683,7 +683,7 @@ To handle these requirements, we will define some new combinators that throw awa
 
 These are easy to define -- just map over the result of `.>>.`, which is a tuple, and keep only one element of the pair.
 
-```
+```fsharp
 /// Keep only the result of the left side parser
 let (.>>) p1 p2 = 
     // create a pair
@@ -701,7 +701,7 @@ let (>>.) p1 p2 =
 
 These combinators allow us to simplify the `digitThenSemicolon` example shown earlier:
 
-```
+```fsharp
 let digit = anyOf ['0'..'9']
 
 // use .>> below
@@ -717,7 +717,7 @@ How about an example with whitespace?
 
 The following code creates a parser that looks for "AB" followed by one or more whitespace chars, followed by "CD".
 
-```
+```fsharp
 let whitespaceChar = anyOf [' '; '\t'; '\n']
 let whitespace = many1 whitespaceChar 
 
@@ -736,7 +736,7 @@ A particularly common requirement is to look for a parser between delimiters suc
 
 Creating a combinator for this is trivial:
 
-```
+```fsharp
 /// Keep only the result of the middle parser
 let between p1 p2 p3 = 
     p1 >>. p2 .>> p3 
@@ -744,7 +744,7 @@ let between p1 p2 p3 =
 
 And here it is in use, to parse a quoted integer:
 
-```
+```fsharp
 let pdoublequote = pchar '"'
 let quotedInteger = between pdoublequote pint pdoublequote
 
@@ -764,7 +764,7 @@ To implement a "one or more" list, we need to:
 
 Here's the code:
 
-```
+```fsharp
 /// Parses one or more occurrences of p separated by sep
 let sepBy1 p sep =
     let sepThenP = sep >>. p            
@@ -774,7 +774,7 @@ let sepBy1 p sep =
 
 For the "zero or more" version, we can choose the empty list as an alternate if `sepBy1` does not find any matches:
 
-```
+```fsharp
 /// Parses zero or more occurrences of p separated by sep
 let sepBy p sep =
     sepBy1 p sep <|> returnP []
@@ -782,7 +782,7 @@ let sepBy p sep =
 
 Here's some tests for `sepBy1` and `sepBy`, with results shown in the comments:
 
-```
+```fsharp
 let comma = pchar ',' 
 let digit = anyOf ['0'..'9']
 
@@ -813,7 +813,7 @@ But now that we have have some experience, let's implement `bind` and see what w
 
 Here's the implementation of `bindP` (as I'll call it)
 
-```
+```fsharp
 /// "bindP" takes a parser-producing function f, and a parser p
 /// and passes the output of p into f, to create a new parser
 let bindP f p =
@@ -833,7 +833,7 @@ let bindP f p =
 
 The signature of `bindP` is:
 
-```
+```fsharp
 val bindP : 
     f:('a -> Parser<'b>) -> Parser<'a> -> Parser<'b>
 ```
@@ -843,7 +843,7 @@ See [this post for more details on how `bind` works](../posts/elevated-world-2.m
 
 The infix version of `bind` is `>>=`. Note that the parameters are flipped: `f` is now the second parameter which makes it more convenient for F#'s pipeline idiom.
 
-```
+```fsharp
 let ( >>= ) p f = bindP f p
 ```
 
@@ -851,7 +851,7 @@ let ( >>= ) p f = bindP f p
 
 The combination of `bindP` and `returnP` can be used to re-implement many of the other combinators. Here are some examples:
 
-```
+```fsharp
 let mapP f =         
     bindP (f >> returnP)
 
@@ -911,7 +911,7 @@ Here's the complete listing for the parsing library so far -- it's about 200 lin
 
 *The source code displayed below is also available at [this gist](https://gist.github.com/swlaschin/a3dbb114a9ee95b2e30d#file-parserlibrary_v2-fsx).*
 
-```
+```fsharp
 open System
 
 /// Type that represents Success/Failure in parsing

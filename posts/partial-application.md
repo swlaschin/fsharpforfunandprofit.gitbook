@@ -15,7 +15,7 @@ The idea of partial application is that if you fix the first N parameters of the
 
 Here are some simple examples that demonstrate this:
 
-```
+```fsharp
 // create an "adder" by partial application of add
 let add42 = (+) 42    // partial application
 add42 1
@@ -44,7 +44,7 @@ In each case, we create a partially applied function that we can then reuse in m
 
 The partial application can just as easily involve fixing function parameters, of course. Here are some examples:
 
-```
+```fsharp
 // an example using List.map
 let add1 = (+) 1
 let add1ToEach = List.map add1   // fix the "add1" function
@@ -67,7 +67,7 @@ The following more complex example shows how the same approach can be used to cr
 * We then create various implementations of the logging function, such as a console logger or a popup logger.
 * And finally we partially apply the main function to create new functions that have a particular logger baked into them. 
 
-```
+```fsharp
 // create an adder that supports a pluggable logging function
 let adderWithPluggableLogger logger x y = 
     logger "x" x
@@ -100,7 +100,7 @@ addWithPopupLogger  42 99
 
 These functions with the logger baked in can in turn be used like any other function. For example, we can create a partial application to add 42, and then pass that into a list function, just like we did for the simple "`add42`" function.
 
-```
+```fsharp
 // create a another adder with 42 baked in
 let add42WithConsoleLogger = addWithConsoleLogger 42 
 [1;2;3] |> List.map add42WithConsoleLogger  
@@ -117,7 +117,7 @@ You can see that the order of the parameters can make a big difference in the ea
 
 The list is always the last parameter. Here are some examples of the full form:
 
-```
+```fsharp
 List.map    (fun i -> i+1) [0;1;2;3]
 List.filter (fun i -> i>1) [0;1;2;3]
 List.sortBy (fun i -> -i ) [0;1;2;3]
@@ -125,7 +125,7 @@ List.sortBy (fun i -> -i ) [0;1;2;3]
 
 And the same examples using partial application:
 
-```
+```fsharp
 let eachAdd1 = List.map (fun i -> i+1) 
 eachAdd1 [0;1;2;3]
 
@@ -148,7 +148,7 @@ Guideline 1 is straightforward. The parameters that are most likely to be "fixed
 
 Guideline 2 makes it easier to pipe a structure or collection from function to function. We have seen this many times already with list functions.
 
-```
+```fsharp
 // piping using list functions
 let result = 
    [1..10]
@@ -158,7 +158,7 @@ let result =
 
 Similarly, partially applied list functions are easy to compose, because the list parameter itself can be easily elided:
 
-```
+```fsharp
 let compositeOp = List.map (fun i -> i+1) 
                   >> List.filter (fun i -> i>5)
 let result = compositeOp [1..10]
@@ -170,7 +170,7 @@ The .NET base class library functions are easy to access in F#, but are not real
 
 However, it is easy enough to create wrappers for them that are more idiomatic. For example, in the snippet below, the .NET string functions are rewritten to have the string target be the last parameter rather than the first:
 
-```
+```fsharp
 // create wrappers for .NET string functions
 let replace oldStr newStr (s:string) = 
   s.Replace(oldValue=oldStr, newValue=newStr)
@@ -181,7 +181,7 @@ let startsWith lookFor (s:string) =
 
 Once the string becomes the last parameter, we can then use them with pipes in the expected way:
 
-```
+```fsharp
 let result = 
      "hello" 
      |> replace "h" "j" 
@@ -193,7 +193,7 @@ let result =
 
 or with function composition:
 
-```
+```fsharp
 let compositeOp = replace "h" "j" >> startsWith "j"
 let result = compositeOp "hello"
 ```
@@ -204,13 +204,13 @@ Now that you have seen how partial application works, you should be able to unde
 
 The pipe function is defined as:
 
-```
+```fsharp
 let (|>) x f = f x
 ```
 
 All it does is allow you to put the function argument in front of the function rather than after. That's all. 
 
-```
+```fsharp
 let doSomething x y z = x+y+z
 doSomething 1 2 3       // all parameters after function
 ```
@@ -219,7 +219,7 @@ If the function has multiple parameters, then it appears that the input is the f
 
 Here's the same example rewritten to use partial application
 
-```
+```fsharp
 let doSomething x y  = 
    let intermediateFn z = x+y+z
    intermediateFn        // return intermediateFn
@@ -231,7 +231,7 @@ doSomethingPartial 3     // only one parameter after function now
 
 As you have already seen, the pipe operator is extremely common in F#, and used all the time to preserve a natural flow. Here are some more usages that you might see:
 
-```
+```fsharp
 "12" |> int               // parses string "12" to an int
 1 |> (+) 2 |> (*) 3       // chain of arithmetic
 ```
@@ -240,7 +240,7 @@ As you have already seen, the pipe operator is extremely common in F#, and used 
 
 You might occasionally see the reverse pipe function "<|" being used.  
 
-```
+```fsharp
 let (<|) f x = f x
 ```
 
@@ -248,7 +248,7 @@ It seems that this function doesn't really do anything different from normal, so
 
 The reason is that, when used in the infix style as a binary operator, it reduces the need for parentheses and can make the code cleaner.
 
-```
+```fsharp
 printf "%i" 1+2          // error
 printf "%i" (1+2)        // using parens
 printf "%i" <| 1+2       // using reverse pipe
@@ -256,7 +256,7 @@ printf "%i" <| 1+2       // using reverse pipe
 
 You can also use piping in both directions at once to get a pseudo infix notation.
 
-```
+```fsharp
 let add x y = x + y
 (1+2) add (3+4)          // error
 1+2 |> add <| 3+4        // pseudo infix

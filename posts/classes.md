@@ -20,7 +20,7 @@ Also, unlike other types, classes *must* have functions attached to them as memb
 
 So, for example, if we want to have a class called `CustomerName` that requires three parameters to construct it, it would be written like this:
 
-```
+```fsharp
 type CustomerName(firstName, middleInitial, lastName) = 
     member this.FirstName = firstName
     member this.MiddleInitial = middleInitial
@@ -29,7 +29,7 @@ type CustomerName(firstName, middleInitial, lastName) =
 
 Let's compare this with the C# equivalent:
 
-```
+```csharp
 public class CustomerName
 {
     public CustomerName(string firstName, 
@@ -50,7 +50,7 @@ You can see that in the F# version, the primary constructor is embedded into the
 
 So in the above example, because we declared the `CustomerName` class as:
 
-```
+```fsharp
 type CustomerName(firstName, middleInitial, lastName)
 ```
 
@@ -62,7 +62,7 @@ You might not have noticed, but the `CustomerName` class defined above does not 
 
 Here's a version of the class with explicit types in the constructor:
 
-```
+```fsharp
 type CustomerName2(firstName:string, 
                    middleInitial:string, lastName:string) = 
     member this.FirstName = firstName
@@ -72,7 +72,7 @@ type CustomerName2(firstName:string,
 
 One little quirk about F# is that if you ever need to pass a tuple as a parameter to a constructor, you will have to annotate it explicitly, because the call to the constructor will look identical:
 
-```
+```fsharp
 type NonTupledConstructor(x:int,y: int) = 
     do printfn "x=%i y=%i" x y    
 
@@ -95,7 +95,7 @@ Also, in the example above, you see the word "`this`" in front of each member na
 
 When a class is compiled (or when you over hover the definition in the editor), you see the "class signature" for the class. For example, for the class definition:
 
-```
+```fsharp
 type MyClass(intParam:int, strParam:string) = 
     member this.Two = 2
     member this.Square x = x * x
@@ -103,7 +103,7 @@ type MyClass(intParam:int, strParam:string) =
 
 the corresponding signature is:
 
-```
+```fsharp
 type MyClass =
   class
     new : intParam:int * strParam:string -> MyClass
@@ -121,13 +121,13 @@ Method signatures such as are very similar to the [signatures for standalone fun
 
 So in this case, the method signature is:
 
-```
+```fsharp
 member Square : x:int -> int
 ```
 
 And for comparison, the corresponding signature for a standalone function would be:
 
-```
+```fsharp
 val Square : int -> int
 ```
 
@@ -139,7 +139,7 @@ Constructor signatures always take tuple values as their only parameter. In this
 
 Again, we can compare the constructor signature with a similar standalone function:
 
-```
+```fsharp
 // class constructor signature
 new : intParam:int * strParam:string -> MyClass
 
@@ -151,7 +151,7 @@ val new : int * string -> MyClass
 
 Finally, property signatures such as `member Two : int` are very similar to the signatures for standalone simple values, except that no explicit value is given.
 
-```
+```fsharp
 // member property
 member Two : int
 
@@ -165,7 +165,7 @@ After the class declaration, you can optionally have a set of "let" bindings, ty
 
 Here's some sample code to demonstrate this:
 
-```
+```fsharp
 type PrivateValueExample(seed) = 
 
     // private immutable value
@@ -206,7 +206,7 @@ Note that the `seed` value passed into the constructor is also available as a pr
 
 Sometimes, you want a parameter passed to the constructor to be mutable. You cannot specify this in the parameter itself, so the standard technique is to create a mutable let-bound value and assign it from the parameter, as shown below:
 
-```
+```fsharp
 type MutableConstructorParameter(seed) = 
     let mutable mutableSeed = seed 
 
@@ -217,7 +217,7 @@ type MutableConstructorParameter(seed) =
 
 In cases, like this, it is quite common to give the mutable value the same name as the parameter itself, like this:
 
-```
+```fsharp
 type MutableConstructorParameter2(seed) = 
     let mutable seed = seed // shadow the parameter
     
@@ -232,7 +232,7 @@ In the `CustomerName` example earlier, the constructor just allowed some values 
 
 Here's an example:
 
-```
+```fsharp
 type DoExample(seed) = 
     let privateValue = seed + 1
     
@@ -245,7 +245,7 @@ new DoExample(42)
 
 The "do" code can also call any let-bound functions defined before it, as shown in this example:
 
-```
+```fsharp
 type DoPrivateFunctionExample(seed) =   
     let privateValue = seed + 1
     
@@ -269,7 +269,7 @@ One of the differences between the "do" and "let" bindings is that the "do" bind
 
 If you need to call members of the instance from a "do" block, you need some way to refer to the instance itself. This is again done using a "self-identifier", but this time it is attached to the class declaration itself.
 
-```
+```fsharp
 type DoPublicFunctionExample(seed) as this =   
     // Note the "this" keyword in the declaration
 
@@ -294,7 +294,7 @@ A method definition is very like a function definition, except that it has the `
 
 Here are some examples:
 
-```
+```fsharp
 type MethodExample() = 
     
     // standalone method
@@ -327,7 +327,7 @@ Unlike normal functions, methods with more than one parameter can be defined in 
 
 The curried approach is more functional, and the tuple approach is more object-oriented. Here is an example class with a method for each approach:
 
-```
+```fsharp
 type TupleAndCurriedMethodExample() = 
     
     // curried form
@@ -371,7 +371,7 @@ A common pattern is to create let-bound functions that do all the heavy lifting,
 
 Here's an example:
 
-```
+```fsharp
 type LetBoundFunctions() = 
 
     let listReduce reducer list = 
@@ -397,7 +397,7 @@ For more details on how to do this, see [this discussion](../posts/type-extensio
 
 Unlike normal let-bound functions, methods that are recursive do not need the special `rec` keyword.  Here's the boringly familiar Fibonacci function as a method:
 
-```
+```fsharp
 type MethodExample() = 
     
     // recursive method without "rec" keyword
@@ -415,7 +415,7 @@ printfn "%i" <| me.Fib 10
 
 As usual, the types for a method's parameters and return value can normally be inferred by the compiler, but if you need to specify them, you do so in the same way that you would for a standard function:
 
-```
+```fsharp
 type MethodExample() = 
     // explicit type annotation
     member this.AddThree (x:int) :int = 
@@ -437,7 +437,7 @@ For immutable properties, the syntax is simple. There is a "get" member that is 
 
 Here's an example:
 
-```
+```fsharp
 type PropertyExample(seed) = 
     // immutable property 
     // using a constructor parameter
@@ -446,14 +446,14 @@ type PropertyExample(seed) =
 
 For mutable properties however, the syntax is more complicated. You need to provide two functions, one to get and one to set. This is done by using the syntax:
 
-```
+```fsharp
 with get() = ...
 and set(value) = ...
 ```
 
 Here's an example:
 
-```
+```fsharp
 type PropertyExample(seed) = 
     // private mutable value
     let mutable myProp = seed
@@ -473,13 +473,13 @@ Starting in VS2012, F# supports automatic properties, which remove the requireme
 
 To create an immutable auto property, use the syntax:
 
-```
+```fsharp
 member val MyProp = initialValue
 ```
 
 To create a mutable auto property, use the syntax:
 
-```
+```fsharp
 member val MyProp = initialValue with get,set
 ```
 
@@ -489,7 +489,7 @@ Note that in this syntax there is a new keyword `val` and the self-identifier ha
 
 Here's a complete example that demonstrates all the property types:
 
-```
+```fsharp
 type PropertyExample(seed) = 
     // private mutable value
     let mutable myProp = seed
@@ -543,7 +543,7 @@ At this point you might be confused by the difference between properties and par
 
 Here's an example of the difference in both definition and usage:
 
-```
+```fsharp
 type ParameterlessMethodExample() = 
     member this.MyProp = 1    // No parens!
     member this.MyFunc() = 1  // Note the ()
@@ -558,7 +558,7 @@ You can also tell the difference by looking at the signature of the class defini
 
 The class definition looks like this:
 
-```
+```fsharp
 type ParameterlessMethodExample =
   class
     new : unit -> ParameterlessMethodExample
@@ -571,14 +571,14 @@ The method has signature `MyFunc : unit -> int` and the property has signature `
 
 This is very similar to what the signatures would be if the function and property were declared standalone, outside of any class:
 
-```
+```fsharp
 let MyFunc2() = 1 
 let MyProp2 = 1 
 ```
 
 The signatures for these would look like:
 
-```
+```fsharp
 val MyFunc2 : unit -> int
 val MyProp2 : int = 1
 ```
@@ -592,7 +592,7 @@ If you are unclear on the difference and why the unit parameter is needed for th
 
 In addition to the primary constructor embedded in its declaration, a class can have additional constructors.  These are indicated by the `new` keyword and must call the primary constructor as their last expression. 
 
-```
+```fsharp
 type MultipleConstructors(param1, param2) =
     do printfn "Param1=%i Param12=%i" param1 param2
 
@@ -617,7 +617,7 @@ Just as in C#, classes can have static members, and this is indicated with the `
 
 Members which are static cannot have a self-identifier such as "this" because there is no instance for them to refer to.
 
-```
+```fsharp
 type StaticExample() = 
     member this.InstanceValue = 1
     static member StaticValue = 2  // no "this"
@@ -632,7 +632,7 @@ printf "%i" StaticExample.StaticValue
 
 There is no direct equivalent of a static constructor in F#, but you can create static let-bound values and static do-blocks that are executed when the class is first used.
 
-```
+```fsharp
 type StaticConstructor() =
     
     // static field
@@ -653,7 +653,7 @@ Unlike C#, all class members are public by default, not private. This includes b
 
 Here's an example:
 
-```
+```fsharp
 type AccessibilityExample() = 
     member this.PublicValue = 1
     member private this.PrivateValue = 2
@@ -666,7 +666,7 @@ printf "%i" a.PrivateValue  // not accessible
 
 For properties, if the set and get have different accessibilities, you can tag each part with a separate accessibility modifier.
 
-```
+```fsharp
 type AccessibilityExample2() = 
     let mutable privateValue = 42
     member this.PrivateSetProperty
@@ -693,7 +693,7 @@ F# classes which are defined outside a module are generated as normal top-level 
 
 Here's an example of two F# classes, one defined outside a module and one defined inside:
 
-```
+```fsharp
 // Note: this code will not work in an .FSX script, 
 // only in an .FS source file.
 namespace MyNamespace
@@ -709,7 +709,7 @@ module MyModule =
        
 And here's how the same code might look in C#:
 
-```
+```csharp
 namespace MyNamespace
 {
   public class TopLevelClass
@@ -733,7 +733,7 @@ Now that we have defined the class, how do we go about using it?
 
 One way to create an instance of a class is straightfoward and just like C# -- use the `new` keyword and pass in the arguments to the constructor.
 
-```
+```fsharp
 type MyClass(intParam:int, strParam:string) = 
     member this.Two = 2
     member this.Square x = x * x
@@ -743,14 +743,14 @@ let myInstance = new MyClass(1,"hello")
 
 However, in F#, the constructor is considered to be just another function, so you can normally eliminate the `new` and call the constructor function on its own, like this:
 
-```
+```fsharp
 let myInstance2 = MyClass(1,"hello")
 let point = System.Drawing.Point(1,2)   // works with .NET classes too!
 ```
 
 In the case when you are creating a class that implements `IDisposible`, you will get a compiler warning if you do not use `new`. 
 
-```
+```fsharp
 let sr1 = System.IO.StringReader("")      // Warning
 let sr2 = new System.IO.StringReader("")  // OK
 ```
@@ -761,7 +761,7 @@ This can be a useful reminder to use the `use` keyword instead of the `let` keyw
 
 And once you have an instance, you can "dot into" the instance and use any methods and properties in the standard way.
 
-```
+```fsharp
 myInstance.Two
 myInstance.Square 2
 ```
@@ -770,7 +770,7 @@ We have seen many examples of member usage in the above discussion, and there's 
 
 Remember that, as discussed above, tuple-style methods and curried-style methods can be called in distinct ways:
 
-```
+```fsharp
 type TupleAndCurriedMethodExample() = 
     member this.TupleAdd(x,y) = x + y
     member this.CurriedAdd x y = x + y

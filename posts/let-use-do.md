@@ -18,7 +18,7 @@ In this post we'll look at these bindings in more detail.
 
 The `let` binding is straightforward, it has the general form:
 
-```
+```fsharp
 let aName = someExpression
 ```
 
@@ -28,7 +28,7 @@ But there are two uses of `let` that are subtly different.  One is to define a n
 
 Here's an example of both types:
 
-```
+```fsharp
 module MyModule = 
 
     let topLevelName = 
@@ -46,7 +46,7 @@ But the nested names are completely inaccessible to anyone -- they are only vali
 
 We have already seen examples of how bindings can use patterns directly
 
-```
+```fsharp
 let a,b = 1,2
 
 type Person = {First:string; Last:string}
@@ -56,7 +56,7 @@ let {First=first} = alice
 
 And in function definitions the binding includes parameters as well:
 
-```
+```fsharp
 // pattern match the parameters
 let add (x,y) = x + y
 
@@ -71,7 +71,7 @@ The details of the various pattern bindings depends on the type being bound, and
 
 We have emphasized that an expression is composed from smaller expressions.  But what about a nested `let`? 
 
-```
+```fsharp
 let nestedName = someExpression
 ```
 
@@ -79,7 +79,7 @@ How can "`let`" be an expression? What does it return?
 
 The answer that a nested "let" can never be used in isolation -- it must always be part of a larger code block, so that it can be interpreted as:
 
-```
+```fsharp
 let nestedName = [some expression] in [some other expression involving nestedName]
 ```
 
@@ -87,7 +87,7 @@ That is, every time you see the symbol "nestedName" in the second expression (ca
 
 So for example, the expression:
 
-```
+```fsharp
 // standard syntax
 let f () = 
   let x = 1  
@@ -97,7 +97,7 @@ let f () =
 
 really means: 
 
-```
+```fsharp
 // syntax using "in" keyword
 let f () = 
   let x = 1 in   // the "in" keyword is available in F#
@@ -115,7 +115,7 @@ In a sense, the nested names are just "macros" or "placeholders" that disappear 
    
 If you understand how nested `let` bindings work, then certain errors become understandable. For example, if there is nothing for a nested "let" to be "in", the entire expression is not complete. In the example below, there is nothing following the let line, which is an error:
 
-```
+```fsharp
 let f () = 
   let x = 1  
 // error FS0588: Block following this 'let' is unfinished. 
@@ -124,7 +124,7 @@ let f () =
 
 And you cannot have multiple expression results, because you cannot have multiple body expressions. Anything evaluated before the final body expression must be a "`do`" expression (see below), and return `unit`.
 
-```
+```fsharp
 let f () = 
   2 + 2      // warning FS0020: This expression should 
              // have type 'unit'
@@ -134,7 +134,7 @@ let f () =
 
 In a case like this, you must pipe the results into "ignore".
 
-```
+```fsharp
 let f () = 
   2 + 2 |> ignore 
   let x = 1  
@@ -150,7 +150,7 @@ The key difference is that is also *automatically disposes* the value when it go
 
 Obviously, this means that `use` only applies in nested situations. You cannot have a top level `use` and the compiler will warn you if you try.
 
-```
+```fsharp
 module A = 
     use f () =  // Error
       let x = 1  
@@ -159,7 +159,7 @@ module A =
 
 To see how a proper `use` binding works, first let's create a helper function that creates an `IDisposable` on the fly.
 
-```
+```fsharp
 // create a new object that implements IDisposable
 let makeResource name = 
    { new System.IDisposable 
@@ -168,7 +168,7 @@ let makeResource name =
 
 Now let's test it with a nested `use` binding:
 
-```
+```fsharp
 let exampleUseBinding name =
     use myResource = makeResource name
     printfn "done"
@@ -181,7 +181,7 @@ We can see that "done" is printed, and then immediately after that, `myResource`
 
 On the other hand, if we test it using the regular `let` binding, we don't get the same effect.
 
-```
+```fsharp
 let exampleLetBinding name =
     let myResource = makeResource name
     printfn "done"
@@ -196,7 +196,7 @@ In this case, we see that "done" is printed, but `Dispose` is never called.
 
 Note that "use" bindings only work with types that implement `IDisposable`, and the compiler will complain otherwise:
 
-```
+```fsharp
 let exampleUseBinding2 name =
     use s = "hello"  // Error: The type 'string' is 
                      // not compatible with the type 'IDisposable'
@@ -211,7 +211,7 @@ If you attempt to return the value for use by another function, the return value
 
 The following example shows how *not* to do it:
 
-```
+```fsharp
 let returnInvalidResource name =
     use myResource = makeResource name
     myResource // don't do this!
@@ -230,7 +230,7 @@ The function then would work as follows:
 
 Here's an example:
 
-```
+```fsharp
 let usingResource name callback =
     use myResource = makeResource name
     callback myResource
@@ -246,7 +246,7 @@ Another possible way is to *not* use a `use` binding on creation, but use a `let
 
 Here's an example:
 
-```
+```fsharp
 let returnValidResource name =
     // "let" binding here instead of "use"
     let myResource = makeResource name
@@ -271,7 +271,7 @@ There is a built-in `using` function that works in the same way. It takes two pa
 
 Here's our earlier example rewritten with the `using` function:
 
-```
+```fsharp
 let callback aResource = printfn "Resource is %A" aResource
 using (makeResource "hello") callback 
 ```
@@ -289,7 +289,7 @@ The way to do this is:
 
 For example, here is an extension method that starts a timer and then returns an `IDisposable` that stops it.
 
-```
+```fsharp
 module TimerExtensions = 
 
     type System.Timers.Timer with 
@@ -311,7 +311,7 @@ module TimerExtensions =
 
 So now in the calling code, we create the timer and bind it with `use`. When the timer value goes out of scope, it will stop automatically!
 
-```
+```fsharp
 open TimerExtensions
 let testTimerWithDisposable =     
     let handler = (fun _ -> printfn "elapsed")
@@ -335,25 +335,25 @@ That is, rather than having "`let x = do something`" we just the "`do something`
 
 You can do this by prefixing the code with "`do`":
 
-```
+```fsharp
 do printf "logging"
 ```
 
 In many situations, the `do` keyword can be omitted:
 
-```
+```fsharp
 printf "logging"
 ```
 
 But in both cases, the expression must return unit. If it does not, you will get a compiler error.
 
-```
+```fsharp
 do 1 + 1    // warning: This expression is a function 
 ```
 
 As always, you can force a non-unit result to be discarded by piping the results into "`ignore`".
 
-```
+```fsharp
 do ( 1+1 |> ignore )
 ```
 
@@ -368,7 +368,7 @@ Just like `let`, `do` can be used both in a nested context, and at the top level
 
 When used at the module level, the `do` expression is evaluated once only, when the module is first loaded.  
 
-```
+```fsharp
 module A =
 
     module B =
@@ -391,7 +391,7 @@ In this context, it means they are being used to wait for an async operation to 
 
 Here are some examples we saw earlier in [a post from the "why use F#?" series](../posts/concurrency-async-and-parallel):
 
-```
+```fsharp
 //This simple workflow just sleeps for 2 seconds.
 open System
 let sleepWorkflow  = async{
@@ -436,7 +436,7 @@ If they are at the top-level in a module, `let` and `do` bindings can have attri
 
 Here are some examples in C# and then the same code in F#:
 
-```
+```csharp
 class AttributeTest
 {
     [Obsolete]
@@ -452,7 +452,7 @@ class AttributeTest
 }
 ```
 
-```
+```fsharp
 module AttributeTest = 
     [<Obsolete>]
     let myObsoleteFunction x y = x + y
@@ -473,7 +473,7 @@ The special `EntryPoint` attribute is used to mark the entry point of a standalo
 
 Here's the familiar C# version:
 
-```
+```csharp
 class Program
 {
     static int Main(string[] args)
@@ -491,7 +491,7 @@ class Program
 
 And here's the F# equivalent:
 
-```
+```fsharp
 module Program
 
 [<EntryPoint>]
@@ -525,7 +525,7 @@ In a C# project, there is an `AssemblyInfo.cs` file that contains all the assemb
 
 In F#, the equivalent way to do this is with a dummy module which contains a `do` expression annotated with these attributes.
 
-```
+```fsharp
 open System.Reflection
 
 module AssemblyInfo = 
@@ -539,7 +539,7 @@ module AssemblyInfo =
 
 Another occasionally useful attribute is the `DllImport` attribute. Here's a C# example.
 
-```
+```csharp
 using System.Runtime.InteropServices;
 
 [TestFixture]
@@ -565,7 +565,7 @@ public class TestDllImport
 
 It works the same way in F# as in C#. One thing to note is that the `extern declaration ...` puts the types before the parameters, C-style.
 
-```
+```fsharp
 open System.Runtime.InteropServices
 open System.Text
 

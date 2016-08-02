@@ -14,7 +14,7 @@ This is a follow-on from the [previous post on classes](../posts/classes.md). Th
 
 To declare that a class inherits from another class, use the syntax:
 
-```
+```fsharp
 type DerivedClass(param1, param2) =
    inherit BaseClass(param1)
 ```
@@ -23,7 +23,7 @@ The `inherit` keyword signals that `DerivedClass` inherits from `BaseClass`. In 
 
 It might be useful to compare F# with C# at this point. Here is some C# code for a very simple pair of classes. 
 
-```
+```csharp
 public class MyBaseClass
 {
     public MyBaseClass(int param1)
@@ -47,7 +47,7 @@ Note that the inheritance declaration `class MyDerivedClass: MyBaseClass` is dis
 
 Now here is the F# version:
 
-```
+```fsharp
 type BaseClass(param1) =
    member this.Param1 = param1
 
@@ -71,7 +71,7 @@ Obviously, part of the point of inheritance is to be able to have abstract metho
 
 In C#, an abstract method is indicated by the `abstract` keyword plus the method signature. In F#, it is the same concept, except that the way that function signatures are written in F# is quite different from C#.
 
-```
+```fsharp
 // concrete function definition
 let Add x y = x + y
 
@@ -81,7 +81,7 @@ let Add x y = x + y
 
 So to define an abstract method, we use the signature syntax, along with the `abstract member` keywords:
 
-```
+```fsharp
 type BaseClass() =
    abstract member Add: int -> int -> int
 ```
@@ -99,14 +99,14 @@ We'll look at both of these alternatives shortly.
 
 An abstract immutable property is defined in a similar way. The signature is just like that of a simple value.
 
-```
+```fsharp
 type BaseClass() =
    abstract member Pi : float
 ```
 
 If the abstract property is read/write, you add the get/set keywords.
 
-```
+```fsharp
 type BaseClass() =
    abstract Area : float with get,set
 ```
@@ -115,7 +115,7 @@ type BaseClass() =
 
 To provide a default implementation of an abstract method in the base class, use the `default` keyword instead of the `member` keyword:
 
-```
+```fsharp
 // with default implementations
 type BaseClass() =
    // abstract method
@@ -136,7 +136,7 @@ One major difference between F# and C# is that in C# you can combine the abstrac
 
 If at least one abstract method does *not* have a default implementation, then the entire class is abstract, and you must indicate this by annotating it with the `AbstractClass` attribute. 
 
-```
+```fsharp
 [<AbstractClass>]
 type AbstractBaseClass() =
    // abstract method
@@ -155,7 +155,7 @@ If this is done, then the compiler will no longer complain about a missing imple
 
 To override an abstract method or property in a subclass, use the `override` keyword instead of the `member` keyword.  Other than that change, the overridden method is defined in the usual way.
 
-```
+```fsharp
 [<AbstractClass>]
 type Animal() =
    abstract member MakeNoise: unit -> unit 
@@ -172,7 +172,7 @@ dog.MakeNoise()
 
 And to call a base method, use the `base` keyword, just as in C#.
 
-```
+```fsharp
 type Vehicle() =
    abstract member TopSpeed: unit -> int
    default this.TopSpeed() = 60

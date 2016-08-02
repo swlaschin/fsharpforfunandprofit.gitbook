@@ -10,7 +10,7 @@ categories: [Types, DDD]
 
 At the end of the previous post, we had values for email addresses, zip codes, etc., defined like this:
 
-```
+```fsharp
 
 EmailAddress: string;
 State: string;
@@ -33,7 +33,7 @@ The simplest way to create a separate type is to wrap the underlying string type
 
 We can do it using single case union types, like so:
 
-```
+```fsharp
 type EmailAddress = EmailAddress of string
 type ZipCode = ZipCode of string
 type StateCode = StateCode of string
@@ -41,7 +41,7 @@ type StateCode = StateCode of string
 
 or alternatively, we could use record types with one field, like this:
 
-```
+```fsharp
 type EmailAddress = { EmailAddress: string }
 type ZipCode = { ZipCode: string }
 type StateCode = { StateCode: string}
@@ -53,7 +53,7 @@ The answer is generally the single case discriminated union.  It is much easier 
 
 Here's some examples of how an `EmailAddress` type might be constructed and deconstructed:
 
-```
+```fsharp
 type EmailAddress = EmailAddress of string
 
 // using the constructor as a function
@@ -77,7 +77,7 @@ You can't do this as easily using record types.
 
 So, let's refactor the code again to use these union types.  It now looks like this:
 
-```
+```fsharp
 type PersonalName = 
     {
     FirstName: string;
@@ -125,7 +125,7 @@ Another nice thing about the union type is that the implementation can be encaps
 
 In the examples above we used the same name for the case as we did for the type:
 
-```
+```fsharp
 type EmailAddress = EmailAddress of string
 type ZipCode = ZipCode of string
 type StateCode = StateCode of string
@@ -135,7 +135,7 @@ This might seem confusing initially, but really they are in different scopes, so
 
 So if you see a function signature like this:
 
-```
+```fsharp
 val f: string -> EmailAddress
 ```
 
@@ -143,7 +143,7 @@ this refers to things in the world of types, so `EmailAddress` refers to the typ
 
 On the other hand, if you see some code like this:
 
-```
+```fsharp
 let x = EmailAddress y
 ```
 
@@ -157,7 +157,7 @@ This implies that we will need to do validation at some point, and what better p
 
 Here's how we might extend the above module with some constructor functions:
 
-```
+```fsharp
 
 ... types as above ...
 
@@ -176,7 +176,7 @@ let CreateStateCode (s:string) =
 
 We can test the constructors now:
 
-```
+```fsharp
 CreateStateCode "CA"
 CreateStateCode "XX"
 
@@ -198,7 +198,7 @@ Next, you could return an option type, with `None` meaning that the input wasn't
 This is generally the easiest approach. It has the advantage that the caller has to explicitly handle the case when the value is not valid. 
 
 For example, the caller's code for the example above might look like:
-```
+```fsharp
 match (CreateEmailAddress "a@example.com") with
 | Some email -> ... do something with email
 | None -> ... ignore?
@@ -210,7 +210,7 @@ If you do need more detail, you might want to return a type which contains a mor
 
 The following example uses a `CreationResult` type to indicate the error in the failure case.
 
-```
+```fsharp
 type EmailAddress = EmailAddress of string
 type CreationResult<'T> = Success of 'T | Error of string            
 
@@ -225,7 +225,7 @@ CreateEmailAddress2 "example.com"
 
 Finally, the most general approach uses continuations. That is, you pass in two functions, one for the success case (that takes the newly constructed email as parameter), and another for the failure case (that takes the error string as parameter).
 
-```
+```fsharp
 type EmailAddress = EmailAddress of string
 
 let CreateEmailAddressWithContinuations success failure (s:string) = 
@@ -238,7 +238,7 @@ The success function takes the email as a parameter and the error function takes
 
 Here is a simple example -- both functions do a printf, and return nothing (i.e. unit).
 
-```
+```fsharp
 let success (EmailAddress s) = printfn "success creating email %s" s        
 let failure  msg = printfn "error creating email: %s" msg
 CreateEmailAddressWithContinuations success failure "example.com"
@@ -247,7 +247,7 @@ CreateEmailAddressWithContinuations success failure "x@example.com"
 
 With continuations, you can easily reproduce any of the other approaches. Here's the way to create options, for example. In this case both functions return an `EmailAddress option`.
 
-```
+```fsharp
 let success e = Some e
 let failure _  = None
 CreateEmailAddressWithContinuations success failure "example.com"
@@ -256,7 +256,7 @@ CreateEmailAddressWithContinuations success failure "x@example.com"
 
 And here is the way to throw exceptions in the error case:
 
-```
+```fsharp
 let success e = e
 let failure _  = failwith "bad email address"
 CreateEmailAddressWithContinuations success failure "example.com"
@@ -265,7 +265,7 @@ CreateEmailAddressWithContinuations success failure "x@example.com"
 
 This code seems quite cumbersome, but in practice you would probably create a local partially applied function that you use instead of the long-winded one.
 
-```
+```fsharp
 // setup a partially applied function
 let success e = Some e
 let failure _  = None
@@ -282,7 +282,7 @@ These simple wrapper types are starting to get more complicated now that we are 
 
 So it is probably a good idea to create a module for each wrapper type, and put the type and its associated functions there.
 
-```
+```fsharp
 module EmailAddress = 
 
     type T = EmailAddress of string
@@ -299,7 +299,7 @@ module EmailAddress =
 
 The users of the type would then use the module functions to create and unwrap the type. For example:
 
-```
+```fsharp
 
 // create email addresses
 let address1 = EmailAddress.create "x@example.com"
@@ -320,7 +320,7 @@ a "private" type, and provide "wrap" and "unwrap" functions so that the clients 
 
 Here's an example:
 
-```
+```fsharp
 
 module EmailAddress = 
 
@@ -343,7 +343,7 @@ If you really want to encapsulate the internals of the type and force callers to
 
 Here's a signature file for the email address example:
 
-```
+```fsharp
 // FILE: EmailAddress.fsi
 
 module EmailAddress  
@@ -362,7 +362,7 @@ val value : T -> string
 
 Here's the implementation file:
 
-```
+```fsharp
 // FILE: EmailAddress.fs
 
 module EmailAddress  
@@ -383,7 +383,7 @@ let value (EmailAddress e) = e
 
 And here's a client:
 
-```
+```fsharp
 // FILE: EmailAddressClient.fs
 
 module EmailAddressClient
@@ -417,7 +417,7 @@ As part of the construction, it is critical that the caller uses the provided co
 
 For example, here is some code that shows the UI doing its own validation:
 
-```
+```fsharp
 let processFormSubmit () = 
     let s = uiTextBox.Text
     if (s.Length < 50) 
@@ -427,7 +427,7 @@ let processFormSubmit () =
 
 A better way is to let the constructor do it, as shown earlier.
 
-```
+```fsharp
 let processFormSubmit () = 
     let emailOpt = uiTextBox.Text |> EmailAddress.create 
     match emailOpt with
@@ -443,19 +443,19 @@ One tip to avoid explicit unwrapping is to use the continuation approach again, 
 
 That is, rather than calling the "unwrap" function explicitly:
 
-```
+```fsharp
 address |> EmailAddress.value |> printfn "the value is %s" 
 ```
 
 You would pass in a function which gets applied to the inner value, like this:
 
-```
+```fsharp
 address |> EmailAddress.apply (printfn "the value is %s")
 ```
 
 Putting this together, we now have the complete `EmailAddress` module.
 
-```
+```fsharp
 module EmailAddress = 
 
     type _T = EmailAddress of string
@@ -486,7 +486,7 @@ The `create` and `value` functions are not strictly necessary, but are added for
 
 Let's refactor the `Contact` code now, with the new wrapper types and modules added.
 
-```
+```fsharp
 module EmailAddress = 
 
     type T = EmailAddress of string

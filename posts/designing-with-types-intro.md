@@ -20,7 +20,7 @@ Many of the suggestions are also feasable in C# or Java, but the lightweight nat
 
 For demonstration of the various uses of types, I'll work with a very straightforward example, namely a `Contact` type, such as the one below. 
 
-```
+```fsharp
 type Contact = 
     {
     FirstName: string;
@@ -62,7 +62,7 @@ For `PostalAddress`, it seems clear that the core "address" part is a useful com
 
 So it seems that we should create *two* types. One is a generic `PostalAddress` and the other is an address in the context of a contact, which we can call `PostalContactInfo`, say.
 
-```
+```fsharp
 type PostalAddress = 
     {
     Address1: string;
@@ -82,7 +82,7 @@ type PostalContactInfo =
  
 Finally, we can use the option type to signal that certain values, such as `MiddleInitial`, are indeed optional.
 
-```
+```fsharp
 type PersonalName = 
     {
     FirstName: string;
@@ -96,7 +96,7 @@ type PersonalName =
  
 With all these changes, we now have the following code:
 
-```
+```fsharp
 type PersonalName = 
     {
     FirstName: string;
